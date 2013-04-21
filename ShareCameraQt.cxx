@@ -368,11 +368,12 @@ void ShareCameraQt::flipMeshes() {
         if (scalars == NULL)
             continue;
         char *scalarName = this->polyList->at(index - 1)->GetPointData()->GetScalars()->GetName();
+        double *range = this->polyList->at(index - 1)->GetPointData()->GetScalars()->GetRange();
         vtkFloatArray *newScalars = vtkFloatArray::New();
         newScalars->SetName(scalarName);
         for (int j = 0; j < scalars->GetNumberOfTuples();j++) {
             float scalar = scalars->GetValue(j);
-            scalar = (this->phi) ? (scalar > PI) ? 3*PI - scalar: PI - scalar: (scalar > PI/2) ? 3*PI/2 - scalar: PI/2 - scalar;
+            scalar = (scalar > (range[0] + range[1])/2) ? 3.0/2*range[1] - scalar: range[1]/2 - scalar;
             newScalars->InsertNextValue(scalar);
         }
         this->polyList->at(index-1)->GetPointData()->SetScalars(newScalars);
