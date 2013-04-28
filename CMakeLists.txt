@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 2.8)
  
-PROJECT(ShareCameraQt)
+PROJECT(ShapePopulationViewer)
  
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
@@ -17,16 +17,16 @@ file(GLOB CXX_FILES *.cxx)
 
 QT4_WRAP_UI(UISrcs ${UI_FILES})
 QT4_WRAP_CPP(MOCSrcs ${QT_WRAP})
-add_executable(ShareCameraQt MACOSX_BUNDLE ${CXX_FILES} ${UISrcs} ${MOCSrcs})
+add_executable(ShapePopulationViewer MACOSX_BUNDLE ${CXX_FILES} ${UISrcs} ${MOCSrcs})
  
 if(VTK_LIBRARIES)
   if(${VTK_VERSION} VERSION_LESS "6")
-    target_link_libraries(ShareCameraQt ${VTK_LIBRARIES} QVTK)
+    target_link_libraries(ShapePopulationViewer ${VTK_LIBRARIES} QVTK)
   else()
-    target_link_libraries(ShareCameraQt ${VTK_LIBRARIES})
+    target_link_libraries(ShapePopulationViewer ${VTK_LIBRARIES})
   endif()
 else()
-  target_link_libraries(ShareCameraQt vtkHybrid QVTK vtkViews ${QT_LIBRARIES})
+  target_link_libraries(ShapePopulationViewer vtkHybrid QVTK vtkViews ${QT_LIBRARIES})
 endif()
 
 ENABLE_TESTING()

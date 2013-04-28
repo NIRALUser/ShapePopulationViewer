@@ -13,9 +13,9 @@ moc_ShareCameraQt.cxx
 moc_ui_ShareCameraQt.cxx
 moc_ViewportWidget.cxx
 ShareCameraQt
-ShareCameraQt.cxx
-ShareCameraQt.h
-ShareCameraQt.ui
-ShareCameraQtDriver.cxx
-ui_ShareCameraQt.h
+ShapePopulationViewer.cxx
+ShapePopulationViewer.h
+ShapePopulationViewer.ui
+ShapePopulationViewerDriver.cxx
+ui_ShapePopulationViewer.h
 ViewportWidget.h
