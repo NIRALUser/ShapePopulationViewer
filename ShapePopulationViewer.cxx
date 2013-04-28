@@ -267,6 +267,8 @@ void ShapePopulationViewer::updateWidgets() {
         }
 
     }
+    if (meshes == 0)
+        return;
     int root = 0;
     for ( ;root*root < this->widgetList->size();root++);
     bool square = root*root == this->widgetList->size();
