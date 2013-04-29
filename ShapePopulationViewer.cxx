@@ -1,46 +1,29 @@
 #include "ShapePopulationViewer.h"
-#include <vtkDataObjectToTable.h>
-#include <vtkElevationFilter.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkQtTableView.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
-#include <vtkSphereSource.h>
-#include <vtkCubeSource.h>
 #include "vtkSmartPointer.h"
 #include <vtkCamera.h>
 #include <vtkPolyDataReader.h>
 #include <QFileDialog>
-#include <QVectorIterator>
 #include <QString>
 #include <QStringList>
 #include <QDir>
 #include <QFileInfoList>
-#include <QFileInfoListIterator>
 #include <QFileInfo>
 #include "vtkColorTransferFunction.h"
-#include "vtkPiecewiseFunction.h"
 #include "vtkLookupTable.h"
 #include "vtkPolyData.h"
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
-#include "vtkVolume.h"
-#include "vtkVolumeProperty.h"
-#include "vtkVolumeMapper.h"
-#include "vtkVolumeRayCastMapper.h"
-#include "vtkVolumeRayCastCompositeFunction.h"
-#include "vtkProperty.h"
-#include <QDebug>
 #include "vtkFloatArray.h"
 #include "vtkScalarBarActor.h"
 #include <QCheckBox>
-#include <QMessageBox>
 #include "vtkPolyDataNormals.h"
 #include <QSize>
 #include <QResizeEvent>
 #include <QInputDialog>
-#include <QStringList>
 #include <QRegExp>
 #include "vtkPolyDataWriter.h"
 #include <QEvent>
@@ -50,6 +33,7 @@
 /**
  * Constructor for ShapePopulationViewer GUI, it will initialize model vectors, connect some callbacks and also draw the arrow icons.
  * @brief ShapePopulationViewer::ShapePopulationViewer
+ * @author Michael Guarino
  */
 ShapePopulationViewer::ShapePopulationViewer()
 {
@@ -93,6 +77,7 @@ ShapePopulationViewer::ShapePopulationViewer()
  * Handler to any modified event sent by a QVTKWidget in the viewport.  The handler calls render on all
  * the windows provided user is viewing in synchronized mode.
  * @brief ShapePopulationViewer::ModifiedHandler
+ * @author Michael Guarino
  */
 void ShapePopulationViewer::ModifiedHandler()
 {
@@ -103,7 +88,10 @@ void ShapePopulationViewer::ModifiedHandler()
         this->widgetList->value(i)->GetRenderWindow()->Render();
     }
 }
-
+/**
+ * Close function for the gui.
+ * @brief ShapePopulationViewer::slotExit
+ */
 void ShapePopulationViewer::slotExit()
 {
   qApp->exit();
@@ -125,6 +113,12 @@ void ShapePopulationViewer::slotExit()
 //    //this->lineEdit_3->insert(vtkDir.absolutePath());
 //    this->updateWidgets();
 //}
+/**
+ * Helper function which reads a directory filled with .vtk files and renders each polydata within in a
+ * separate QVTKWidget.  All model vectors are filled as well.
+ * @brief ShapePopulationViewer::updateWidgets
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::updateWidgets() {
     for (int i = 0; i < this->widgetList->size(); i++) {
         QGridLayout *layout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
@@ -172,11 +166,6 @@ void ShapePopulationViewer::updateWidgets() {
             }
         }
 
-      //  polydata->GetPointData()->SetActiveScalars(scalars);
-//        if (this->phi)
-//            polydata->GetPointData()->SetActiveScalars("Color_Map_Phi_original");
-//        else
-//            polydata->GetPointData()->SetActiveScalars("Color_Map_Theta_original");
         polydata->Update();
         vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
         #if VTK_MAJOR_VERSION <= 5
@@ -302,6 +291,11 @@ void ShapePopulationViewer::updateWidgets() {
         this->widgetList->value(i)->GetRenderWindow()->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationViewer::ModifiedHandler);
     }
 }
+/**
+ * Helper function which sets the working color map to the one saved in the cmap QString instance variable
+ * @brief ShapePopulationViewer::updateCMaps
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::updateCMaps() {
     for (int i = 0; i < this->polyList->size(); i++) {
         QByteArray arr = this->cmap.toLatin1();
@@ -337,16 +331,14 @@ void ShapePopulationViewer::updateCMaps() {
     }
 }
 
-//void ShapePopulationViewer::on_checkBox_toggled(bool checked)
-//{
-//    if (checked)
-//        this->checkBox_2->setCheckState(Qt::Unchecked);
-//    this->phi = 1;
-//    if (loaded) {
-//        this->updateCMaps();
-//        this->ModifiedHandler();
-//    }
-//}
+
+/**
+ * Overrides QMainWindow's resize event to also help resize the contents of the dockwidget's scrollarea.
+ * There is no other easy way to do this with the Qt tools as they are currently.
+ * @brief ShapePopulationViewer::resizeEvent
+ * @param event - variable containing the event data for a resize (needed for a super call)
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
     QSize dockSize = this->dockWidget->size();
@@ -356,16 +348,12 @@ void ShapePopulationViewer::resizeEvent(QResizeEvent *event) {
     this->scrollAreaWidgetContents->resize(dockSize.width()-20,dockSize.height());
 }
 
-//void ShapePopulationViewer::on_checkBox_2_toggled(bool checked)
-//{
-//    if (checked)
-//        this->checkBox->setCheckState(Qt::Unchecked);
-//    this->phi = 0;
-//    if (loaded) {
-//        this->updateCMaps();
-//        this->ModifiedHandler();
-//    }
-//}
+/**
+ * Callback for the flip meshes menu item, this function remaps the scalars in the specified meshes to simulate a polar shift in the
+ * parameterization.  No remapping of the pointdata individuals is performed, though.
+ * @brief ShapePopulationViewer::flipMeshes
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::flipMeshes() {
     QString response = QInputDialog::getText(this,"Flip some meshes","Enter the mesh numbers you want to flip in CSV format");
     QStringList tokens = response.split(",",QString::SkipEmptyParts);
@@ -392,6 +380,12 @@ void ShapePopulationViewer::flipMeshes() {
     }
     this->ModifiedHandler();
 }
+/**
+ * Callback to the Write Meshes menu item, this will write every current polydata back to their original files. The choice of saving each file individually with
+ * a user specified file name was eliminated as it is entirely possible that very large numbers of meshes are going to be visualized, make that procedure tedious.
+ * @brief ShapePopulationViewer::writeMeshes
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::writeMeshes() {
     QFileInfoList list = this->directory.entryInfoList();
     int meshes = 0;
@@ -408,6 +402,12 @@ void ShapePopulationViewer::writeMeshes() {
 
     }
 }
+/**
+ * Callback to Open .vtk Files menu item, this simply clears all current widgets, pulls open a filedialog to let the user
+ * select a directory and then calls the updateWidgets() helper function
+ * @brief ShapePopulationViewer::openVTKS
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::openVTKS() {
     loaded = 1;
     for (int i = 0; i < this->widgetList->size(); i++) {
@@ -422,26 +422,39 @@ void ShapePopulationViewer::openVTKS() {
     this->updateWidgets();
 }
 
+/**
+ * Callback for the View All Meshes checkbox.
+ * @brief ShapePopulationViewer::on_checkBox_9_toggled
+ * @param checked
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::on_checkBox_9_toggled(bool checked)
 {
     if (checked) {
-        this->checkBox_10->setCheckState(Qt::Unchecked);
-        this->scrollAreaSize = this->scrollAreaWidgetContents->size();
+        this->checkBox_10->setCheckState(Qt::Unchecked);//deselect the view in __ columns option.
+        this->scrollAreaSize = this->scrollAreaWidgetContents->size();//save current size to be used when checkbox is deselected.
         this->scrollArea->setWidgetResizable(true);
     }
     else {
         this->scrollArea->setWidgetResizable(false);
-        this->scrollAreaWidgetContents->resize(this->scrollAreaSize.width(),this->scrollAreaSize.height());
+        this->scrollAreaWidgetContents->resize(this->scrollAreaSize.width(),this->scrollAreaSize.height());//resize to the previous saved size
     }
 }
-
+/**
+ * Callback for the View in ___ columns checkbox.  This reads from the ___ columns line edit, and then re-arranges the QVTKWidgets
+ * according to the integer entry.  Returns if an integer is not entered (or if the same integer was reentered or if there are no widgets
+ * to rearrange).
+ * @brief ShapePopulationViewer::on_checkBox_10_toggled
+ * @param checked
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::on_checkBox_10_toggled(bool checked)
 {
     if (checked) {
         this->checkBox_9->setCheckState(Qt::Unchecked);
         QString cols = this->lineEdit->text();
         int colNum = cols.toInt();
-        if (cols == 0 || this->widgetList->size() == 0 || this->prevCols == colNum)
+        if (cols == 0 || this->widgetList->size() == 0 || this->prevCols == colNum)//0 is returned if integer conversion fails
             return;
         int rows = this->widgetList->size()/colNum;
         if (this->widgetList->size()%colNum != 0)
@@ -471,7 +484,12 @@ void ShapePopulationViewer::on_checkBox_10_toggled(bool checked)
         //do nothing I guess...
     }
 }
-
+/**
+ * Callback to the ___ columns line edit.  This checks if the view in ___ columns checkbox is selected, then it will simply call its callback
+ * with true passed as the check state. So a lineedit modification also activates column rearrangement.
+ * @brief ShapePopulationViewer::on_lineEdit_editingFinished
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::on_lineEdit_editingFinished()
 {
     if (this->checkBox_10->checkState() == Qt::Checked) {
@@ -479,37 +497,53 @@ void ShapePopulationViewer::on_lineEdit_editingFinished()
     }
 }
 
-
+/**
+ * Callback to the Desynchronize Meshes checkbox.  Sets the synced instance variable.
+ * @brief ShapePopulationViewer::on_checkBox_3_toggled
+ * @param checked
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::on_checkBox_3_toggled(bool checked)
 {
     synced = !checked;
 }
 
+/**
+ * Callback to the colormap dropdown menu.  This will pull the selected text from the menu, call the updateCMaps() helper, then call Render on all the
+ * QVTKWidgets to render the updates.
+ * @brief ShapePopulationViewer::on_comboBox_currentIndexChanged
+ * @param arg1
+ * @author Michael Guarino
+ */
 void ShapePopulationViewer::on_comboBox_currentIndexChanged(const QString &arg1)
 {
     QString text = this->comboBox->currentText();
     this->cmap = text;
     this->updateCMaps();
+    bool temp = this->synced;
+    this->synced = true;
     this->ModifiedHandler();
+    this->synced = temp;
 }
 
-void ShapePopulationViewer::on_toolButton_clicked()
-{
-    viewChange(0,0,1);
-
-}
-
-
+/**
+ * Helper function for viewing the meshes along a specified axis.  Parameters (1,0,0) will allow you to view the mesh from the end of the positive x-axis, for
+ * instance. Generally, <x,y,z> is a distance-normalized vector specifying the position you want to place the viewing camera (distance being the current distance from the
+ * camera to the mesh).
+ * @brief ShapePopulationViewer::viewChange
+ * @param x
+ * @param y
+ * @param z
+ * @author Joe Waggoner
+ */
 void ShapePopulationViewer::viewChange(int x, int y, int z){
     if(loaded==0){
         return;
     }
     vtkRendererCollection* collection = this->widgetList->value(0)->GetRenderWindow()->GetRenderers();
     vtkRenderer* firstRenderer = collection->GetFirstRenderer();
-    this->coords  = firstRenderer->GetActiveCamera()->GetFocalPoint();
-    this->distance = firstRenderer->GetActiveCamera()->GetDistance();
-    double* positions =  firstRenderer->GetActiveCamera()->GetPosition();
-    double roll = firstRenderer->GetActiveCamera()->GetRoll();
+    double *coords  = firstRenderer->GetActiveCamera()->GetFocalPoint();
+    double distance = firstRenderer->GetActiveCamera()->GetDistance();
     firstRenderer->GetActiveCamera()->SetPosition(coords[0]+x*distance,coords[1]+y*distance,coords[2]+z*distance);
     //setroll to .001, because it breaks on y axis if roll = 0
     firstRenderer->GetActiveCamera()->SetRoll(.001);
@@ -518,28 +552,57 @@ void ShapePopulationViewer::viewChange(int x, int y, int z){
     this->ModifiedHandler();
     this->synced = temp;
 }
+/**
+ * Callback to the +Z axis view button. See viewChange() for implemntation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
+void ShapePopulationViewer::on_toolButton_clicked()
+{
+    viewChange(0,0,1);
 
-
+}
+/**
+ * Callback to the -Z axis view button. See viewChange() for implemntation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
 void ShapePopulationViewer::on_toolButton_2_clicked()
 {
     viewChange(0,0,-1);
 }
-
+/**
+ * Callback to the +X axis view button. See viewChange() for implemntation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
 void ShapePopulationViewer::on_toolButton_3_clicked()
 {
     viewChange(1,0,0);
 }
-
+/**
+ * Callback to the -X axis view button. See viewChange() for implemntation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
 void ShapePopulationViewer::on_toolButton_4_clicked()
 {
     viewChange(-1,0,0);
 }
-
+/**
+ * Callback to the +Y axis view button. See viewChange() for implemntation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
 void ShapePopulationViewer::on_toolButton_5_clicked()
 {
     viewChange(0,1,0);
 }
-
+/**
+ * Callback to the -Y axis view button. See viewChange() for implemntation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
 void ShapePopulationViewer::on_toolButton_6_clicked()
 {
     viewChange(0,-1,0);
