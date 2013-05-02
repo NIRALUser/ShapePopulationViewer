@@ -1,5 +1,0 @@
-Testing/filePathTest 0 0
-Testing/mapperTest 3 0.0211747
-Testing/qVectorTests 2 0.0374246
----
-Testing/filePathTest
