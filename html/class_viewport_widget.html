@@ -39,7 +39,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -73,7 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -87,6 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="class_viewport_widget-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ViewportWidget Class Reference</div>  </div>
@@ -96,16 +96,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>The <a class="el" href="class_viewport_widget.html" title="The ViewportWidget class.">ViewportWidget</a> class.  
  <a href="class_viewport_widget.html#details">More...</a></p>
 
-<p><code>#include &lt;ViewportWidget.h&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="_viewport_widget_8h_source.html">ViewportWidget.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for ViewportWidget:</div>
 <div class="dyncontent">
-<div class="center"><img src="class_viewport_widget__inherit__graph.jpg" border="0" usemap="#_viewport_widget_inherit__map" alt="Inheritance graph"/></div>
+<div class="center"><img src="class_viewport_widget__inherit__graph.png" border="0" usemap="#_viewport_widget_inherit__map" alt="Inheritance graph"/></div>
+<map name="_viewport_widget_inherit__map" id="_viewport_widget_inherit__map">
+</map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for ViewportWidget:</div>
 <div class="dyncontent">
-<div class="center"><img src="class_viewport_widget__coll__graph.jpg" border="0" usemap="#_viewport_widget_coll__map" alt="Collaboration graph"/></div>
+<div class="center"><img src="class_viewport_widget__coll__graph.png" border="0" usemap="#_viewport_widget_coll__map" alt="Collaboration graph"/></div>
+<map name="_viewport_widget_coll__map" id="_viewport_widget_coll__map">
+</map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -122,10 +126,16 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a319e0b4792e88f86ce11da6ae415930c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_viewport_widget.html#a319e0b4792e88f86ce11da6ae415930c">resizeEvent</a> (QResizeEvent *event)</td></tr>
 <tr class="memdesc:a319e0b4792e88f86ce11da6ae415930c"><td class="mdescLeft">&#160;</td><td class="mdescRight">resizeEvent  <a href="#a319e0b4792e88f86ce11da6ae415930c">More...</a><br/></td></tr>
 <tr class="separator:a319e0b4792e88f86ce11da6ae415930c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a8c9d6a8a415b90ccf0eb617831d313a4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8c9d6a8a415b90ccf0eb617831d313a4"></a>
+QWidget *&#160;</td><td class="memItemRight" valign="bottom"><b>scrollAreaContents</b></td></tr>
+<tr class="separator:a8c9d6a8a415b90ccf0eb617831d313a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_viewport_widget.html" title="The ViewportWidget class.">ViewportWidget</a> class. </p>
-<p>Extension of the QDockWidget class to handle resizing of children of children of the widget effectively. Basically everything about QDockWidget remains unchanged except it's resizeEvent function is overridden. A constructor and instance variable is added to faciliate. </p>
+<p>Extension of the QDockWidget class to handle resizing of children of children of the widget effectively. Basically everything about QDockWidget remains unchanged except it's resizeEvent function is overridden. A constructor and instance variable is added to faciliate. The instance variable is a general QWidget. On any call to QDockWidget's resizeEvent, the QWidget will be resized in a regular manner. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a0012361ba2ffd4983794291422db7e7a"></a>
 <div class="memitem">
@@ -160,7 +170,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p><a class="el" href="class_viewport_widget.html" title="The ViewportWidget class.">ViewportWidget</a>. </p>
-<p>Additional constructor, calls superconstructor and initializes an instance variable (in our case the contents of the scroll area whose parent is the dock widget). </p>
+<p>Additional constructor, calls superconstructor and initializes an instance variable (in our case the contents of the scroll area whose parent is the dock widget), which will be the object the viewport also resizes on any resizeEvent. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">parent</td><td></td></tr>
@@ -195,7 +205,7 @@ Protected Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>resizeEvent </p>
-<p>Overriden resizeEvent handler. Basically, make the super call, then make a standardized resize to the instance variable. (In our case this is the contents of the scroll area whose parent is the dock widget). </p>
+<p>Overriden resizeEvent handler. Basically, make the super call, then make a standardized resize to the instance variable. (In our case this is the contents of the scroll area whose parent is the dock widget). The width will be 20 units less than that of the dock widget, and the height will be equal to that of the dock widget. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">event</td><td></td></tr>
@@ -230,19 +240,19 @@ Protected Member Functions</h2></td></tr>
 
 <p>size </p>
 <p>Clarity function returning the size of the dock widget. </p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>size of the dockWidget </dd></dl>
 
 <p>Referenced by <a class="el" href="class_viewport_widget.html#a319e0b4792e88f86ce11da6ae415930c">resizeEvent()</a>, and <a class="el" href="class_shape_population_viewer.html#ae4f86b69e03ff6fe171055ef3284c2ae">ShapePopulationViewer::resizeEvent()</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_viewport_widget_8h.html">ViewportWidget.h</a></li>
+<li><a class="el" href="_viewport_widget_8h_source.html">ViewportWidget.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Apr 29 2013 16:26:06 for Shape Population Viewer by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed May 1 2013 21:31:55 for Shape Population Viewer by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

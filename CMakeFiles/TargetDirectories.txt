@@ -1,1 +1,4 @@
 /Users/michaelguarino/ShapePopulationViewer/CMakeFiles/ShapePopulationViewer.dir
+/Users/michaelguarino/ShapePopulationViewer/CMakeFiles/Testing/filePathTest.dir
+/Users/michaelguarino/ShapePopulationViewer/CMakeFiles/Testing/mapperTest.dir
+/Users/michaelguarino/ShapePopulationViewer/CMakeFiles/Testing/qVectorTests.dir

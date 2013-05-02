@@ -404,6 +404,8 @@ QResizeEvent
 ShapePopulationViewer.h
 /Users/michaelguarino/ShapePopulationViewer/ShapePopulationViewer.h
 
+/Users/michaelguarino/ShapePopulationViewer/moc_ViewportWidget.cxx
+
 /Users/michaelguarino/ShapePopulationViewer/ui_ShapePopulationViewer.h
 QtCore/QVariant
 -
