@@ -1,18 +1,26 @@
 #ifndef SHAPEPOPULATIONVIEWER_H
 #define SHAPEPOPULATIONVIEWER_H
 
-#include <QMainWindow>
+// local
 #include "ui_ShapePopulationViewer.h"
+
+// QT
 #include <QDir>
 #include <QVector>
-#include "QVTKWidget.h"
-#include "vtkPolyData.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkScalarBarActor.h"
+#include <QMainWindow>
+#include <QVTKWidget.h>
 #include <QResizeEvent>
 #include <QEvent>
 #include <QSize>
 #include <QString>
+
+// VTK
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkScalarBarActor.h>
+#include <vtkColorTransferFunction.h>
+#include <vtkCamera.h>
+
 
 /**
  * ShapePopulationViewer Gui class specification.  This class contains all model data and controller callbacks, if we are going to consider the code within the MVC paradigm.  See
@@ -37,22 +45,18 @@ public slots:
   virtual void slotExit();
 
 protected:
-   void ModifiedHandler();
-   void resizeEvent(QResizeEvent* event);
-   /**
-    * Bit which represents if the meshes will propogate events upon a modification
-    * @brief synced
-    */
-   bool synced;
+
    /**
     * The user selected working directory
     * @brief directory
     */
    QDir directory;
    /**
-    * Vector of QVTKWidgets maintained to generate render callbacks, and for removal from the scrollarea
-    * For the removal to be visualized, one must remove them from memory entirely
-    * @brief widgetList
+    * @brief camera
+    */
+   vtkCamera * headcam;
+   /**
+    * @brief camera
     */
    QVector<QVTKWidget *> *widgetList;
    /**
@@ -66,7 +70,6 @@ protected:
     */
    QVector<vtkPolyDataMapper *> *mapperList;
    /**
-    *
     * @brief colorMaps
     */
    QSize scrollAreaSize;
@@ -76,29 +79,53 @@ protected:
     */
    QString cmap;
 
-   //these are all trivial maintenance data
-   int prevCols;
-   int prevRows;
-   int phi;
    int loaded;
+
+   //Display functionsn
    void updateWidgets();
-   void updateCMaps();
+   void ModifiedHandler();
+   void SelectedWidget(vtkObject* object, unsigned long ulong, void* voidi);
+
+   void updateCMaps(vtkPolyDataMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT);
+
+   void resizeEvent(QResizeEvent* event);
+
+   void printColNumber(int colNumber);
+   int getNumberOfColumns();
+   int getNumberOfRows(int colNumber);
+   void placeWidgetInArea(int colNumber);
+   void resizeWidgetInArea();
+
 protected slots:
-   void on_checkBox_9_toggled(bool checked);
    void flipMeshes();
    void writeMeshes();
    void openVTKS();
-   void on_checkBox_10_toggled(bool checked);
-   void on_lineEdit_editingFinished();
-   void on_checkBox_3_toggled(bool checked);
-   void on_comboBox_currentIndexChanged(const QString &arg1);
-   void on_toolButton_clicked();
+
+   //View Options
+   void on_radioButton_4_toggled();  //all
+   void on_radioButton_5_toggled(); //square
+   void on_colNumberEdit_editingFinished();
+   void on_colNumberSlider_valueChanged();
+   void on_colNumberSlider_sliderReleased();
+
+   //Synchro Options
+   void on_radioButton_1_toggled();
+   void on_radioButton_2_toggled();
+   void on_radioButton_3_toggled();
+
+   //
+   void on_colorMapBox_currentIndexChanged(const QString &arg1);
+
+   //Axis change
+   void on_toolButton_0_clicked();
+   void on_toolButton_1_clicked();
    void on_toolButton_2_clicked();
    void on_toolButton_3_clicked();
    void on_toolButton_4_clicked();
    void on_toolButton_5_clicked();
    void on_toolButton_6_clicked();
    void viewChange(int x, int y, int z);
+
 };
 
 #endif

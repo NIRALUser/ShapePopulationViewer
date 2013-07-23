@@ -29,18 +29,21 @@ else()
   target_link_libraries(ShapePopulationViewer vtkHybrid QVTK vtkViews ${QT_LIBRARIES})
 endif()
 
-ENABLE_TESTING()
-add_executable(Testing/filePathTest Testing/filePathTest.cxx)
-target_link_libraries(Testing/filePathTest ${QT_LIBRARIES} ${VTK_LIBRARIES} QVTK vtkViews vtkHybrid)
-add_test(Testing/filePathTest  ${CMAKE_CURRENT_BINARY_DIR}/Testing/filePathTest)
+
+#######################################################################################################
+
+#ENABLE_TESTING()
+#add_executable(Testing/filePathTest Testing/filePathTest.cxx)
+#target_link_libraries(Testing/filePathTest ${QT_LIBRARIES} ${VTK_LIBRARIES} QVTK vtkViews vtkHybrid)
+#add_test(Testing/filePathTest  ${CMAKE_CURRENT_BINARY_DIR}/Testing/filePathTest)
 
 
-add_executable(Testing/mapperTest Testing/mapper.cxx)
-target_link_libraries(Testing/mapperTest ${QT_LIBRARIES} ${VTK_LIBRARIES} QVTK vtkViews vtkHybrid)
-add_test(Testing/mapperTest  ${CMAKE_CURRENT_BINARY_DIR}/Testing/mapperTest)
+#add_executable(Testing/mapperTest Testing/mapper.cxx)
+#target_link_libraries(Testing/mapperTest ${QT_LIBRARIES} ${VTK_LIBRARIES} QVTK vtkViews vtkHybrid)
+#add_test(Testing/mapperTest  ${CMAKE_CURRENT_BINARY_DIR}/Testing/mapperTest)
 
 
-add_executable(Testing/qVectorTests Testing/qVectorTests.cxx)
-target_link_libraries(Testing/qVectorTests ${QT_LIBRARIES} ${VTK_LIBRARIES} QVTK vtkViews vtkHybrid)
-add_test(Testing/qVectorTests  ${CMAKE_CURRENT_BINARY_DIR}/Testing/qVectorTests)
+#add_executable(Testing/qVectorTests Testing/qVectorTests.cxx)
+#target_link_libraries(Testing/qVectorTests ${QT_LIBRARIES} ${VTK_LIBRARIES} QVTK vtkViews vtkHybrid)
+#add_test(Testing/qVectorTests  ${CMAKE_CURRENT_BINARY_DIR}/Testing/qVectorTests)
 
