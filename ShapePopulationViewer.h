@@ -52,39 +52,33 @@ protected:
     */
    QDir directory;
    /**
+    * vtkcamera shared by the renderWindows when the surfaces are synchronized
     * @brief camera
     */
-   vtkCamera * headcam;
+   vtkCamera *headcam;
    /**
-    * @brief camera
+    * vector of QVTKWidget
+    * @brief widgetList
     */
    QVector<QVTKWidget *> *widgetList;
    /**
-    * Vector of vtkPolyData, which is maintained for the purpose of writing back the polydata to secondary storage primarily
-    * @brief polyList
+    * Vector of vtkRenderWindows selected
+    * @brief selectedWidgetList
     */
-   QVector<vtkPolyData *> *polyList;
+   QVector<vtkRenderWindow *> *windowList;
    /**
-    * Vector of vtkPolyDataMapper's, maintained to make colormap updates easier.
+    * Vector of vtkPolyDataMapper's, maintained to make colormap updates easier and access the polydata (getInput)
     * @brief mapperList
     */
    QVector<vtkPolyDataMapper *> *mapperList;
-   /**
-    * @brief colorMaps
-    */
-   QSize scrollAreaSize;
-   /**
-    * Name of the working colormap
-    * @brief cmap
-    */
-   QString cmap;
+
 
    int loaded;
 
    //Display functionsn
    void updateWidgets();
    void ModifiedHandler();
-   void SelectedWidget(vtkObject* object, unsigned long ulong, void* voidi);
+   void SelectedWidget(vtkObject* selectedObject, unsigned long ulong, void*);
 
    void updateCMaps(vtkPolyDataMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT);
 
@@ -111,10 +105,10 @@ protected slots:
    //Synchro Options
    void on_radioButton_1_toggled();
    void on_radioButton_2_toggled();
-   void on_radioButton_3_toggled();
+   void on_checkBox_synchro_toggled(bool checked);
 
    //
-   void on_colorMapBox_currentIndexChanged(const QString &arg1);
+   void on_colorMapBox_currentIndexChanged();
 
    //Axis change
    void on_toolButton_0_clicked();

@@ -316,10 +316,23 @@
           <x>0</x>
           <y>30</y>
           <width>111</width>
-          <height>80</height>
+          <height>108</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QCheckBox" name="checkBox_synchro">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Select All</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QRadioButton" name="radioButton_1">
            <property name="enabled">
@@ -345,19 +358,6 @@
             <string>Delayed</string>
            </property>
            <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="radioButton_3">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>None</string>
-           </property>
-           <property name="checkable">
             <bool>true</bool>
            </property>
           </widget>
