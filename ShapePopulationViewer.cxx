@@ -53,7 +53,10 @@
 
 #include <vtkEventQtSlotConnect.h>
 #include <vtkInteractorStyleTrackballActor.h>
-// PUBLIC FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                       PUBLIC FUNCTIONS                                        * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 /**
  * Constructor for ShapePopulationViewer GUI, it will initialize model vectors, connect some callbacks and also draw the arrow icons.
@@ -88,7 +91,6 @@ ShapePopulationViewer::ShapePopulationViewer()
 
     // Set up action signals and slots
     connect(this->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
-    connect(this->actionFlip_Meshes,SIGNAL(triggered()),this,SLOT(flipMeshes()));
     connect(this->actionWrite_Back_Meshes,SIGNAL(triggered()),this,SLOT(writeMeshes()));
     connect(this->actionOpen_vtk_Files,SIGNAL(triggered()),this,SLOT(openVTKS()));
 }
@@ -105,8 +107,56 @@ void ShapePopulationViewer::slotExit()
 }
 
 
-// DISPLAY FUNCTIONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                        MENU FUNCTIONS                                         * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+/**
+ * Callback to the Write Meshes menu item, this will write every current polydata back to their original files. The choice of saving each file individually with
+ * a user specified file name was eliminated as it is entirely possible that very large numbers of meshes are going to be visualized, making that procedure tedious.
+ * @brief ShapePopulationViewer::writeMeshes
+ * @author Michael Guarino
+ */
+void ShapePopulationViewer::writeMeshes()
+{
+    if(loaded==0) return;
+
+    QFileInfoList list = this->directory.entryInfoList();
+    int meshes = 0;
+    for (int i = 0; i < list.size(); i++)
+    {
+        QString path = list.at(i).absoluteFilePath();
+        if (!path.endsWith(".vtk"))
+            continue;
+        QByteArray arr = path.toLatin1();
+        const char *filePath = arr.data();
+        vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
+        writer->SetFileName(filePath);
+        writer->SetInput(this->mapperList->at(meshes++)->GetInput());
+        writer->Update();
+    }
+}
+
+
+/**
+ * Callback to Open .vtk Files menu item, this simply open a filedialog to let the user
+ * select a directory and then calls the updateWidgets() helper function.
+ * @brief ShapePopulationViewer::openVTKS
+ * @author Michael Guarino & Alexis Girault
+ */
+void ShapePopulationViewer::openVTKS()
+{
+    QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),"~",QFileDialog::ShowDirsOnly);
+    QDir vtkDir(dir);
+    this->directory = vtkDir;
+    this->updateWidgets();
+}
+
+
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                       DISPLAY FUNCTIONS                                       * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 /**
  * Helper function which reads a directory filled with .vtk files and renders each polydata within in a
  * separate QVTKWidget.  All model vectors are filled as well.
@@ -275,7 +325,6 @@ void ShapePopulationViewer::updateWidgets()
 
     // Enable buttons and give the maximum to the slider
     loaded = 1;
-    actionFlip_Meshes->setDisabled(false);
     actionWrite_Back_Meshes->setDisabled(true); // todo
     axisButton->setDisabled(false);
     radioButton_1->setDisabled(false);
@@ -289,6 +338,7 @@ void ShapePopulationViewer::updateWidgets()
     colNumberEdit->setDisabled(false);
     colNumberSlider->setDisabled(false);
     colNumberSlider->setMaximum(meshesNumber);
+    pushButton_flip->setDisabled(false);
     colorMapBox->setDisabled(false);
 
     //Identify the best number of columns for first display
@@ -315,14 +365,12 @@ void ShapePopulationViewer::updateWidgets()
 }
 
 
-
-
 /**
  * Permits to get the ID of the widget selected.
  * @brief ShapePopulationViewer::SelectedWidget
  * @author Alexis Girault
  */
-void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned long ulong, void* )
+void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned long, void* )
 {
     if(checkBox_synchro->isChecked()) return; // Dont' do anything if the synchro is on "All"
 
@@ -378,55 +426,9 @@ void ShapePopulationViewer::ModifiedHandler()
 }
 
 
-/**
- * Helper function which sets the working color map to the one saved in the cmap QString instance variable.  Generally speaking, this
- * function will pull the specified colormap name, create a new color transfer function and add it to its mapper.
- * @brief ShapePopulationViewer::updateCMaps
- * @author Michael Guarino & Alexis Girault
- */
-void ShapePopulationViewer::updateCMaps(vtkPolyDataMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT)
-{
-    DistanceMapTFunc->AdjustRange(rangeLUT);
-    DistanceMapTFunc->SetColorSpaceToDiverging();                                           //this is necessary for the color transfer function to automatically interpolate between the points we set
-    DistanceMapTFunc->RemoveAllPoints();
-    DistanceMapTFunc->AddRGBPoint(rangeLUT[0], 0, 255, 0);                                  // we add a point in the LUT to enforce the min value to be green = 0,255,0
-    DistanceMapTFunc->AddRGBPoint( (fabs(rangeLUT[1] - rangeLUT[0]) ) /2, 255, 255, 0);     // we add another point in the middle of the range to be yellow = 255,255,0
-    DistanceMapTFunc->AddRGBPoint(rangeLUT[1], 255, 0, 0);                                  // we add a last point in the LUT to enforce the max value to be red = 255,0,0
-    DistanceMapTFunc->ClampingOn();//out of range values go to either max or min
-
-    mapper->SetLookupTable( DistanceMapTFunc );
-    //mapper->SetScalarRange(rangeLUT[0],rangeLUT[1]);
-    mapper->ScalarVisibilityOn();
-    //mapper->SetScalarModeToUsePointData();  //we want to use point scalars (could have been cell)
-    //mapper->SetColorModeToMapScalars();
-    mapper->Update();
-}
-
-
-/**
- * Overrides QMainWindow's resize event to also help resize the contents of the dockwidget's scrollarea.
- * There is no other easy way to do this with the Qt tools as they are currently.
- * @brief ShapePopulationViewer::resizeEvent
- * @param event - variable containing the event data for a resize (needed for a super call)
- * @author Michael Guarino & Alexis Girault
- */
-void ShapePopulationViewer::resizeEvent(QResizeEvent *event)
-{
-    //Resizing Windows
-    QMainWindow::resizeEvent(event);
-    QSize dockSize = this->dockWidget->size();
-
-    //According to the View Options
-    if (this->radioButton_5->isChecked() == true )//view square meshes
-    {
-        resizeWidgetInArea();
-    }
-
-}
-
-
-// PLACING FUNCTIONS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                       PLACING FUNCTIONS                                       * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 /**
  *
  * @brief ShapePopulationViewer::printColNumber
@@ -536,104 +538,30 @@ void ShapePopulationViewer::resizeWidgetInArea()
 }
 
 
-// TOOLBAR FONCTIONS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
- * Callback for the flip meshes menu item, this function remaps the scalars in the specified meshes to simulate a polar shift in the
- * parameterization.  No remapping of the pointdata individuals is performed, though.
- * @brief ShapePopulationViewer::flipMeshes
+ * Overrides QMainWindow's resize event to also help resize the contents of the dockwidget's scrollarea.
+ * There is no other easy way to do this with the Qt tools as they are currently.
+ * @brief ShapePopulationViewer::resizeEvent
+ * @param event - variable containing the event data for a resize (needed for a super call)
  * @author Michael Guarino & Alexis Girault
  */
-void ShapePopulationViewer::flipMeshes()
+void ShapePopulationViewer::resizeEvent(QResizeEvent *event)
 {
-    if(loaded==0) return;
+    //Resizing Windows
+    QMainWindow::resizeEvent(event);
+    QSize dockSize = this->dockWidget->size();
 
-    //Get the numbers in a list, separated by ","
-    QString QS_response = QInputDialog::getText(this,"Flip meshes","Enter the mesh numbers separated by comma");
-    QStringList QS_meshIndexes = QS_response.split(",",QString::SkipEmptyParts);
-
-    for (int i = 0; i < QS_meshIndexes.size(); i++)
+    //According to the View Options
+    if (this->radioButton_5->isChecked() == true )//view square meshes
     {
-        QString QS_meshIndex = QS_meshIndexes.at(i);
-        int meshIndex = QS_meshIndex.toInt();
-
-        // if number of mesh incorrect
-        if (meshIndex < 1 || meshIndex > this->mapperList->size())
-        {
-            continue;
-        }
-
-        // if no datas
-        vtkFloatArray *scalars = vtkFloatArray::SafeDownCast(this->mapperList->at(meshIndex-1)->GetInput()->GetPointData()->GetScalars());
-        if (scalars == NULL)
-        {
-            continue;
-        }
-
-        // creating the new scalar
-        vtkFloatArray *newScalars = vtkFloatArray::New();
-        char *scalarName = this->mapperList->at(meshIndex-1)->GetInput()->GetPointData()->GetScalars()->GetName();
-        newScalars->SetName(scalarName);
-        double *range = this->mapperList->at(meshIndex-1)->GetInput()->GetPointData()->GetScalars()->GetRange();
-        for (int j = 0; j < scalars->GetNumberOfTuples();j++)
-        {
-            float scalar = scalars->GetValue(j);
-            scalar = (scalar > (range[0] + range[1])/2) ? 3.0/2*range[1] - scalar: range[1]/2 - scalar;//map mid-range values to extremes, and extremes to mid-ranges
-            newScalars->InsertNextValue(scalar);
-        }
-
-        // updating the scalars
-        this->mapperList->at(meshIndex-1)->GetInput()->GetPointData()->SetScalars(newScalars);
-
-        // rendering the mesh
-        this->widgetList->value(meshIndex-1)->GetRenderWindow()->Render();
+        resizeWidgetInArea();
     }
 }
 
 
-/**
- * Callback to the Write Meshes menu item, this will write every current polydata back to their original files. The choice of saving each file individually with
- * a user specified file name was eliminated as it is entirely possible that very large numbers of meshes are going to be visualized, making that procedure tedious.
- * @brief ShapePopulationViewer::writeMeshes
- * @author Michael Guarino
- */
-void ShapePopulationViewer::writeMeshes()
-{
-    if(loaded==0) return;
-
-    QFileInfoList list = this->directory.entryInfoList();
-    int meshes = 0;
-    for (int i = 0; i < list.size(); i++)
-    {
-        QString path = list.at(i).absoluteFilePath();
-        if (!path.endsWith(".vtk"))
-            continue;
-        QByteArray arr = path.toLatin1();
-        const char *filePath = arr.data();
-        vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-        writer->SetFileName(filePath);
-        writer->SetInput(this->mapperList->at(meshes++)->GetInput());
-        writer->Update();
-    }
-}
-
-
-/**
- * Callback to Open .vtk Files menu item, this simply open a filedialog to let the user
- * select a directory and then calls the updateWidgets() helper function.
- * @brief ShapePopulationViewer::openVTKS
- * @author Michael Guarino & Alexis Girault
- */
-void ShapePopulationViewer::openVTKS()
-{
-    QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),"~",QFileDialog::ShowDirsOnly);
-    QDir vtkDir(dir);
-    this->directory = vtkDir;
-    this->updateWidgets();
-}
-
-
-// VIEW OPTIONS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                         VIEW OPTIONS                                          * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 /**
  * Callback for the View All Meshes checkbox.
@@ -707,7 +635,9 @@ void ShapePopulationViewer::on_colNumberSlider_sliderReleased()
 }
 
 
-// SYNCHRONISATION ////////////////////////////////////////////////////////////////
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                        SYNCHRONISATION                                        * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 /**
  * Callback to the REal-time Synchro Meshes radioButton.
@@ -743,7 +673,7 @@ void ShapePopulationViewer::on_radioButton_2_toggled()
 }
 
 /**
- * Callback to the select all meshes checkbox.
+ * Callback to the "select all meshes" checkbox.
  * Attach or detach widgets to the main camera.
  * @brief ShapePopulationViewer::on_checkBox_synchro_toggled
  * @param checked
@@ -760,13 +690,13 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
 
     for (int i = 0; i < this->widgetList->size(); i++)
     {
-        if(checked)
+        if(checked) // All synchro
         {
             this->windowList->append(this->widgetList->value(i)->GetRenderWindow());//select all renderwindows
             this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(headcam);//connect to headcam for synchro
-
+            on_colorMapBox_currentIndexChanged(); //update the same colormap for all
         }
-        else
+        else // No synchro
         {
             //Create an independant camera, copy of headcam
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
@@ -775,19 +705,20 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
         }
     }
 
-    //Render everything
-    ModifiedHandler();
 }
 
 
-// TEST 2 ////////////////////////////////////////////////////////////////
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                           COLORMAP                                            * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
 
 /**
  * Callback to the colormap dropdown menu.  This will pull the selected text from the menu, call the updateCMaps() helper, then call Render on all the
  * QVTKWidgets to render the updates.
  * @brief ShapePopulationViewer::on_colorMapBox_currentIndexChanged
  * @param arg1
- * @author Michael Guarino
+ * @author Michael Guarino & Alexis Girault
  */
 void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
 {
@@ -795,21 +726,86 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
     QByteArray arr = text.toLatin1();
     const char *cmap  = arr.data();
 
-    for (int i = 0; i < this->mapperList->size(); i++)
+    for (int i = 0; i < this->windowList->size(); i++)
     {
-        this->mapperList->at(i)->GetInput()->GetPointData()->SetActiveScalars(cmap);
+        this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(cmap);
 
-        vtkColorTransferFunction* DistanceMapTFunc = vtkColorTransferFunction::SafeDownCast(this->mapperList->at(i)->GetLookupTable());
-        double *rangeLUT = this->mapperList->at(i)->GetInput()->GetPointData()->GetScalars()->GetRange();
+        vtkColorTransferFunction* DistanceMapTFunc =
+                vtkColorTransferFunction::SafeDownCast(this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetLookupTable());
+        double *rangeLUT =this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetRange();
 
-        updateCMaps(this->mapperList->at(i), DistanceMapTFunc, rangeLUT);
+        updateCMaps(this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper(), DistanceMapTFunc, rangeLUT);
     }
 
     this->ModifiedHandler();
 }
 
+/**
+ * Callback for the flip meshes button this function remaps the scalars in the specified meshes to simulate a polar shift in the
+ * parameterization.  No remapping of the pointdata individuals is performed, though.
+ * @brief ShapePopulationViewer::on_pushButton_flip_clicked
+ * @author Alexis Girault
+ */
+void ShapePopulationViewer::on_pushButton_flip_clicked()
+{
+    if(this->windowList->empty()) return;
 
-// AXIS FUNCTIONS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    for (int i = 0; i < this->windowList->size();i++)
+    {
+        //getting the scalars
+        vtkFloatArray *scalars =
+                vtkFloatArray::SafeDownCast(this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars());
+        if (scalars == NULL)
+        {
+            continue;
+        }
+
+        //updating the scalars
+        vtkFloatArray *newScalars = vtkFloatArray::New();
+        newScalars->SetName(scalars->GetName());
+
+        double *range = scalars->GetRange();
+        for (int j = 0; j < scalars->GetNumberOfTuples();j++)
+        {
+            float scalar = scalars->GetValue(j);
+            scalar = (scalar > (range[0] + range[1])/2) ? 3.0/2*range[1] - scalar: range[1]/2 - scalar;//map mid-range values to extremes, and extremes to mid-ranges
+            newScalars->InsertNextValue(scalar);
+        }
+
+        // updating the scalars
+        this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->SetScalars(newScalars);
+    }
+    ModifiedHandler();
+}
+
+/**
+ * Helper function which sets the working color map to the one saved in the cmap QString instance variable.  Generally speaking, this
+ * function will pull the specified colormap name, create a new color transfer function and add it to its mapper.
+ * @brief ShapePopulationViewer::updateCMaps
+ * @author Michael Guarino & Alexis Girault
+ */
+void ShapePopulationViewer::updateCMaps(vtkMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT)
+{
+    DistanceMapTFunc->AdjustRange(rangeLUT);
+    DistanceMapTFunc->SetColorSpaceToDiverging();                                           //this is necessary for the color transfer function to automatically interpolate between the points we set
+    DistanceMapTFunc->RemoveAllPoints();
+    DistanceMapTFunc->AddRGBPoint(rangeLUT[0], 0, 255, 0);                                  // we add a point in the LUT to enforce the min value to be green = 0,255,0
+    DistanceMapTFunc->AddRGBPoint( (fabs(rangeLUT[1] - rangeLUT[0]) ) /2, 255, 255, 0);     // we add another point in the middle of the range to be yellow = 255,255,0
+    DistanceMapTFunc->AddRGBPoint(rangeLUT[1], 255, 0, 0);                                  // we add a last point in the LUT to enforce the max value to be red = 255,0,0
+    DistanceMapTFunc->ClampingOn();//out of range values go to either max or min
+
+    mapper->SetLookupTable( DistanceMapTFunc );
+    //mapper->SetScalarRange(rangeLUT[0],rangeLUT[1]);
+    mapper->ScalarVisibilityOn();
+    //mapper->SetScalarModeToUsePointData();  //we want to use point scalars (could have been cell)
+    //mapper->SetColorModeToMapScalars();
+    mapper->Update();
+}
+
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                         AXIS FUNCTIONS                                        * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 /**
  * Callback to the 0 axis view button.
@@ -827,61 +823,6 @@ void ShapePopulationViewer::on_toolButton_0_clicked()
     this->ModifiedHandler();
 }
 
-/**
- * Callback to the +Z axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_1_clicked
- * @author Joe Waggoner
- */
-void ShapePopulationViewer::on_toolButton_1_clicked()
-{
-    viewChange(0,0,-1);
-
-}
-/**
- * Callback to the -Z axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
- * @author Joe Waggoner
- */
-void ShapePopulationViewer::on_toolButton_2_clicked()
-{
-    viewChange(0,0,1);
-}
-/**
- * Callback to the +X axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
- * @author Joe Waggoner
- */
-void ShapePopulationViewer::on_toolButton_3_clicked()
-{
-    viewChange(1,0,0);
-}
-/**
- * Callback to the -X axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
- * @author Joe Waggoner
- */
-void ShapePopulationViewer::on_toolButton_4_clicked()
-{
-    viewChange(-1,0,0);
-}
-/**
- * Callback to the +Y axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
- * @author Joe Waggoner
- */
-void ShapePopulationViewer::on_toolButton_5_clicked()
-{
-    viewChange(0,1,0);
-}
-/**
- * Callback to the -Y axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
- * @author Joe Waggoner
- */
-void ShapePopulationViewer::on_toolButton_6_clicked()
-{
-    viewChange(0,-1,0);
-}
 /**
  * Helper function for viewing the meshes along a specified axis.
  * Parameters (1,0,0) will allow you to view the mesh from the end of the positive x-axis, for instance.
@@ -906,4 +847,64 @@ void ShapePopulationViewer::viewChange(int x, int y, int z)
     firstRenderer->GetActiveCamera()->SetRoll(.001);
 
     this->ModifiedHandler();
+}
+
+/**
+ * Callback to the +Z axis view button. See viewChange() for implementation details.
+ * @brief ShapePopulationViewer::on_toolButton_1_clicked
+ * @author Joe Waggoner
+ */
+void ShapePopulationViewer::on_toolButton_1_clicked()
+{
+    viewChange(0,0,-1);
+}
+
+/**
+ * Callback to the -Z axis view button. See viewChange() for implementation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
+void ShapePopulationViewer::on_toolButton_2_clicked()
+{
+    viewChange(0,0,1);
+}
+
+/**
+ * Callback to the +X axis view button. See viewChange() for implementation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
+void ShapePopulationViewer::on_toolButton_3_clicked()
+{
+    viewChange(1,0,0);
+}
+
+/**
+ * Callback to the -X axis view button. See viewChange() for implementation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
+void ShapePopulationViewer::on_toolButton_4_clicked()
+{
+    viewChange(-1,0,0);
+}
+
+/**
+ * Callback to the +Y axis view button. See viewChange() for implementation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
+void ShapePopulationViewer::on_toolButton_5_clicked()
+{
+    viewChange(0,1,0);
+}
+
+/**
+ * Callback to the -Y axis view button. See viewChange() for implementation details.
+ * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @author Joe Waggoner
+ */
+void ShapePopulationViewer::on_toolButton_6_clicked()
+{
+    viewChange(0,-1,0);
 }

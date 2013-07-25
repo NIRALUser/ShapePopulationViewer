@@ -54,9 +54,9 @@
       <widget class="QGroupBox" name="BoxVisualization">
        <property name="geometry">
         <rect>
-         <x>820</x>
+         <x>710</x>
          <y>30</y>
-         <width>241</width>
+         <width>181</width>
          <height>251</height>
         </rect>
        </property>
@@ -66,14 +66,14 @@
        <widget class="QWidget" name="verticalLayoutWidget">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>221</width>
-          <height>101</height>
+          <x>0</x>
+          <y>30</y>
+          <width>161</width>
+          <height>62</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
-         <item alignment="Qt::AlignTop">
+         <item>
           <widget class="QComboBox" name="colorMapBox">
            <property name="enabled">
             <bool>false</bool>
@@ -83,6 +83,16 @@
              <string>Select Color Map</string>
             </property>
            </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_flip">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Flip Scalars</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -301,38 +311,25 @@
       <widget class="QGroupBox" name="BoxSyncho">
        <property name="geometry">
         <rect>
-         <x>370</x>
+         <x>540</x>
          <y>30</y>
          <width>151</width>
-         <height>191</height>
+         <height>91</height>
         </rect>
        </property>
        <property name="title">
-        <string>Meshes Synchro</string>
+        <string>Synchronisation</string>
        </property>
        <widget class="QWidget" name="verticalLayoutWidget_2">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>30</y>
-          <width>111</width>
-          <height>108</height>
+          <width>92</width>
+          <height>52</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <widget class="QCheckBox" name="checkBox_synchro">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Select All</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="QRadioButton" name="radioButton_1">
            <property name="enabled">
@@ -364,36 +361,39 @@
          </item>
         </layout>
        </widget>
+       <zorder>verticalLayoutWidget_2</zorder>
+       <zorder>groupBox</zorder>
+       <zorder>groupBox</zorder>
       </widget>
       <widget class="QGroupBox" name="groupBox">
        <property name="geometry">
         <rect>
-         <x>540</x>
+         <x>390</x>
          <y>30</y>
          <width>181</width>
-         <height>191</height>
+         <height>131</height>
         </rect>
        </property>
        <property name="title">
-        <string>Mode</string>
+        <string>Interaction</string>
        </property>
-       <widget class="QWidget" name="horizontalLayoutWidget_2">
+       <widget class="QWidget" name="verticalLayoutWidget_3">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>30</y>
-          <width>201</width>
-          <height>27</height>
+          <width>101</width>
+          <height>88</height>
          </rect>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="QRadioButton" name="radioButton_7">
            <property name="enabled">
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Select</string>
+            <string>Datas</string>
            </property>
           </widget>
          </item>
@@ -410,21 +410,15 @@
            </property>
           </widget>
          </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="verticalLayoutWidget_3">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>60</y>
-          <width>178</width>
-          <height>93</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QLineEdit" name="widgetNumberEdit">
-           <property name="readOnly">
+          <widget class="QCheckBox" name="checkBox_synchro">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Select All</string>
+           </property>
+           <property name="checked">
             <bool>true</bool>
            </property>
           </widget>
@@ -544,7 +538,6 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionFlip_Meshes"/>
     <addaction name="actionWrite_Back_Meshes"/>
    </widget>
    <widget class="QMenu" name="menuFile">
@@ -614,7 +607,7 @@
   </action>
   <action name="actionOpen_vtk_Files">
    <property name="text">
-    <string>Open .vtk Files</string>
+    <string>Load DIrectory</string>
    </property>
   </action>
   <action name="actionHelp">

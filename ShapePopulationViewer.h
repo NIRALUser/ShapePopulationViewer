@@ -78,9 +78,9 @@ protected:
    //Display functionsn
    void updateWidgets();
    void ModifiedHandler();
-   void SelectedWidget(vtkObject* selectedObject, unsigned long ulong, void*);
+   void SelectedWidget(vtkObject* selectedObject, unsigned long, void*);
 
-   void updateCMaps(vtkPolyDataMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT);
+   void updateCMaps(vtkMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT);
 
    void resizeEvent(QResizeEvent* event);
 
@@ -91,7 +91,6 @@ protected:
    void resizeWidgetInArea();
 
 protected slots:
-   void flipMeshes();
    void writeMeshes();
    void openVTKS();
 
@@ -101,6 +100,7 @@ protected slots:
    void on_colNumberEdit_editingFinished();
    void on_colNumberSlider_valueChanged();
    void on_colNumberSlider_sliderReleased();
+   void on_pushButton_flip_clicked();
 
    //Synchro Options
    void on_radioButton_1_toggled();
