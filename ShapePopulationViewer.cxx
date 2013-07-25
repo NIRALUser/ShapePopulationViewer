@@ -263,6 +263,9 @@ void ShapePopulationViewer::updateWidgets()
         this->widgetList->append(meshWidget);
         meshWidget->GetRenderWindow()->AddRenderer(renderer);
 
+        //SELECTION
+        meshWidget->GetInteractor()->AddObserver(vtkCommand::StartInteractionEvent, this, &ShapePopulationViewer::SelectedWidget);
+
         /*
          *End vtk initialization pipeline
          */
@@ -304,14 +307,11 @@ void ShapePopulationViewer::updateWidgets()
     //Start with a delayed synchro
     on_radioButton_2_toggled();
 
-    //Displau Colormap (also before in the for??)
-    on_colorMapBox_currentIndexChanged();
+    //Start with all meshes selected
+    on_checkBox_synchro_toggled(true);
 
-    //Test selection
-    for (int i = 0; i < this->widgetList->size(); i++)
-    {
-        this->widgetList->value(i)->GetInteractor()->AddObserver(vtkCommand::StartInteractionEvent, this, &ShapePopulationViewer::SelectedWidget);
-    }
+    //Display Colormap (also before in the for??)
+    on_colorMapBox_currentIndexChanged();
 }
 
 
@@ -331,7 +331,7 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
     vtkRenderWindow * selectedWindow = selectedInteractor->GetRenderWindow();
 
     //if the renderwindow already is in the renderwindowlist
-    if(windowList->contains(selectedWindow)) return;
+    if(this->windowList->contains(selectedWindow)) return;
 
     // If new selection (Ctrl not pushed)
     if(selectedInteractor->GetControlKey()==0)
@@ -340,11 +340,16 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
         {
             this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0,0,0);
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
+
             camera->DeepCopy(headcam);
             this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
+            this->windowList->value(i)->Render();
         }
         this->windowList->clear(); // empty the selected windows list
     }
+
+    //Background color to grey
+    selectedWindow->GetRenderers()->GetFirstRenderer()->SetBackground(0.2,0.0,0.4);
 
     //Set to headcam
     headcam->DeepCopy(selectedWindow->GetRenderers()->GetFirstRenderer()->GetActiveCamera());
@@ -352,9 +357,6 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
 
     //Add to the windowList
     this->windowList->append(selectedWindow);
-
-    //Background color to grey
-    selectedWindow->GetRenderers()->GetFirstRenderer()->SetBackground(0.2,0.0,0.4);
 }
 
 
@@ -366,9 +368,9 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
  */
 void ShapePopulationViewer::ModifiedHandler()
 {
-    for (int i = 0; i < this->widgetList->size();i++) //render all windows (one of them will be the event window)
+    for (int i = 0; i < this->windowList->size();i++) //render all windows selected (one of them will be the event window)
     {
-        this->widgetList->value(i)->GetRenderWindow()->Render();
+        this->windowList->value(i)->Render();
     }
 }
 
@@ -755,20 +757,23 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
 
     for (int i = 0; i < this->widgetList->size(); i++)
     {
-        //connect to headcam for synchro
         if(checked)
         {
-            this->widgetList->value(i)->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetActiveCamera(headcam);
-            this->widgetList->value(i)->GetRenderWindow()->Render();
+            this->windowList->append(this->widgetList->value(i)->GetRenderWindow());//select all renderwindows
+            this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(headcam);//connect to headcam for synchro
+
         }
         else
         {
-            //Copy the headcam
+            //Create an independant camera, copy of headcam
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
             camera->DeepCopy(headcam);
             this->widgetList->value(i)->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
         }
     }
+
+    //Render everything
+    ModifiedHandler();
 }
 
 
@@ -811,12 +816,9 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
  */
 void ShapePopulationViewer::on_toolButton_0_clicked()
 {
-    if(loaded==0)
-    {
-        return;
-    }
+    if(this->windowList->empty()) return;
 
-    vtkRenderer* firstRenderer = this->widgetList->value(0)->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+    vtkRenderer* firstRenderer = this->windowList->value(0)->GetRenderers()->GetFirstRenderer();
     firstRenderer->ResetCamera();
 
     this->ModifiedHandler();
@@ -890,9 +892,9 @@ void ShapePopulationViewer::on_toolButton_6_clicked()
  */
 void ShapePopulationViewer::viewChange(int x, int y, int z)
 {
-    if(loaded==0) return;
+    if(this->windowList->empty()) return;
 
-    vtkRenderer* firstRenderer = this->widgetList->value(0)->GetRenderWindow()->GetRenderers()->GetFirstRenderer();
+    vtkRenderer* firstRenderer = this->windowList->value(0)->GetRenderers()->GetFirstRenderer();
     double *coords  = firstRenderer->GetActiveCamera()->GetFocalPoint();
     double distance = firstRenderer->GetActiveCamera()->GetDistance();
     firstRenderer->GetActiveCamera()->SetPosition(coords[0]+x*distance,coords[1]+y*distance,coords[2]+z*distance);
