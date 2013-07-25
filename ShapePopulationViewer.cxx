@@ -352,7 +352,10 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
     selectedWindow->GetRenderers()->GetFirstRenderer()->SetBackground(0.2,0.0,0.4);
 
     //Set to headcam
-    headcam->DeepCopy(selectedWindow->GetRenderers()->GetFirstRenderer()->GetActiveCamera());
+    if(this->windowList->isEmpty())
+    {
+        headcam->DeepCopy(selectedWindow->GetRenderers()->GetFirstRenderer()->GetActiveCamera());
+    }
     selectedWindow->GetRenderers()->GetFirstRenderer()->SetActiveCamera(headcam);
 
     //Add to the windowList
