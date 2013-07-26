@@ -71,7 +71,6 @@ ShapePopulationViewer::ShapePopulationViewer()
     this->headcam = vtkCamera::New();
     this->windowList = new QVector<vtkRenderWindow *>(20);           //to get the widgets, renderwindow, renderer, and camera
     this->widgetList = new QVector<QVTKWidget *>(20);           //to get the widgets, renderwindow, renderer, and camera
-    this->loaded = 0;
 
     // Set up Axes buttons
     QString path = QDir::currentPath();
@@ -118,7 +117,7 @@ void ShapePopulationViewer::slotExit()
  */
 void ShapePopulationViewer::writeMeshes()
 {
-    if(loaded==0) return;
+    if(this->widgetList->size()==0) return;
 
     QFileInfoList list = this->directory.entryInfoList();
     int meshes = 0;
@@ -325,7 +324,6 @@ void ShapePopulationViewer::updateWidgets()
     if (meshesNumber == 0) return;//we did not encounter a mesh : quit
 
     // Enable buttons and give the maximum to the slider
-    loaded = 1;
     action_Write_Meshes->setDisabled(true); // todo
     axisButton->setDisabled(false);
     radioButton_1->setDisabled(false);
@@ -541,7 +539,7 @@ void ShapePopulationViewer::placeWidgetInArea(int colNumber)
  */
 void ShapePopulationViewer::resizeWidgetInArea()
 {
-    if(loaded==0) return;
+    if(this->widgetList->size()==0) return;
 
     QSize QSize_dockSize = this->dockWidget->size();
     int dockWidth = QSize_dockSize.width();
@@ -611,7 +609,7 @@ void ShapePopulationViewer::on_radioButton_5_toggled()
  */
 void ShapePopulationViewer::on_colNumberEdit_editingFinished()
 {
-    if(loaded==0) return;
+    if(this->widgetList->size()==0) return;
 
     int colNumber = getNumberOfColumns();
     placeWidgetInArea(colNumber);

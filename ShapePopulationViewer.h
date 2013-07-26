@@ -68,9 +68,7 @@ protected:
    QVector<vtkRenderWindow *> *windowList;
 
 
-   int loaded;
-
-   //Display functionsn
+   //Display functions
    void updateWidgets();
    void ModifiedHandler();
    void SelectedWidget(vtkObject* selectedObject, unsigned long, void*);
