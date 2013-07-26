@@ -361,9 +361,6 @@
          </item>
         </layout>
        </widget>
-       <zorder>verticalLayoutWidget_2</zorder>
-       <zorder>groupBox</zorder>
-       <zorder>groupBox</zorder>
       </widget>
       <widget class="QGroupBox" name="groupBox">
        <property name="geometry">
@@ -419,7 +416,7 @@
             <string>Select All</string>
            </property>
            <property name="checked">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -538,13 +535,17 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionWrite_Back_Meshes"/>
+    <addaction name="action_Write_Meshes"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen_vtk_Files"/>
+    <addaction name="action_Open_Directory"/>
+    <addaction name="action_Open_Files"/>
+    <addaction name="action_Open_Data"/>
+    <addaction name="separator"/>
+    <addaction name="action_Delete_Surfaces"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -597,7 +598,7 @@
     <string>Flip Meshes</string>
    </property>
   </action>
-  <action name="actionWrite_Back_Meshes">
+  <action name="action_Write_Meshes">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -605,9 +606,9 @@
     <string>Write Back Meshes</string>
    </property>
   </action>
-  <action name="actionOpen_vtk_Files">
+  <action name="action_Open_Directory">
    <property name="text">
-    <string>Load DIrectory</string>
+    <string>Add Directory</string>
    </property>
   </action>
   <action name="actionHelp">
@@ -622,6 +623,31 @@
   <action name="actionI_3_NIRAL">
    <property name="text">
     <string>I &lt;3 NIRAL</string>
+   </property>
+  </action>
+  <action name="actionAdd_a_Directory">
+   <property name="text">
+    <string>Add a Directory</string>
+   </property>
+  </action>
+  <action name="actionLoad_vtk_files">
+   <property name="text">
+    <string>Load new ,vtk files</string>
+   </property>
+  </action>
+  <action name="action_Open_Files">
+   <property name="text">
+    <string>Add .vtk fIles</string>
+   </property>
+  </action>
+  <action name="action_Open_Data">
+   <property name="text">
+    <string>Load .txt datas</string>
+   </property>
+  </action>
+  <action name="action_Delete_Surfaces">
+   <property name="text">
+    <string>Delete all surfaces</string>
    </property>
   </action>
  </widget>

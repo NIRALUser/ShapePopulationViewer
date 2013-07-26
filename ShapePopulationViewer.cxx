@@ -71,7 +71,6 @@ ShapePopulationViewer::ShapePopulationViewer()
     this->headcam = vtkCamera::New();
     this->windowList = new QVector<vtkRenderWindow *>(20);           //to get the widgets, renderwindow, renderer, and camera
     this->widgetList = new QVector<QVTKWidget *>(20);           //to get the widgets, renderwindow, renderer, and camera
-    this->mapperList = new QVector<vtkPolyDataMapper *>(20);    //to modify mappers when the colormap is updated
     this->loaded = 0;
 
     // Set up Axes buttons
@@ -91,8 +90,8 @@ ShapePopulationViewer::ShapePopulationViewer()
 
     // Set up action signals and slots
     connect(this->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
-    connect(this->actionWrite_Back_Meshes,SIGNAL(triggered()),this,SLOT(writeMeshes()));
-    connect(this->actionOpen_vtk_Files,SIGNAL(triggered()),this,SLOT(openVTKS()));
+    connect(this->action_Write_Meshes,SIGNAL(triggered()),this,SLOT(writeMeshes()));
+    connect(this->action_Open_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
 }
 
 
@@ -132,7 +131,7 @@ void ShapePopulationViewer::writeMeshes()
         const char *filePath = arr.data();
         vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
         writer->SetFileName(filePath);
-        writer->SetInput(this->mapperList->at(meshes++)->GetInput());
+        writer->SetInput(this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput());
         writer->Update();
     }
 }
@@ -141,10 +140,10 @@ void ShapePopulationViewer::writeMeshes()
 /**
  * Callback to Open .vtk Files menu item, this simply open a filedialog to let the user
  * select a directory and then calls the updateWidgets() helper function.
- * @brief ShapePopulationViewer::openVTKS
+ * @brief ShapePopulationViewer::openDirectory
  * @author Michael Guarino & Alexis Girault
  */
-void ShapePopulationViewer::openVTKS()
+void ShapePopulationViewer::openDirectory()
 {
     QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),"~",QFileDialog::ShowDirsOnly);
     QDir vtkDir(dir);
@@ -176,7 +175,6 @@ void ShapePopulationViewer::updateWidgets()
     //clear all vectors so they might be refilled
     this->windowList->clear();
     this->widgetList->clear();
-    this->mapperList->clear();
     this->colorMapBox->clear();
 
     //initializations
@@ -254,25 +252,28 @@ void ShapePopulationViewer::updateWidgets()
 
         //MAPPER
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        this->mapperList->append(mapper);//add the mapper to our mapperlist for easy retrieval
         #if VTK_MAJOR_VERSION <= 5
             mapper->SetInputConnection(polydata->GetProducerPort());
         #else
             mapper->SetInputData(polydata);
         #endif
 
-        // Annotate the image with his name (and his number)
+        //ANNOTATIONS
         vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
         cornerAnnotation->SetLinearFontScaleFactor( 2 );
         cornerAnnotation->SetNonlinearFontScaleFactor( 1 );
         cornerAnnotation->SetMaximumFontSize( 15 );
-        cornerAnnotation->SetText( 2,fileName);
-/*      std::stringstream strs;
-        strs << (i-1);
+
+        vtkIdType numberOfPoints = polydata->GetNumberOfPoints(); //number of points
+
+        std::stringstream strs;
+        strs << "NAME: "<< fileName <<std::endl
+             << "POINTS: "<< (int)numberOfPoints <<std::endl;
         std::string temp_str = strs.str();
-        const char* fileNumber = temp_str.c_str();
-        cornerAnnotation->SetText( 3,fileNumber); //problem if files not a vtk file!
-*/
+        const char* txt_cornerAnnotation = temp_str.c_str();
+
+        cornerAnnotation->SetText( 2,txt_cornerAnnotation);
+
 
         //ACTOR
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
@@ -325,7 +326,7 @@ void ShapePopulationViewer::updateWidgets()
 
     // Enable buttons and give the maximum to the slider
     loaded = 1;
-    actionWrite_Back_Meshes->setDisabled(true); // todo
+    action_Write_Meshes->setDisabled(true); // todo
     axisButton->setDisabled(false);
     radioButton_1->setDisabled(false);
     radioButton_2->setDisabled(false);
@@ -338,7 +339,6 @@ void ShapePopulationViewer::updateWidgets()
     colNumberEdit->setDisabled(false);
     colNumberSlider->setDisabled(false);
     colNumberSlider->setMaximum(meshesNumber);
-    pushButton_flip->setDisabled(false);
     colorMapBox->setDisabled(false);
 
     //Identify the best number of columns for first display
@@ -354,14 +354,22 @@ void ShapePopulationViewer::updateWidgets()
     //Display Widgets
     on_colNumberEdit_editingFinished();
 
+    //Display All surfaces
+    on_radioButton_4_toggled();
+    this->radioButton_4->toggle();
+
     //Start with a delayed synchro
     on_radioButton_2_toggled();
+    this->radioButton_2->toggle();
 
-    //Start with all meshes selected
+    //Display Colormap for All
     on_checkBox_synchro_toggled(true);
-
-    //Display Colormap (also before in the for??)
     on_colorMapBox_currentIndexChanged();
+
+    //Start with meshes not selected
+    on_checkBox_synchro_toggled(false);
+    this->checkBox_synchro->setChecked(false);
+
 }
 
 
@@ -374,9 +382,12 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
 {
     if(checkBox_synchro->isChecked()) return; // Dont' do anything if the synchro is on "All"
 
+    //Allowing interactions
+    pushButton_flip->setDisabled(false);
+
     //Get the interactor used
-    QVTKInteractor* selectedInteractor = (QVTKInteractor*)selectedObject;
-    vtkRenderWindow * selectedWindow = selectedInteractor->GetRenderWindow();
+    vtkSmartPointer<QVTKInteractor> selectedInteractor = (QVTKInteractor*)selectedObject;
+    vtkSmartPointer<vtkRenderWindow> selectedWindow = selectedInteractor->GetRenderWindow();
 
     //if the renderwindow already is in the renderwindowlist
     if(this->windowList->contains(selectedWindow)) return;
@@ -397,7 +408,7 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
     }
 
     //Background color to grey
-    selectedWindow->GetRenderers()->GetFirstRenderer()->SetBackground(0.2,0.0,0.4);
+    selectedWindow->GetRenderers()->GetFirstRenderer()->SetBackground(0.1,0.0,0.3);
 
     //Set to headcam
     if(this->windowList->isEmpty())
@@ -408,6 +419,9 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
 
     //Add to the windowList
     this->windowList->append(selectedWindow);
+
+    //Update Colormap (maybe better to acualise
+    if(selectedInteractor->GetControlKey()==1) on_colorMapBox_currentIndexChanged();
 }
 
 
@@ -681,19 +695,17 @@ void ShapePopulationViewer::on_radioButton_2_toggled()
  */
 void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
 {
-    for (int i = 0; i < this->windowList->size();i++) //reset all backgrounds
-    {
-        this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0,0,0);
-        this->windowList->value(i)->Render();
-    }
+
     this->windowList->clear(); // empty the selected windows list
 
     for (int i = 0; i < this->widgetList->size(); i++)
     {
         if(checked) // All synchro
         {
-            this->windowList->append(this->widgetList->value(i)->GetRenderWindow());//select all renderwindows
-            this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(headcam);//connect to headcam for synchro
+            pushButton_flip->setDisabled(true); //Disable flip
+            this->windowList->append(this->widgetList->value(i)->GetRenderWindow()); //select all renderwindows
+            this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(headcam); //connect to headcam for synchro
+            this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0.1,0.0,0.3);
             on_colorMapBox_currentIndexChanged(); //update the same colormap for all
         }
         else // No synchro
@@ -702,6 +714,8 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
             camera->DeepCopy(headcam);
             this->widgetList->value(i)->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
+            this->widgetList->value(i)->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(0,0,0);
+            this->widgetList->value(i)->GetRenderWindow()->Render();
         }
     }
 

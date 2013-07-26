@@ -66,11 +66,6 @@ protected:
     * @brief selectedWidgetList
     */
    QVector<vtkRenderWindow *> *windowList;
-   /**
-    * Vector of vtkPolyDataMapper's, maintained to make colormap updates easier and access the polydata (getInput)
-    * @brief mapperList
-    */
-   QVector<vtkPolyDataMapper *> *mapperList;
 
 
    int loaded;
@@ -91,8 +86,8 @@ protected:
    void resizeWidgetInArea();
 
 protected slots:
+   void openDirectory();
    void writeMeshes();
-   void openVTKS();
 
    //View Options
    void on_radioButton_4_toggled();  //all
