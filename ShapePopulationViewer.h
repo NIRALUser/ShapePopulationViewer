@@ -13,6 +13,7 @@
 #include <QEvent>
 #include <QSize>
 #include <QString>
+#include <QFileInfoList>
 
 // VTK
 #include <vtkPolyData.h>
@@ -36,24 +37,26 @@
 class ShapePopulationViewer : public QMainWindow, public Ui::ShapePopulationViewer
 {
   Q_OBJECT
+
 public:
-  // Constructor/Destructor
-  ShapePopulationViewer();
-  ~ShapePopulationViewer() {}
+
+    ShapePopulationViewer();
+  ~ShapePopulationViewer() {} //TO DO : Desallocate pointers
+
 public slots:
 
   virtual void slotExit();
 
 protected:
 
-   /**
-    * The user selected working directory
-    * @brief directory
+    /**
+    * The user selected files
+    * @brief meshesList
     */
-   QDir directory;
+    QFileInfoList meshesList;
    /**
     * vtkcamera shared by the renderWindows when the surfaces are synchronized
-    * @brief camera
+    * @brief headcam
     */
    vtkCamera *headcam;
    /**
@@ -63,47 +66,53 @@ protected:
    QVector<QVTKWidget *> *widgetList;
    /**
     * Vector of vtkRenderWindows selected
-    * @brief selectedWidgetList
+    * @brief windowList
     */
    QVector<vtkRenderWindow *> *windowList;
 
 
-   //Display functions
+   //DISPLAY
    void updateWidgets();
-   void ModifiedHandler();
    void SelectedWidget(vtkObject* selectedObject, unsigned long, void*);
+   void ModifiedHandler();
+   void DeleteSelectedWidgets();
 
+   //COLORMAP
    void updateCMaps(vtkMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT);
 
-   void resizeEvent(QResizeEvent* event);
-
+   //PLACING WIDGETS
    void printColNumber(int colNumber);
    int getNumberOfColumns();
    int getNumberOfRows(int colNumber);
    void placeWidgetInArea(int colNumber);
    void resizeWidgetInArea();
+   void resizeEvent(QResizeEvent* event);
 
 protected slots:
-   void openDirectory();
-   void writeMeshes();
 
-   //View Options
+   //MENU
+   void writeMeshes();
+   void openDirectory();
+   void openFiles();
+
+   //VIEW
    void on_radioButton_4_toggled();  //all
    void on_radioButton_5_toggled(); //square
    void on_colNumberEdit_editingFinished();
    void on_colNumberSlider_valueChanged();
    void on_colNumberSlider_sliderReleased();
-   void on_pushButton_flip_clicked();
 
-   //Synchro Options
+   //SYNCHRONIZATION
    void on_radioButton_1_toggled();
    void on_radioButton_2_toggled();
    void on_checkBox_synchro_toggled(bool checked);
 
-   //
+   //COLORMAP
+   void on_pushButton_flip_clicked();
    void on_colorMapBox_currentIndexChanged();
 
-   //Axis change
+   //AXIS
+   void viewChange(int x, int y, int z);
    void on_toolButton_0_clicked();
    void on_toolButton_1_clicked();
    void on_toolButton_2_clicked();
@@ -111,7 +120,6 @@ protected slots:
    void on_toolButton_4_clicked();
    void on_toolButton_5_clicked();
    void on_toolButton_6_clicked();
-   void viewChange(int x, int y, int z);
 
 };
 

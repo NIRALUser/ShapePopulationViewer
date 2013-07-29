@@ -91,6 +91,7 @@ ShapePopulationViewer::ShapePopulationViewer()
     connect(this->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
     connect(this->action_Write_Meshes,SIGNAL(triggered()),this,SLOT(writeMeshes()));
     connect(this->action_Open_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
+    connect(this->action_Open_Files,SIGNAL(triggered()),this,SLOT(openFiles()));
 }
 
 
@@ -110,6 +111,37 @@ void ShapePopulationViewer::slotExit()
 // *                                        MENU FUNCTIONS                                         * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 /**
+ * Callback to Open Directory menu item, this simply open a filedialog to let the user
+ * select a directory and then calls the updateWidgets() helper function.
+ * @brief ShapePopulationViewer::openDirectory
+ * @author Michael Guarino & Alexis Girault
+ */
+void ShapePopulationViewer::openDirectory()
+{
+    QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),"/home",QFileDialog::ShowDirsOnly);
+    QDir vtkDir(dir);
+    this->meshesList.append(vtkDir.entryInfoList());
+    this->updateWidgets();
+}
+
+/**
+ * Callback to Open .vtk Files menu item, this simply open a filedialog to let the user
+ * select files and then calls the updateWidgets() helper function.
+ * @brief ShapePopulationViewer::openVTK
+ * @author Alexis Girault
+ */
+void ShapePopulationViewer::openFiles()
+{
+    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open .vtk Files"),"/home","VTK Files (*.vtk)");
+
+    for(int i=0; i < stringList.size(); i++)
+    {
+        this->meshesList.append(QFileInfo(stringList.at(i)));
+    }
+    this->updateWidgets();
+}
+
+/**
  * Callback to the Write Meshes menu item, this will write every current polydata back to their original files. The choice of saving each file individually with
  * a user specified file name was eliminated as it is entirely possible that very large numbers of meshes are going to be visualized, making that procedure tedious.
  * @brief ShapePopulationViewer::writeMeshes
@@ -119,11 +151,10 @@ void ShapePopulationViewer::writeMeshes()
 {
     if(this->widgetList->size()==0) return;
 
-    QFileInfoList list = this->directory.entryInfoList();
     int meshes = 0;
-    for (int i = 0; i < list.size(); i++)
+    for (int i = 0; i < meshesList.size(); i++)
     {
-        QString path = list.at(i).absoluteFilePath();
+        QString path = meshesList.at(i).absoluteFilePath();
         if (!path.endsWith(".vtk"))
             continue;
         QByteArray arr = path.toLatin1();
@@ -136,27 +167,11 @@ void ShapePopulationViewer::writeMeshes()
 }
 
 
-/**
- * Callback to Open .vtk Files menu item, this simply open a filedialog to let the user
- * select a directory and then calls the updateWidgets() helper function.
- * @brief ShapePopulationViewer::openDirectory
- * @author Michael Guarino & Alexis Girault
- */
-void ShapePopulationViewer::openDirectory()
-{
-    QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),"~",QFileDialog::ShowDirsOnly);
-    QDir vtkDir(dir);
-    this->directory = vtkDir;
-    this->updateWidgets();
-}
-
-
-
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                       DISPLAY FUNCTIONS                                       * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 /**
- * Helper function which reads a directory filled with .vtk files and renders each polydata within in a
+ * Helper function which reads .vtk files and renders each polydata within in a
  * separate QVTKWidget.  All model vectors are filled as well.
  * @brief ShapePopulationViewer::updateWidgets
  * @author Michael Guarino & Alexis Girault
@@ -175,17 +190,14 @@ void ShapePopulationViewer::updateWidgets()
     this->windowList->clear();
     this->widgetList->clear();
     this->colorMapBox->clear();
-
-    //initializations
-    QFileInfoList list = this->directory.entryInfoList(); //pull the filenames from the directory
-    int meshesNumber = 0; //number of .vtk files to be
+    int meshesNumber = this->widgetList->size(); //number of .vtk files to be
 
     //upload and visualization of all the .vtk files
-    for (int i = 0; i < list.size(); i++)
+    for (int i = 0; i < meshesList.size(); i++)
     {
         //get filepath of current file, convert it to ascii chars if .vtk file
-        QString QFilePath = list.at(i).canonicalFilePath();
-        QString QFileName = list.at(i).fileName();
+        QString QFilePath = meshesList.at(i).canonicalFilePath();
+        QString QFileName = meshesList.at(i).fileName();
         if (!QFilePath.endsWith(".vtk")) //if not a .vtk extension, analyze next file in the 'for'
         {
             continue;
@@ -323,21 +335,26 @@ void ShapePopulationViewer::updateWidgets()
 
     if (meshesNumber == 0) return;//we did not encounter a mesh : quit
 
-    // Enable buttons and give the maximum to the slider
-    action_Write_Meshes->setDisabled(true); // todo
+    //Enable buttons
+    action_Write_Meshes->setDisabled(true); // to do
     axisButton->setDisabled(false);
     radioButton_1->setDisabled(false);
     radioButton_2->setDisabled(false);
     checkBox_synchro->setDisabled(false);
     radioButton_4->setDisabled(false);
     radioButton_5->setDisabled(false);
-    radioButton_6->setDisabled(true); // todo : move or select
-    radioButton_7->setDisabled(true); // todo
+    radioButton_6->setDisabled(true); //to do : move or select
+    radioButton_7->setDisabled(true); //to do
     colNumberTXT->setDisabled(false);
     colNumberEdit->setDisabled(false);
     colNumberSlider->setDisabled(false);
     colNumberSlider->setMaximum(meshesNumber);
     colorMapBox->setDisabled(false);
+
+    //Initialize Menu actions
+    action_Open_Directory->setText("Add directory");
+    action_Open_Files->setText("Add .vtk files");
+    action_Delete_Surfaces->setDisabled(true); // to do
 
     //Identify the best number of columns for first display
     int colNumber = 0;
@@ -380,8 +397,7 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
 {
     if(checkBox_synchro->isChecked()) return; // Dont' do anything if the synchro is on "All"
 
-    //Allowing interactions
-    pushButton_flip->setDisabled(false);
+    pushButton_flip->setDisabled(true);
 
     //Get the interactor used
     vtkSmartPointer<QVTKInteractor> selectedInteractor = (QVTKInteractor*)selectedObject;
@@ -403,6 +419,9 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
             this->windowList->value(i)->Render();
         }
         this->windowList->clear(); // empty the selected windows list
+
+        //Allowing interactions
+        pushButton_flip->setDisabled(false);
     }
 
     //Background color to grey
@@ -437,6 +456,15 @@ void ShapePopulationViewer::ModifiedHandler()
     }
 }
 
+void ShapePopulationViewer::DeleteSelectedWidgets()
+{
+    if(this->windowList->empty()) return;
+
+    for (int i = 0; i < this->windowList->size();i++)
+    {
+        this->windowList->value(i)->Delete();
+    }
+}
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                       PLACING FUNCTIONS                                       * //
