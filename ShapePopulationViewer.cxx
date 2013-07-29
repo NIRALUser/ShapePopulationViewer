@@ -92,6 +92,7 @@ ShapePopulationViewer::ShapePopulationViewer()
     connect(this->action_Write_Meshes,SIGNAL(triggered()),this,SLOT(writeMeshes()));
     connect(this->action_Open_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
     connect(this->action_Open_Files,SIGNAL(triggered()),this,SLOT(openFiles()));
+    connect(this->action_Delete_Surfaces,SIGNAL(triggered()),this,SLOT(closeAll()));
 }
 
 
@@ -111,7 +112,7 @@ void ShapePopulationViewer::slotExit()
 // *                                        MENU FUNCTIONS                                         * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 /**
- * Callback to Open Directory menu item, this simply open a filedialog to let the user
+ * Callback to "Open Directory" menu item, this  open a filedialog to let the user
  * select a directory and then calls the updateWidgets() helper function.
  * @brief ShapePopulationViewer::openDirectory
  * @author Michael Guarino & Alexis Girault
@@ -125,9 +126,9 @@ void ShapePopulationViewer::openDirectory()
 }
 
 /**
- * Callback to Open .vtk Files menu item, this simply open a filedialog to let the user
+ * Callback to "Open .vtk Files" menu item, this  open a filedialog to let the user
  * select files and then calls the updateWidgets() helper function.
- * @brief ShapePopulationViewer::openVTK
+ * @brief ShapePopulationViewer::openFiles
  * @author Alexis Girault
  */
 void ShapePopulationViewer::openFiles()
@@ -140,6 +141,42 @@ void ShapePopulationViewer::openFiles()
     }
     this->updateWidgets();
 }
+
+/**
+ * Callback to "Delete All surfaces" menu item, that calls the updateWidgets()
+ * helper function after clearing the meshesList.
+ * @brief ShapePopulationViewer::closeAll
+ * @author Alexis Girault
+ */
+void ShapePopulationViewer::closeAll()
+{
+    //Empty the meshes FileInfo List
+    meshesList.clear();
+
+    //Disable buttons
+    axisButton->setDisabled(true);
+    radioButton_1->setDisabled(true);
+    radioButton_2->setDisabled(true);
+    checkBox_synchro->setDisabled(true);
+    radioButton_4->setDisabled(true);
+    radioButton_5->setDisabled(true);
+    radioButton_6->setDisabled(true);
+    radioButton_7->setDisabled(true);
+    colNumberTXT->setDisabled(true);
+    colNumberEdit->setDisabled(true);
+    colNumberSlider->setDisabled(true);
+    colorMapBox->setDisabled(true);
+    pushButton_flip->setDisabled(true);
+
+    //Initialize Menu actions
+    action_Open_Directory->setText("Open directory");
+    action_Open_Files->setText("Open .vtk files");
+    action_Write_Meshes->setDisabled(true);
+    action_Delete_Surfaces->setDisabled(true);
+
+    this->updateWidgets();
+}
+
 
 /**
  * Callback to the Write Meshes menu item, this will write every current polydata back to their original files. The choice of saving each file individually with
@@ -336,7 +373,6 @@ void ShapePopulationViewer::updateWidgets()
     if (meshesNumber == 0) return;//we did not encounter a mesh : quit
 
     //Enable buttons
-    action_Write_Meshes->setDisabled(true); // to do
     axisButton->setDisabled(false);
     radioButton_1->setDisabled(false);
     radioButton_2->setDisabled(false);
@@ -354,7 +390,8 @@ void ShapePopulationViewer::updateWidgets()
     //Initialize Menu actions
     action_Open_Directory->setText("Add directory");
     action_Open_Files->setText("Add .vtk files");
-    action_Delete_Surfaces->setDisabled(true); // to do
+    action_Write_Meshes->setDisabled(true); // to do
+    action_Delete_Surfaces->setDisabled(false);
 
     //Identify the best number of columns for first display
     int colNumber = 0;
@@ -397,14 +434,14 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
 {
     if(checkBox_synchro->isChecked()) return; // Dont' do anything if the synchro is on "All"
 
-    pushButton_flip->setDisabled(true);
-
     //Get the interactor used
     vtkSmartPointer<QVTKInteractor> selectedInteractor = (QVTKInteractor*)selectedObject;
     vtkSmartPointer<vtkRenderWindow> selectedWindow = selectedInteractor->GetRenderWindow();
 
     //if the renderwindow already is in the renderwindowlist
     if(this->windowList->contains(selectedWindow)) return;
+
+    pushButton_flip->setDisabled(true);
 
     // If new selection (Ctrl not pushed)
     if(selectedInteractor->GetControlKey()==0)

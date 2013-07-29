@@ -94,6 +94,7 @@ protected slots:
    void writeMeshes();
    void openDirectory();
    void openFiles();
+   void closeAll();
 
    //VIEW
    void on_radioButton_4_toggled();  //all
