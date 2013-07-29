@@ -4,23 +4,41 @@
 // local
 #include "ui_ShapePopulationViewer.h"
 
-// QT
-#include <QDir>
-#include <QVector>
-#include <QMainWindow>
-#include <QVTKWidget.h>
-#include <QResizeEvent>
-#include <QEvent>
-#include <QSize>
-#include <QString>
-#include <QFileInfoList>
+// Basics
+#include <vtkSmartPointer.h>
+#include <sstream>
 
-// VTK
+// PolyData
+#include <vtkPolyDataReader.h>
+#include <vtkPolyDataWriter.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataNormals.h>
+
+// Visualization
 #include <vtkPolyDataMapper.h>
-#include <vtkScalarBarActor.h>
-#include <vtkColorTransferFunction.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
+#include <vtkRenderWindow.h>
 #include <vtkCamera.h>
+#include <QVTKWidget.h>
+
+// Scalars
+#include <vtkPointData.h>
+#include <vtkFloatArray.h>
+//#include <vtkDataArray.h>
+//#include <vtkScalarsToColors.h>
+
+// Transfer Function
+#include <vtkColorTransferFunction.h>
+#include <vtkLookupTable.h>
+#include <vtkScalarBarActor.h>
+
+// Window Annotations
+#include <vtkCornerAnnotation.h>
+#include <vtkTextProperty.h>
+
+// QT
+#include <qfiledialog.h>
 
 
 /**

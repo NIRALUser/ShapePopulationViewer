@@ -1,58 +1,5 @@
 #include "ShapePopulationViewer.h"
 
-// Basics
-#include <vtkSmartPointer.h>
-#include <sstream>
-#include <string.h>
-
-// PolyData
-#include <vtkPolyDataReader.h>
-#include <vtkPolyDataWriter.h>
-#include <vtkPolyData.h>
-#include <vtkPolyDataNormals.h>
-
-// Scalars
-//#include vvtkDataArray.h>
-#include <vtkPointData.h>
-#include <vtkFloatArray.h>
-//#include <vtkScalarsToColors.h>
-
-// Visualization
-#include <vtkPolyDataMapper.h>
-#include <vtkRenderer.h>
-#include <vtkRendererCollection.h>
-#include <vtkRenderWindow.h>
-#include <vtkCamera.h>
-#include <QVTKWidget.h>
-
-// Window Annotations
-#include <vtkCornerAnnotation.h>
-#include <vtkTextProperty.h>
-
-// Transfer Function
-#include <vtkColorTransferFunction.h>
-#include <vtkLookupTable.h>
-#include <vtkScalarBarActor.h>
-
-// QT
-#include <QFileDialog>
-#include <QString>
-#include <QStringList>
-#include <QDir>
-#include <QFileInfoList>
-#include <QFileInfo>
-#include <QCheckBox>
-#include <QSize>
-#include <QResizeEvent>
-#include <QInputDialog>
-#include <QRegExp>
-#include <QEvent>
-#include <QIcon>
-#include <QMouseEvent>
-
-
-#include <vtkEventQtSlotConnect.h>
-#include <vtkInteractorStyleTrackballActor.h>
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                       PUBLIC FUNCTIONS                                        * //
