@@ -174,7 +174,7 @@ void ShapePopulationViewer::updateWidgets()
     this->windowList->clear();
     this->widgetList->clear();
     this->colorMapBox->clear();
-    int meshesNumber = this->widgetList->size(); //number of .vtk files to be
+    int meshesNumber = this->widgetList->size();
 
     //upload and visualization of all the .vtk files
     for (int i = 0; i < meshesList.size(); i++)
@@ -311,6 +311,7 @@ void ShapePopulationViewer::updateWidgets()
 
         //SELECTION
         meshWidget->GetInteractor()->AddObserver(vtkCommand::StartInteractionEvent, this, &ShapePopulationViewer::SelectedWidget);
+        meshWidget->GetInteractor()->AddObserver(vtkCommand::KeyPressEvent, this, &ShapePopulationViewer::UnselectWidget);
 
         /*
          *End vtk initialization pipeline
@@ -323,7 +324,7 @@ void ShapePopulationViewer::updateWidgets()
     axisButton->setDisabled(false);
     radioButton_1->setDisabled(false);
     radioButton_2->setDisabled(false);
-    checkBox_synchro->setDisabled(false);
+    if (meshesNumber > 1) checkBox_synchro->setDisabled(false);
     radioButton_4->setDisabled(false);
     radioButton_5->setDisabled(false);
     radioButton_6->setDisabled(true); //to do : move or select
@@ -427,6 +428,35 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
 
 
 /**
+ * Unleash the selected Widgets by emptying the windowList.
+ * @brief ShapePopulationViewer::UnselectWidget
+ * @author Alexis Girault
+ */
+void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void_event)
+{
+    if(checkBox_synchro->isChecked()) return; // Dont' do anything if the synchro is on "All"
+
+    QKeyEvent *event = (QKeyEvent*)void_event;
+    //qDebug()<<QKeySequence(event->key()).toString();
+
+    if((event->key() == Qt::Key_Escape))
+    {
+        pushButton_flip->setDisabled(true);
+
+        for (int i = 0; i < this->windowList->size();i++) //reset all backgrounds and cameras
+        {
+            this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0,0,0);
+            vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
+
+            camera->DeepCopy(headcam);
+            this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
+            this->windowList->value(i)->Render();
+        }
+        this->windowList->clear(); // empty the selected windows list
+    }
+}
+
+/**
  * Handler to any modified event sent by a QVTKWidget in the viewport.
  * The handler calls render on all the windows provided user is viewing in synchronized mode.
  * @brief ShapePopulationViewer::ModifiedHandler
@@ -440,13 +470,14 @@ void ShapePopulationViewer::ModifiedHandler()
     }
 }
 
+// TEST DELETE SELECTED WIDGETS : TO DO
 void ShapePopulationViewer::DeleteSelectedWidgets()
 {
     if(this->windowList->empty()) return;
 
     for (int i = 0; i < this->windowList->size();i++)
     {
-        this->windowList->value(i)->Delete();
+        this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput();
     }
 }
 

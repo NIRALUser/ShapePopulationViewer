@@ -38,7 +38,10 @@
 #include <vtkTextProperty.h>
 
 // QT
-#include <qfiledialog.h>
+#include <QFileDialog>
+#include <QKeyEvent>
+#include <QKeySequence>
+#include <QDebug>
 
 
 /**
@@ -92,8 +95,9 @@ protected:
    //DISPLAY
    void updateWidgets();
    void SelectedWidget(vtkObject* selectedObject, unsigned long, void*);
+   void UnselectWidget(vtkObject*, unsigned long, void* void_event);
    void ModifiedHandler();
-   void DeleteSelectedWidgets();
+   void DeleteSelectedWidgets(); // to do
 
    //COLORMAP
    void updateCMaps(vtkMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT);

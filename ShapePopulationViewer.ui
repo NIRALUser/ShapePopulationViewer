@@ -69,7 +69,7 @@
           <x>0</x>
           <y>30</y>
           <width>161</width>
-          <height>62</height>
+          <height>95</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -92,6 +92,16 @@
            </property>
            <property name="text">
             <string>Flip Scalars</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_delete">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Delete Surface</string>
            </property>
           </widget>
          </item>
