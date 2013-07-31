@@ -211,19 +211,10 @@ void ShapePopulationViewer::updateWidgets()
         #else
            normalGenerator->SetInputData(polydata);
         #endif
+        normalGenerator->SplittingOff();
         normalGenerator->ComputePointNormalsOn();
         normalGenerator->ComputeCellNormalsOff();
         normalGenerator->Update();
-
-        // Optional settings
-        normalGenerator->SetFeatureAngle(30.0);     // put paraview parameters here
-        normalGenerator->SetSplitting(0);           // DO NOT SPLIT, this will result in the mesh duplicating points, which could affect comparison
-        normalGenerator->SetConsistency(0);         //
-        normalGenerator->SetAutoOrientNormals(0);   //
-        normalGenerator->SetComputePointNormals(1); // Other initialization specific, see vtkPolyDataNormals
-        normalGenerator->SetComputeCellNormals(0);  //
-        normalGenerator->SetFlipNormals(0);         //
-        normalGenerator->SetNonManifoldTraversal(1);//
         polydata = normalGenerator->GetOutput();
 
 
@@ -380,7 +371,7 @@ void ShapePopulationViewer::updateWidgets()
  */
 void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned long, void* )
 {
-    if(checkBox_synchro->isChecked()) return; // Dont' do anything if the synchro is on "All"
+    if(checkBox_synchro->isChecked()) return; // Don't do anything if the synchro is on "All"
 
     //Get the interactor used
     vtkSmartPointer<QVTKInteractor> selectedInteractor = (QVTKInteractor*)selectedObject;
@@ -428,18 +419,18 @@ void ShapePopulationViewer::SelectedWidget(vtkObject* selectedObject, unsigned l
 
 
 /**
- * Unleash the selected Widgets by emptying the windowList.
+ * Unselect the selected Widgets by emptying the windowList.
  * @brief ShapePopulationViewer::UnselectWidget
  * @author Alexis Girault
  */
-void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void_event)
+void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* voidEvent)
 {
-    if(checkBox_synchro->isChecked()) return; // Dont' do anything if the synchro is on "All"
+    if(checkBox_synchro->isChecked()) return; // Don't do anything if the synchro is on "All"
 
-    QKeyEvent *event = (QKeyEvent*)void_event;
-    //qDebug()<<QKeySequence(event->key()).toString();
+    QKeyEvent * keyEvent = (QKeyEvent*) voidEvent;
+    //qDebug()<<QKeySequence(keyEvent->key()).toString();
 
-    if((event->key() == Qt::Key_Escape))
+    if((keyEvent->key() == Qt::Key_Escape))
     {
         pushButton_flip->setDisabled(true);
 
@@ -464,22 +455,23 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
  */
 void ShapePopulationViewer::ModifiedHandler()
 {
+    for (int i = 0; i < this->windowList->size();i++) //disable the renderWindows to callback ModifiedHandler again
+    {
+        this->windowList->value(i)->RemoveAllObservers();
+    }
+
     for (int i = 0; i < this->windowList->size();i++) //render all windows selected (one of them will be the event window)
     {
         this->windowList->value(i)->Render();
     }
-}
 
-// TEST DELETE SELECTED WIDGETS : TO DO
-void ShapePopulationViewer::DeleteSelectedWidgets()
-{
-    if(this->windowList->empty()) return;
-
-    for (int i = 0; i < this->windowList->size();i++)
+    for (int i = 0; i < this->windowList->size();i++) //attribuate the observers back to the windows the way it used to be
     {
-        this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput();
+        if(radioButton_1->isChecked()) on_radioButton_1_toggled();
+        else on_radioButton_2_toggled();
     }
 }
+
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                       PLACING FUNCTIONS                                       * //
@@ -739,17 +731,20 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
 
     this->windowList->clear(); // empty the selected windows list
 
-    for (int i = 0; i < this->widgetList->size(); i++)
+    if(checked) // All synchro
     {
-        if(checked) // All synchro
+        for (int i = 0; i < this->widgetList->size(); i++)
         {
-            pushButton_flip->setDisabled(true); //Disable flip
             this->windowList->append(this->widgetList->value(i)->GetRenderWindow()); //select all renderwindows
             this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(headcam); //connect to headcam for synchro
             this->windowList->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0.1,0.0,0.3);
-            on_colorMapBox_currentIndexChanged(); //update the same colormap for all
         }
-        else // No synchro
+        pushButton_flip->setDisabled(true); //Disable flip
+        on_colorMapBox_currentIndexChanged(); //update the same colormap for all
+    }
+    else // No synchro
+    {
+        for (int i = 0; i < this->widgetList->size(); i++)
         {
             //Create an independant camera, copy of headcam
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();

@@ -95,9 +95,8 @@ protected:
    //DISPLAY
    void updateWidgets();
    void SelectedWidget(vtkObject* selectedObject, unsigned long, void*);
-   void UnselectWidget(vtkObject*, unsigned long, void* void_event);
+   void UnselectWidget(vtkObject*, unsigned long, void* voidEvent);
    void ModifiedHandler();
-   void DeleteSelectedWidgets(); // to do
 
    //COLORMAP
    void updateCMaps(vtkMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT);
