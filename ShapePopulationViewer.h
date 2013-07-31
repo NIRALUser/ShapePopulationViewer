@@ -71,6 +71,11 @@ public slots:
 protected:
 
     /**
+    * Last directory containing opened files
+    * @brief lastDirectory
+    */
+    QString lastDirectory;
+    /**
     * The user selected files
     * @brief meshesList
     */

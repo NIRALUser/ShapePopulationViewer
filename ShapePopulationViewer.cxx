@@ -15,6 +15,7 @@ ShapePopulationViewer::ShapePopulationViewer()
     this->setupUi(this);
 
     //Vector initialization
+    this->lastDirectory = "/home";
     this->headcam = vtkCamera::New();
     this->windowList = new QVector<vtkRenderWindow *>(20);           //to get the widgets, renderwindow, renderer, and camera
     this->widgetList = new QVector<QVTKWidget *>(20);           //to get the widgets, renderwindow, renderer, and camera
@@ -66,10 +67,15 @@ void ShapePopulationViewer::slotExit()
  */
 void ShapePopulationViewer::openDirectory()
 {
-    QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),"/home",QFileDialog::ShowDirsOnly);
-    QDir vtkDir(dir);
-    this->meshesList.append(vtkDir.entryInfoList());
-    this->updateWidgets();
+    QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),lastDirectory,QFileDialog::ShowDirsOnly);
+    if(dir!="")
+    {
+        lastDirectory = dir;
+        QDir vtkDir(dir);
+
+        this->meshesList.append(vtkDir.entryInfoList());
+        this->updateWidgets();
+    }
 }
 
 /**
@@ -80,13 +86,18 @@ void ShapePopulationViewer::openDirectory()
  */
 void ShapePopulationViewer::openFiles()
 {
-    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open .vtk Files"),"/home","VTK Files (*.vtk)");
+    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open .vtk Files"),lastDirectory,"VTK Files (*.vtk)");
 
-    for(int i=0; i < stringList.size(); i++)
+    if(stringList.size()!=0)
     {
-        this->meshesList.append(QFileInfo(stringList.at(i)));
+        lastDirectory=QFileInfo(stringList.at(0)).path();
+
+        for(int i=0; i < stringList.size(); i++)
+        {
+            this->meshesList.append(QFileInfo(stringList.at(i)));
+        }
+        this->updateWidgets();
     }
-    this->updateWidgets();
 }
 
 /**
