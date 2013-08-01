@@ -437,6 +437,9 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
 
     //Update Colormap (maybe better to actualise)
     if(selectedInteractor->GetControlKey()==1) on_colorMapBox_currentIndexChanged();
+
+    //If everything is selected
+    if(selectedWindows->size()==widgetList->size()) this->checkBox_synchro->setChecked(true);
 }
 
 
