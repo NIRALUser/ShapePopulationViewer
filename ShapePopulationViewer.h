@@ -64,10 +64,6 @@ public:
     ShapePopulationViewer();
   ~ShapePopulationViewer() {} //TO DO : Desallocate pointers
 
-public slots:
-
-  virtual void slotExit();
-
 protected:
 
     /**
@@ -94,12 +90,12 @@ protected:
     * Vector of vtkRenderWindows selected
     * @brief windowList
     */
-   QVector<vtkRenderWindow *> *windowList;
+   QVector<vtkRenderWindow *> *selectedWindows;
 
 
    //DISPLAY
    void updateWidgets();
-   void SelectedWidget(vtkObject* selectedObject, unsigned long, void*);
+   void SelectWidget(vtkObject* selectedObject, unsigned long, void*);
    void UnselectWidget(vtkObject*, unsigned long, void* voidEvent);
    void ModifiedHandler();
 
@@ -115,12 +111,17 @@ protected:
    void resizeEvent(QResizeEvent* event);
 
 protected slots:
+\
+   //QUIT
+   void slotExit();
+
 
    //MENU
    void writeMeshes();
    void openDirectory();
    void openFiles();
    void closeAll();
+   void on_pushButton_delete_clicked();
 
    //VIEW
    void on_radioButton_4_toggled();  //all

@@ -552,6 +552,7 @@
     <addaction name="separator"/>
     <addaction name="action_Write_Meshes"/>
     <addaction name="separator"/>
+    <addaction name="actionDelete_selected_surfaces"/>
     <addaction name="action_Delete_Surfaces"/>
    </widget>
    <addaction name="menuFile"/>
@@ -648,15 +649,26 @@
   </action>
   <action name="action_Open_Data">
    <property name="text">
-    <string>Load .txt datas</string>
+    <string>Load CSV datas</string>
    </property>
   </action>
   <action name="action_Delete_Surfaces">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
     <string>Delete all surfaces</string>
+   </property>
+  </action>
+  <action name="actionDelete_selected_surfaces">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Delete selected surfaces</string>
    </property>
   </action>
  </widget>
