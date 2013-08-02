@@ -271,6 +271,54 @@ void ShapePopulationViewer::updateWidgets()
 
     }
 
+    // COLORMAPS
+    for (int i = 0; i < rendererList->size(); i++)
+    {
+        int numScalars = polyDataList->value(i)->GetPointData()->GetNumberOfArrays();
+        if(i==0)
+        {
+            for (int j = 0; j < numScalars; j++)
+            {
+                QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
+                this->commonColorMaps.insert(scalarName);
+            }
+        }
+        else
+        {
+            QSet<QString> compareColorMaps;
+            for (int j = 0; j < numScalars; j++)
+            {
+                QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
+                compareColorMaps.insert(scalarName);
+            }
+            commonColorMaps = commonColorMaps.intersect(compareColorMaps);
+        }
+    }
+    for (int k = 0; k < commonColorMaps.size(); k++)
+    {
+        QString scalarName = commonColorMaps.values().value(k);
+        this->colorMapBox->addItem(scalarName);
+    }
+    //Display Colormap for All
+    on_checkBox_synchro_toggled(true);
+    on_colorMapBox_currentIndexChanged();
+
+    // SCALAR BAR
+    for (int i = 0; i < rendererList->size(); i++)
+    {
+        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+        scalarBar->SetLookupTable(mapperList->value(i)->GetLookupTable());
+        scalarBar->SetNumberOfLabels(3);
+        scalarBar->SetMaximumWidthInPixels(60);
+
+        vtkSmartPointer<vtkTextProperty> LabelProperty = vtkSmartPointer<vtkTextProperty>::New();
+        LabelProperty->SetFontSize(12);
+        LabelProperty->ShadowOn();
+        scalarBar->SetLabelTextProperty(LabelProperty);
+
+        rendererList->value(i)->AddActor2D(scalarBar);
+    }
+
     // ANNOTATIONS
     for (int i = 0; i < rendererList->size(); i++)
     {
@@ -296,42 +344,6 @@ void ShapePopulationViewer::updateWidgets()
         cornerAnnotation->SetMaximumFontSize( 15 );
         cornerAnnotation->SetText( 2,txt_cornerAnnotation);
         rendererList->value(i)->AddViewProp(cornerAnnotation);
-    }
-
-    // DATAS
-    for (int i = 0; i < rendererList->size(); i++)
-    {
-        //
-        int numScalars = polyDataList->value(i)->GetPointData()->GetNumberOfArrays();
-        for (int j = 0; j < numScalars; j++)
-        {
-            QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
-            if(i==0)
-            {
-                this->commonColorMaps.append(scalarName);
-                this->colorMapBox->addItem(scalarName);
-            }
-            QByteArray bytes = scalarName.toLatin1();
-            const char * scalars = bytes.data();
-            polyDataList->value(i)->GetPointData()->SetActiveScalars(scalars);
-        }
-
-        vtkSmartPointer<vtkColorTransferFunction> DistanceMapTFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
-        double *rangeLUT = polyDataList->value(i)->GetPointData()->GetScalars()->GetRange();
-        updateCMaps(mapperList->value(i), DistanceMapTFunc, rangeLUT);
-
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar->SetLookupTable(mapperList->value(i)->GetLookupTable());
-        scalarBar->SetNumberOfLabels(3);
-        scalarBar->SetMaximumWidthInPixels(60);
-
-        vtkSmartPointer<vtkTextProperty> LabelProperty = vtkSmartPointer<vtkTextProperty>::New();
-        LabelProperty->SetFontSize(12);
-        LabelProperty->ShadowOn();
-        scalarBar->SetLabelTextProperty(LabelProperty);
-
-        rendererList->value(i)->AddActor2D(scalarBar);
-
     }
 
     //Enable buttons
@@ -376,9 +388,6 @@ void ShapePopulationViewer::updateWidgets()
     on_radioButton_2_toggled();
     this->radioButton_2->toggle();
 
-    //Display Colormap for All
-    on_checkBox_synchro_toggled(true);
-    on_colorMapBox_currentIndexChanged();
 
     //Start with meshes not selected
     on_checkBox_synchro_toggled(false);
@@ -835,10 +844,9 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
 
 
 /**
- * Callback to the colormap dropdown menu.  This will pull the selected text from the menu, call the updateCMaps() helper, then call Render on all the
- * QVTKWidgets to render the updates.
+ * Callback to the colormap dropdown menu.  This will pull the selected text from the menu,
+ * create a new color transfer function and add it to its mapper.
  * @brief ShapePopulationViewer::on_colorMapBox_currentIndexChanged
- * @param arg1
  * @author Michael Guarino & Alexis Girault
  */
 void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
@@ -850,12 +858,25 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
     for (int i = 0; i < this->selectedWindows->size(); i++)
     {
         this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(cmap);
+        vtkMapper * mapper = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper();
 
-        vtkColorTransferFunction* DistanceMapTFunc =
-                vtkColorTransferFunction::SafeDownCast(this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetLookupTable());
-        double *rangeLUT =this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetRange();
+        vtkColorTransferFunction* DistanceMapTFunc = vtkColorTransferFunction::New();
+        double *rangeLUT =mapper->GetInput()->GetPointData()->GetScalars()->GetRange();
 
-        updateCMaps(this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper(), DistanceMapTFunc, rangeLUT);
+        DistanceMapTFunc->AdjustRange(rangeLUT);
+        DistanceMapTFunc->SetColorSpaceToDiverging();                                           //this is necessary for the color transfer function to automatically interpolate between the points we set
+        DistanceMapTFunc->RemoveAllPoints();
+        DistanceMapTFunc->AddRGBPoint(rangeLUT[0], 0, 255, 0);                                  // we add a point in the LUT to enforce the min value to be green = 0,255,0
+        DistanceMapTFunc->AddRGBPoint( (fabs(rangeLUT[1] - rangeLUT[0]) ) /2, 255, 255, 0);     // we add another point in the middle of the range to be yellow = 255,255,0
+        DistanceMapTFunc->AddRGBPoint(rangeLUT[1], 255, 0, 0);                                  // we add a last point in the LUT to enforce the max value to be red = 255,0,0
+        DistanceMapTFunc->ClampingOn();//out of range values go to either max or min
+
+        mapper->SetLookupTable( DistanceMapTFunc );
+        mapper->ScalarVisibilityOn();
+        //mapper->SetScalarRange(rangeLUT[0],rangeLUT[1]);
+        //mapper->SetScalarModeToUsePointData();  //we want to use point scalars (could have been cell)
+        //mapper->SetColorModeToMapScalars();
+        mapper->Update();
     }
 
     this->ModifiedHandler();
@@ -898,31 +919,6 @@ void ShapePopulationViewer::on_pushButton_flip_clicked()
     }
     ModifiedHandler();
 }
-
-/**
- * Helper function which sets the working color map to the one saved in the cmap QString instance variable.  Generally speaking, this
- * function will pull the specified colormap name, create a new color transfer function and add it to its mapper.
- * @brief ShapePopulationViewer::updateCMaps
- * @author Michael Guarino & Alexis Girault
- */
-void ShapePopulationViewer::updateCMaps(vtkMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT)
-{
-    DistanceMapTFunc->AdjustRange(rangeLUT);
-    DistanceMapTFunc->SetColorSpaceToDiverging();                                           //this is necessary for the color transfer function to automatically interpolate between the points we set
-    DistanceMapTFunc->RemoveAllPoints();
-    DistanceMapTFunc->AddRGBPoint(rangeLUT[0], 0, 255, 0);                                  // we add a point in the LUT to enforce the min value to be green = 0,255,0
-    DistanceMapTFunc->AddRGBPoint( (fabs(rangeLUT[1] - rangeLUT[0]) ) /2, 255, 255, 0);     // we add another point in the middle of the range to be yellow = 255,255,0
-    DistanceMapTFunc->AddRGBPoint(rangeLUT[1], 255, 0, 0);                                  // we add a last point in the LUT to enforce the max value to be red = 255,0,0
-    DistanceMapTFunc->ClampingOn();//out of range values go to either max or min
-
-    mapper->SetLookupTable( DistanceMapTFunc );
-    //mapper->SetScalarRange(rangeLUT[0],rangeLUT[1]);
-    mapper->ScalarVisibilityOn();
-    //mapper->SetScalarModeToUsePointData();  //we want to use point scalars (could have been cell)
-    //mapper->SetColorModeToMapScalars();
-    mapper->Update();
-}
-
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                         AXIS FUNCTIONS                                        * //

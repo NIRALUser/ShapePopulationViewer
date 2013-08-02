@@ -75,7 +75,7 @@ protected:
     * The common colormaps
     * @brief colorMapList
     */
-    QStringList commonColorMaps;
+    QSet<QString> commonColorMaps;
     /**
      * vtkcamera shared by the renderWindows when the surfaces are synchronized
      * @brief headcam
@@ -118,9 +118,6 @@ protected:
    void SelectWidget(vtkObject* selectedObject, unsigned long, void*);
    void UnselectWidget(vtkObject*, unsigned long, void* voidEvent);
    void ModifiedHandler();
-
-   //COLORMAP
-   void updateCMaps(vtkMapper*  mapper, vtkColorTransferFunction* DistanceMapTFunc, double *rangeLUT);
 
    //PLACING WIDGETS
    void printColNumber(int colNumber);
