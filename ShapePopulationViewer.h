@@ -72,15 +72,35 @@ protected:
     */
     QString lastDirectory;
     /**
+    * The common colormaps
+    * @brief colorMapList
+    */
+    QStringList commonColorMaps;
+    /**
+     * vtkcamera shared by the renderWindows when the surfaces are synchronized
+     * @brief headcam
+     */
+    vtkCamera *headcam;
+    /**
     * The user selected files
     * @brief meshesList
     */
-    QFileInfoList meshesList;
+    QFileInfoList fileList;
    /**
-    * vtkcamera shared by the renderWindows when the surfaces are synchronized
-    * @brief headcam
+    * vector of QVTKWidget
+    * @brief widgetList
     */
-   vtkCamera *headcam;
+    QVector<vtkPolyData *> *polyDataList;
+   /**
+    * vector of QVTKWidget
+    * @brief widgetList
+    */
+    QVector<vtkMapper *> *mapperList;
+   /**
+    * vector of QVTKWidget
+    * @brief widgetList
+    */
+    QVector<vtkRenderer *> *rendererList;
    /**
     * vector of QVTKWidget
     * @brief widgetList

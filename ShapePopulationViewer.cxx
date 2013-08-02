@@ -17,8 +17,11 @@ ShapePopulationViewer::ShapePopulationViewer()
     //Vector initialization
     this->lastDirectory = "/home";
     this->headcam = vtkCamera::New();
-    this->widgetList = new QVector<QVTKWidget *>(20);           //to get the widgets, renderwindow, renderer, and camera
-    this->selectedWindows = new QVector<vtkRenderWindow *>(20);           //to get the widgets, renderwindow, renderer, and camera
+    this->polyDataList = new QVector<vtkPolyData *>(20);
+    this->mapperList = new QVector<vtkMapper *>(20);
+    this->rendererList = new QVector<vtkRenderer *>(20);
+    this->widgetList = new QVector<QVTKWidget *>(20);
+    this->selectedWindows = new QVector<vtkRenderWindow *>(20);
 
     // Set up Axes buttons
     QString path = QDir::currentPath();
@@ -73,18 +76,18 @@ void ShapePopulationViewer::openDirectory()
     // if directory choosen
     if(dir!="")
     {
-        // Add files in the meshesList
+        // Add files in the fileList
         lastDirectory = dir;
         QDir vtkDir(dir);
-        this->meshesList.append(vtkDir.entryInfoList());
+        this->fileList.append(vtkDir.entryInfoList());
 
         // Control the files format
-        for (int i = 0; i < meshesList.size(); i++)
+        for (int i = 0; i < fileList.size(); i++)
         {
-            QString QFilePath = meshesList.at(i).canonicalFilePath();
+            QString QFilePath = fileList.at(i).canonicalFilePath();
             if (!QFilePath.endsWith(".vtk"))
             {
-                meshesList.removeAt(i);
+                fileList.removeAt(i);
                 i--;
             }
         }
@@ -110,7 +113,7 @@ void ShapePopulationViewer::openFiles()
 
         for(int i=0; i < stringList.size(); i++)
         {
-            this->meshesList.append(QFileInfo(stringList.at(i)));
+            this->fileList.append(QFileInfo(stringList.at(i)));
         }
         this->updateWidgets();
     }
@@ -118,14 +121,15 @@ void ShapePopulationViewer::openFiles()
 
 /**
  * Callback to "Delete All surfaces" menu item, that calls the updateWidgets()
- * helper function after clearing the meshesList.
+ * helper function after clearing the fileList.
  * @brief ShapePopulationViewer::closeAll
  * @author Alexis Girault
  */
 void ShapePopulationViewer::closeAll()
 {
     //Empty the meshes FileInfo List
-    meshesList.clear();
+    fileList.clear();
+    commonColorMaps.clear();
 
     //Disable buttons
     axisButton->setDisabled(true);
@@ -149,7 +153,13 @@ void ShapePopulationViewer::closeAll()
     action_Write_Meshes->setDisabled(true);
     action_Delete_Surfaces->setDisabled(true);
 
-    this->updateWidgets();
+    //clear any Content from the layout
+    QGridLayout *layout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
+    for (int i = 0; i < this->widgetList->size(); i++)
+    {
+        layout->removeWidget(this->widgetList->value(i));
+        delete this->widgetList->value(i);
+    }
 }
 
 
@@ -164,9 +174,9 @@ void ShapePopulationViewer::writeMeshes()
     if(this->widgetList->size()==0) return;
 
     int meshes = 0;
-    for (int i = 0; i < meshesList.size(); i++)
+    for (int i = 0; i < fileList.size(); i++)
     {
-        QString path = meshesList.at(i).absoluteFilePath();
+        QString path = fileList.at(i).absoluteFilePath();
         if (!path.endsWith(".vtk"))
             continue;
         QByteArray arr = path.toLatin1();
@@ -190,152 +200,145 @@ void ShapePopulationViewer::writeMeshes()
  */
 void ShapePopulationViewer::updateWidgets()
 {
-    //clear any Content from the layout
-    QGridLayout *layout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
-    for (int i = 0; i < this->widgetList->size(); i++)
-    {
-        layout->removeWidget(this->widgetList->value(i));
-        delete this->widgetList->value(i);
-    }
-
     //clear all vectors so they might be refilled
     this->selectedWindows->clear();
+    this->polyDataList->clear();
+    this->mapperList->clear();
+    this->rendererList->clear();
     this->widgetList->clear();
     this->colorMapBox->clear();
-    int meshesNumber = this->widgetList->size();
 
-    //upload and visualization of all the .vtk files
-    for (int i = 0; i < meshesList.size(); i++)
+    // READER
+    for (int i = 0; i < fileList.size(); i++)
     {
-        meshesNumber++;
-
         //get filepath and fileNames
-        QString QFilePath = meshesList.at(i).canonicalFilePath();
+        QString QFilePath = fileList.at(i).canonicalFilePath();
         QByteArray path = QFilePath.toLatin1();
         const char *filePath = path.data();
-        QString QFileName = meshesList.at(i).fileName();
-        QByteArray nam = QFileName.toLatin1();
-        const char *fileName = nam.data();
 
         //initialize a vtkPolyDataReader to read the .vtk file
-        vtkSmartPointer<vtkPolyDataReader> meshReader = vtkSmartPointer<vtkPolyDataReader>::New() ;
+        vtkPolyDataReader * meshReader = vtkPolyDataReader::New() ;
         meshReader->SetFileName ( filePath );
         meshReader->ReadAllScalarsOn();//make sure we are reading scalars
         meshReader->Update();//wire read setting preparation
-        vtkPolyData *polydata = meshReader->GetOutput();//read the file : polydata is our mesh
+        this->polyDataList->append(meshReader->GetOutput());//read the file : polydata is our mesh
+    }
 
+    // SMOOTHER
+    for (int i = 0; i < polyDataList->size(); i++)
+    {
         //smooth the image using a normal generator
-        vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
-        #if VTK_MAJOR_VERSION <= 5
-           normalGenerator->SetInput(polydata); // polydata is your mesh, the one you put in the mapper
-        #else
-           normalGenerator->SetInputData(polydata);
-        #endif
+        vtkPolyDataNormals * normalGenerator = vtkPolyDataNormals::New();
+        normalGenerator->SetInput(polyDataList->value(i));
         normalGenerator->SplittingOff();
         normalGenerator->ComputePointNormalsOn();
         normalGenerator->ComputeCellNormalsOff();
         normalGenerator->Update();
-        polydata = normalGenerator->GetOutput();
+        polyDataList->replace(i,normalGenerator->GetOutput());
+    }
 
-
-        // Get Datas in points
-        int numScalars = polydata->GetPointData()->GetNumberOfArrays();
-        for (int j = 0; j < numScalars; j++)
-        {
-            QString scalarName(polydata->GetPointData()->GetArrayName(j));
-            if (meshesNumber == 1)//only do this for the first mesh (all others should be the same, otherwise there would be no point in a batched comparison
-            {
-                this->colorMapBox->addItem(scalarName);
-            }
-            QByteArray bytes = scalarName.toLatin1();
-            const char * scalars = bytes.data();
-            polydata->GetPointData()->SetActiveScalars(scalars);
-        }
-
-        /*
-         * Begin vtk initialization pipeline, generally speaking, you pass a polydata through a mapper, then an actor, then a renderer
-         */
-
+    // PIPELINE VTK VISU
+    for (int i = 0; i < polyDataList->size(); i++)
+    {
         //MAPPER
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        #if VTK_MAJOR_VERSION <= 5
-            mapper->SetInputConnection(polydata->GetProducerPort());
-        #else
-            mapper->SetInputData(polydata);
-        #endif
-
-        //ANNOTATIONS
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation->SetLinearFontScaleFactor( 2 );
-        cornerAnnotation->SetNonlinearFontScaleFactor( 1 );
-        cornerAnnotation->SetMaximumFontSize( 15 );
-
-        vtkIdType numberOfPoints = polydata->GetNumberOfPoints(); //number of points
-
-        std::stringstream strs;
-        strs << "NAME: "<< fileName <<std::endl
-             << "POINTS: "<< (int)numberOfPoints <<std::endl;
-        std::string temp_str = strs.str();
-        const char* txt_cornerAnnotation = temp_str.c_str();
-
-        cornerAnnotation->SetText( 2,txt_cornerAnnotation);
-
+        this->mapperList->append(mapper);
+        mapper->SetInputConnection(polyDataList->value(i)->GetProducerPort());
 
         //ACTOR
         vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
         actor->SetMapper(mapper);
 
         //RENDERER
-        vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
-        renderer->AddViewProp(cornerAnnotation);
+        vtkRenderer * renderer = vtkRenderer::New();
+        this->rendererList->append(renderer);
         renderer->AddActor(actor);
-
-        //DATAS
-        if (polydata->GetPointData()->GetScalars() != NULL)
-        {
-
-            vtkSmartPointer<vtkColorTransferFunction> DistanceMapTFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
-            double *rangeLUT = polydata->GetPointData()->GetScalars()->GetRange();
-            updateCMaps(mapper, DistanceMapTFunc, rangeLUT);
-
-            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-            scalarBar->SetLookupTable(mapper->GetLookupTable());
-            scalarBar->SetNumberOfLabels(3);
-            scalarBar->SetMaximumWidthInPixels(60);
-
-            vtkSmartPointer<vtkTextProperty> LabelProperty = vtkSmartPointer<vtkTextProperty>::New();
-            LabelProperty->SetFontSize(12);
-            LabelProperty->ShadowOn();
-            scalarBar->SetLabelTextProperty(LabelProperty);
-
-            renderer->AddActor2D(scalarBar);
-        }
-
-        //CAMERA
-        renderer->SetActiveCamera(headcam);//set the active camera for this renderer to main camera
+        renderer->SetActiveCamera(headcam); //set the active camera for this renderer to main camera
         renderer->ResetCamera();
+    }
 
+    // QT WIDGETS
+    for (int i = 0; i < rendererList->size(); i++)
+    {
         //QVTKWIDGET
         QVTKWidget *meshWidget = new QVTKWidget(this->scrollAreaWidgetContents);
         this->widgetList->append(meshWidget);
-        meshWidget->GetRenderWindow()->AddRenderer(renderer);
+        meshWidget->GetRenderWindow()->AddRenderer(rendererList->value(i));
 
         //SELECTION
         meshWidget->GetInteractor()->AddObserver(vtkCommand::StartInteractionEvent, this, &ShapePopulationViewer::SelectWidget);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::KeyPressEvent, this, &ShapePopulationViewer::UnselectWidget);
 
-        /*
-         *End vtk initialization pipeline
-         */
     }
 
-    if (meshesNumber == 0) return;//we did not encounter a mesh : quit
+    // ANNOTATIONS
+    for (int i = 0; i < rendererList->size(); i++)
+    {
+        //NAME
+        QString QFileName = fileList.at(i).fileName();
+        QByteArray nam = QFileName.toLatin1();
+        const char *fileName = nam.data();
+
+        //NUMBER OF POINTS
+        vtkIdType numberOfPoints = polyDataList->value(i)->GetNumberOfPoints(); //number of points
+
+        //CREATE THE STRING
+        std::stringstream strs;
+        strs << "NAME: "<< fileName <<std::endl
+             << "POINTS: "<< (int)numberOfPoints <<std::endl;
+        std::string temp_str = strs.str();
+        const char* txt_cornerAnnotation = temp_str.c_str();
+
+        //CORNER
+        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
+        cornerAnnotation->SetLinearFontScaleFactor( 2 );
+        cornerAnnotation->SetNonlinearFontScaleFactor( 1 );
+        cornerAnnotation->SetMaximumFontSize( 15 );
+        cornerAnnotation->SetText( 2,txt_cornerAnnotation);
+        rendererList->value(i)->AddViewProp(cornerAnnotation);
+    }
+
+    // DATAS
+    for (int i = 0; i < rendererList->size(); i++)
+    {
+        //
+        int numScalars = polyDataList->value(i)->GetPointData()->GetNumberOfArrays();
+        for (int j = 0; j < numScalars; j++)
+        {
+            QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
+            if(i==0)
+            {
+                this->commonColorMaps.append(scalarName);
+                this->colorMapBox->addItem(scalarName);
+            }
+            QByteArray bytes = scalarName.toLatin1();
+            const char * scalars = bytes.data();
+            polyDataList->value(i)->GetPointData()->SetActiveScalars(scalars);
+        }
+
+        vtkSmartPointer<vtkColorTransferFunction> DistanceMapTFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
+        double *rangeLUT = polyDataList->value(i)->GetPointData()->GetScalars()->GetRange();
+        updateCMaps(mapperList->value(i), DistanceMapTFunc, rangeLUT);
+
+        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+        scalarBar->SetLookupTable(mapperList->value(i)->GetLookupTable());
+        scalarBar->SetNumberOfLabels(3);
+        scalarBar->SetMaximumWidthInPixels(60);
+
+        vtkSmartPointer<vtkTextProperty> LabelProperty = vtkSmartPointer<vtkTextProperty>::New();
+        LabelProperty->SetFontSize(12);
+        LabelProperty->ShadowOn();
+        scalarBar->SetLabelTextProperty(LabelProperty);
+
+        rendererList->value(i)->AddActor2D(scalarBar);
+
+    }
 
     //Enable buttons
     axisButton->setDisabled(false);
     radioButton_1->setDisabled(false);
     radioButton_2->setDisabled(false);
-    if (meshesNumber > 1) checkBox_synchro->setDisabled(false);
+    checkBox_synchro->setDisabled(false);
     radioButton_4->setDisabled(false);
     radioButton_5->setDisabled(false);
     radioButton_6->setDisabled(true); //to do : move or select
@@ -343,7 +346,7 @@ void ShapePopulationViewer::updateWidgets()
     colNumberTXT->setDisabled(false);
     colNumberEdit->setDisabled(false);
     colNumberSlider->setDisabled(false);
-    colNumberSlider->setMaximum(meshesNumber);
+    colNumberSlider->setMaximum(fileList.size());
     colorMapBox->setDisabled(false);
 
     //Initialize Menu actions
@@ -400,8 +403,8 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     //if the renderwindow already is in the renderselectedWindows
     if(this->selectedWindows->contains(selectedWindow)) return;
 
-    pushButton_flip->setDisabled(true);
-    pushButton_delete->setDisabled(true);
+    this->pushButton_flip->setDisabled(false);
+    this->pushButton_delete->setDisabled(false);
 
     // If new selection (Ctrl not pushed)
     if(selectedInteractor->GetControlKey()==0)
@@ -416,10 +419,6 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
             this->selectedWindows->value(i)->Render();
         }
         this->selectedWindows->clear(); // empty the selected windows list
-
-        //Allowing interactions
-        this->pushButton_flip->setDisabled(false);
-        this->pushButton_delete->setDisabled(false);
     }
 
     //Background color to grey
@@ -457,7 +456,7 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
 
     if((keyEvent->key() == Qt::Key_Escape))
     {
-        pushButton_flip->setDisabled(true);\
+        pushButton_flip->setDisabled(true);
         pushButton_delete->setDisabled(true);
 
         for (int i = 0; i < this->selectedWindows->size();i++) //reset all backgrounds and cameras
@@ -495,7 +494,7 @@ void ShapePopulationViewer::on_pushButton_delete_clicked()
                 layout->removeWidget(this->widgetList->value(j));
                 delete this->widgetList->value(j);
                 widgetList->remove(j);
-                meshesList.removeAt(j);
+                fileList.removeAt(j);
                 selectedWindows->remove(i);
                 i--;
                 break;
@@ -797,20 +796,25 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
 {
     this->selectedWindows->clear(); // empty the selected windows list
 
-    if(checked) // All synchro
+    if(checked) // Select all
     {
+        this->pushButton_flip->setDisabled(false);
+        this->pushButton_delete->setDisabled(false);
+
         for (int i = 0; i < this->widgetList->size(); i++)
         {
             this->selectedWindows->append(this->widgetList->value(i)->GetRenderWindow()); //select all renderwindows
             this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(headcam); //connect to headcam for synchro
             this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0.1,0.0,0.3);
         }
-        pushButton_flip->setDisabled(true);
-        pushButton_delete->setDisabled(true);
         on_colorMapBox_currentIndexChanged(); //update the same colormap for all
     }
     else // No synchro
     {
+
+        this->pushButton_flip->setDisabled(true);
+        this->pushButton_delete->setDisabled(true);
+
         for (int i = 0; i < this->widgetList->size(); i++)
         {
             //Create an independant camera, copy of headcam
