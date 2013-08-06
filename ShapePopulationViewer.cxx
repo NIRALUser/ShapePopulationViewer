@@ -863,13 +863,14 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
 
         vtkColorTransferFunction* DistanceMapTFunc = vtkColorTransferFunction::New();
         double *rangeLUT =mapper->GetInput()->GetPointData()->GetScalars()->GetRange();
+        double range = fabs(rangeLUT[1] - rangeLUT[0]);
 
         DistanceMapTFunc->AdjustRange(rangeLUT);
         DistanceMapTFunc->SetColorSpaceToDiverging();                                           //this is necessary for the color transfer function to automatically interpolate between the points we set
         DistanceMapTFunc->RemoveAllPoints();
-        DistanceMapTFunc->AddRGBPoint(rangeLUT[0], 0, 255, 0);                                  // we add a point in the LUT to enforce the min value to be green = 0,255,0
-        DistanceMapTFunc->AddRGBPoint( (fabs(rangeLUT[1] - rangeLUT[0]) ) /2, 255, 255, 0);     // we add another point in the middle of the range to be yellow = 255,255,0
-        DistanceMapTFunc->AddRGBPoint(rangeLUT[1], 255, 0, 0);                                  // we add a last point in the LUT to enforce the max value to be red = 255,0,0
+        DistanceMapTFunc->AddRGBPoint(rangeLUT[0] - range / 256.0, 0, 255, 0);                                  // we add a point in the LUT to enforce the min value to be green = 0,255,0
+        DistanceMapTFunc->AddRGBPoint(rangeLUT[0] + range / 2.0 , 255, 255, 0);     // we add another point in the middle of the range to be yellow = 255,255,0
+        DistanceMapTFunc->AddRGBPoint(rangeLUT[1] + range / 256.0, 255, 0, 0);                                  // we add a last point in the LUT to enforce the max value to be red = 255,0,0
         DistanceMapTFunc->ClampingOn();//out of range values go to either max or min
 
         mapper->SetLookupTable( DistanceMapTFunc );
@@ -878,6 +879,7 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
         //mapper->SetScalarModeToUsePointData();  //we want to use point scalars (could have been cell)
         //mapper->SetColorModeToMapScalars();
         mapper->Update();
+
     }
 
     this->ModifiedHandler();
