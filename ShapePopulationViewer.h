@@ -75,7 +75,7 @@ protected:
     * The common colormaps
     * @brief colorMapList
     */
-    QSet<QString> commonColorMaps;
+    QStringList commonColorMaps;
     /**
      * vtkcamera shared by the renderWindows when the surfaces are synchronized
      * @brief headcam
@@ -141,20 +141,21 @@ protected slots:
    void on_pushButton_delete_clicked();
 
    //VIEW
-   void on_radioButton_4_toggled();  //all
-   void on_radioButton_5_toggled(); //square
+   void on_radioButton_viewAll_toggled();  //all
+   void on_radioButton_viewSquare_toggled(); //square
    void on_colNumberEdit_editingFinished();
    void on_colNumberSlider_valueChanged();
    void on_colNumberSlider_sliderReleased();
 
    //SYNCHRONIZATION
-   void on_radioButton_1_toggled();
-   void on_radioButton_2_toggled();
+   void on_radioButton_realTimeSync_toggled();
+   void on_radioButton_delayedSync_toggled();
    void on_checkBox_synchro_toggled(bool checked);
 
    //COLORMAP
-   void on_pushButton_flip_clicked();
    void on_colorMapBox_currentIndexChanged();
+   void on_pushButton_flip_clicked();
+   void on_pushButton_center_clicked();
 
    //AXIS
    void viewChange(int x, int y, int z);

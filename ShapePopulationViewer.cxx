@@ -133,11 +133,11 @@ void ShapePopulationViewer::closeAll()
 
     //Disable buttons
     axisButton->setDisabled(true);
-    radioButton_1->setDisabled(true);
-    radioButton_2->setDisabled(true);
+    radioButton_realTimeSync->setDisabled(true);
+    radioButton_delayedSync->setDisabled(true);
     checkBox_synchro->setDisabled(true);
-    radioButton_4->setDisabled(true);
-    radioButton_5->setDisabled(true);
+    radioButton_viewAll->setDisabled(true);
+    radioButton_viewSquare->setDisabled(true);
     radioButton_6->setDisabled(true);
     radioButton_7->setDisabled(true);
     colNumberTXT->setDisabled(true);
@@ -146,6 +146,7 @@ void ShapePopulationViewer::closeAll()
     colorMapBox->setDisabled(true);
     pushButton_flip->setDisabled(true);
     pushButton_delete->setDisabled(true);
+    pushButton_center->setDisabled(true);
 
     //Initialize Menu actions
     action_Open_Directory->setText("Open directory");
@@ -272,6 +273,7 @@ void ShapePopulationViewer::updateWidgets()
     }
 
     // COLORMAPS
+    QSet<QString> firstColorMaps;
     for (int i = 0; i < rendererList->size(); i++)
     {
         int numScalars = polyDataList->value(i)->GetPointData()->GetNumberOfArrays();
@@ -280,7 +282,7 @@ void ShapePopulationViewer::updateWidgets()
             for (int j = 0; j < numScalars; j++)
             {
                 QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
-                this->commonColorMaps.insert(scalarName);
+                firstColorMaps.insert(scalarName);
             }
         }
         else
@@ -291,17 +293,14 @@ void ShapePopulationViewer::updateWidgets()
                 QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
                 compareColorMaps.insert(scalarName);
             }
-            commonColorMaps = commonColorMaps.intersect(compareColorMaps);
+            firstColorMaps = firstColorMaps.intersect(compareColorMaps);
         }
     }
-    for (int k = 0; k < commonColorMaps.size(); k++)
-    {
-        QString scalarName = commonColorMaps.values().value(k);
-        this->colorMapBox->addItem(scalarName);
-    }
-    //Display Colormap for All
-    on_checkBox_synchro_toggled(true);
-    on_colorMapBox_currentIndexChanged();
+    commonColorMaps = firstColorMaps.values();  // Gets the QSet values
+    commonColorMaps.sort();                     // to be able to sort them,
+    colorMapBox->addItems(commonColorMaps);     // and then add them to the GUI.
+    on_checkBox_synchro_toggled(true);          // Now we select all windows
+    on_colorMapBox_currentIndexChanged();       // to apply the colorMap on all of them.
 
     // SCALAR BAR
     for (int i = 0; i < rendererList->size(); i++)
@@ -346,13 +345,13 @@ void ShapePopulationViewer::updateWidgets()
         rendererList->value(i)->AddViewProp(cornerAnnotation);
     }
 
-    //Enable buttons
+    // GUI BUTTONS
     axisButton->setDisabled(false);
-    radioButton_1->setDisabled(false);
-    radioButton_2->setDisabled(false);
+    radioButton_realTimeSync->setDisabled(false);
+    radioButton_delayedSync->setDisabled(false);
     checkBox_synchro->setDisabled(false);
-    radioButton_4->setDisabled(false);
-    radioButton_5->setDisabled(false);
+    radioButton_viewAll->setDisabled(false);
+    radioButton_viewSquare->setDisabled(false);
     radioButton_6->setDisabled(true); //to do : move or select
     radioButton_7->setDisabled(true); //to do
     colNumberTXT->setDisabled(false);
@@ -361,37 +360,29 @@ void ShapePopulationViewer::updateWidgets()
     colNumberSlider->setMaximum(fileList.size());
     colorMapBox->setDisabled(false);
 
-    //Initialize Menu actions
+    // GUI ACTIONS
     action_Open_Directory->setText("Add directory");
     action_Open_Files->setText("Add .vtk files");
     action_Write_Meshes->setDisabled(true); // to do
     action_Delete_Surfaces->setDisabled(false);
 
-    //Identify the best number of columns for first display
+    // GUI WIDGETS DISPLAY
+
     int colNumber = 0;
     int sum = 0;
     int nextOdd = 1;
     for ( ;sum < this->widgetList->size();colNumber++,nextOdd += 2)
+    {
         sum += nextOdd;//simple integer square root, will give the ceiling of the colNumber => cols >= rows
-
-    //Display the number of columns in colNumberEdit
-    printColNumber(colNumber+1);
-
-    //Display Widgets
-    on_colNumberEdit_editingFinished();
-
-    //Display All surfaces
-    on_radioButton_4_toggled();
-    this->radioButton_4->toggle();
-
-    //Start with a delayed synchro
-    on_radioButton_2_toggled();
-    this->radioButton_2->toggle();
-
-
-    //Start with meshes not selected
-    on_checkBox_synchro_toggled(false);
-    this->checkBox_synchro->setChecked(false);
+    }
+    printColNumber(colNumber+1);                //Display the number of columns in colNumberEdit,
+    on_colNumberEdit_editingFinished();         //and display the Widgets according to this number.
+    on_radioButton_viewAll_toggled();           //Display All surfaces,
+    this->radioButton_viewAll->toggle();        //and toogle the GUI button.
+    on_radioButton_delayedSync_toggled();       //Start with a delayed synchro,
+    this->radioButton_delayedSync->toggle();    //and toogle the GUI button.
+    on_checkBox_synchro_toggled(false);         //Start with meshes not selected,
+    this->checkBox_synchro->setChecked(false);  //and uncheck the synchro checkBox.
 
 }
 
@@ -412,42 +403,45 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     //if the renderwindow already is in the renderselectedWindows
     if(this->selectedWindows->contains(selectedWindow)) return;
 
+    //if not, allow GUI actions on selections
     this->pushButton_flip->setDisabled(false);
     this->pushButton_delete->setDisabled(false);
+    this->pushButton_center->setDisabled(false);
 
-    // If new selection (Ctrl not pushed)
+    // NEW SELECTION (Ctrl not pushed)
     if(selectedInteractor->GetControlKey()==0)
     {
-        for (int i = 0; i < this->selectedWindows->size();i++) //reset all backgrounds and cameras
+        for (int i = 0; i < this->selectedWindows->size();i++)                              //reset backgrounds and cameras
         {
             this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0,0,0);
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
-
             camera->DeepCopy(this->headcam);
             this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
             this->selectedWindows->value(i)->Render();
         }
-        this->selectedWindows->clear(); // empty the selected windows list
+        this->selectedWindows->clear();                                                     // empty the selectedWindows list
     }
 
-    //Background color to grey
-    selectedWindow->GetRenderers()->GetFirstRenderer()->SetBackground(0.1,0.0,0.3);
-
-    //Set to headcam
-    if(this->selectedWindows->isEmpty())
+    // SELECTING
+    selectedWindow->GetRenderers()->GetFirstRenderer()->SetBackground(0.1,0.0,0.3);         //Background color to grey
+    if(this->selectedWindows->isEmpty())                                                    //Copy last camera if new selection
     {
         this->headcam->DeepCopy(selectedWindow->GetRenderers()->GetFirstRenderer()->GetActiveCamera());
     }
-    selectedWindow->GetRenderers()->GetFirstRenderer()->SetActiveCamera(this->headcam);
+    selectedWindow->GetRenderers()->GetFirstRenderer()->SetActiveCamera(this->headcam);     //Set renderWindow to headcam
+    this->selectedWindows->append(selectedWindow);                                          //Add to the selectedWindows List
 
-    //Add to the selectedWindows
-    this->selectedWindows->append(selectedWindow);
+    //Update Colormap to the last colormap
+    if(selectedInteractor->GetControlKey()==1)
+    {
+        on_colorMapBox_currentIndexChanged();
+    }
 
-    //Update Colormap (maybe better to actualise)
-    if(selectedInteractor->GetControlKey()==1) on_colorMapBox_currentIndexChanged();
-
-    //If everything is selected
-    if(selectedWindows->size()==widgetList->size()) this->checkBox_synchro->setChecked(true);
+    //if everything is selected
+    if(selectedWindows->size()==widgetList->size())
+    {
+        this->checkBox_synchro->setChecked(true);
+    }
 }
 
 
@@ -465,8 +459,10 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
 
     if((keyEvent->key() == Qt::Key_Escape))
     {
+        //disallow GUI actions
         pushButton_flip->setDisabled(true);
         pushButton_delete->setDisabled(true);
+        pushButton_center->setDisabled(true);
 
         for (int i = 0; i < this->selectedWindows->size();i++) //reset all backgrounds and cameras
         {
@@ -542,8 +538,8 @@ void ShapePopulationViewer::ModifiedHandler()
 
     for (int i = 0; i < this->selectedWindows->size();i++) //attribuate the observers back to the windows the way it used to be
     {
-        if(radioButton_1->isChecked()) on_radioButton_1_toggled();
-        else on_radioButton_2_toggled();
+        if(radioButton_realTimeSync->isChecked()) on_radioButton_realTimeSync_toggled();
+        else on_radioButton_delayedSync_toggled();
     }
 }
 
@@ -674,7 +670,7 @@ void ShapePopulationViewer::resizeEvent(QResizeEvent *event)
     QSize dockSize = this->dockWidget->size();
 
     //According to the View Options
-    if (this->radioButton_5->isChecked() == true )//view square meshes
+    if (this->radioButton_viewSquare->isChecked() == true )//view square meshes
     {
         resizeWidgetInArea();
     }
@@ -687,11 +683,11 @@ void ShapePopulationViewer::resizeEvent(QResizeEvent *event)
 
 /**
  * Callback for the View All Meshes checkbox.
- * @brief ShapePopulationViewer::on_radioButton_4_toggled
+ * @brief ShapePopulationViewer::on_radioButton_viewAll_toggled
  * @param checked
  * @author Michael Guarino & Alexis Girault
  */
-void ShapePopulationViewer::on_radioButton_4_toggled()
+void ShapePopulationViewer::on_radioButton_viewAll_toggled()
 {
     this->scrollArea->setWidgetResizable(true);
 }
@@ -700,11 +696,11 @@ void ShapePopulationViewer::on_radioButton_4_toggled()
 /**
  * Callback for the View in ___ columns checkbox.  This reads from the ___ columns line edit, and then re-arranges the QVTKWidgets
  * according to the integer entry.
- * @brief ShapePopulationViewer::on_radioButton_5_toggled
+ * @brief ShapePopulationViewer::on_radioButton_viewSquare_toggled
  * @param checked
  * @author Michael Guarino & Alexis Girault
  */
-void ShapePopulationViewer::on_radioButton_5_toggled()
+void ShapePopulationViewer::on_radioButton_viewSquare_toggled()
 {
     this->scrollArea->setWidgetResizable(false);
     resizeWidgetInArea();
@@ -724,13 +720,13 @@ void ShapePopulationViewer::on_colNumberEdit_editingFinished()
     int colNumber = getNumberOfColumns();
     placeWidgetInArea(colNumber);
 
-    if (this->radioButton_5->isChecked() == true)
+    if (this->radioButton_viewSquare->isChecked() == true)
     {
-        this->on_radioButton_5_toggled();
+        this->on_radioButton_viewSquare_toggled();
     }
     else
     {
-        this->on_radioButton_4_toggled();
+        this->on_radioButton_viewAll_toggled();
     }
 
     this->colNumberSlider->setValue(colNumber);
@@ -764,10 +760,10 @@ void ShapePopulationViewer::on_colNumberSlider_sliderReleased()
 /**
  * Callback to the REal-time Synchro Meshes radioButton.
  * Add an Observer to render meshes when modification finished
- * @brief ShapePopulationViewer::on_radioButton_1_toggled
+ * @brief ShapePopulationViewer::on_radioButton_realTimeSync_toggled
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_radioButton_1_toggled()
+void ShapePopulationViewer::on_radioButton_realTimeSync_toggled()
 {
     for (int i = 0; i < this->widgetList->size(); i++)
     {
@@ -781,10 +777,10 @@ void ShapePopulationViewer::on_radioButton_1_toggled()
 
  * Callback to the Delayed Synchro Meshes radioButton.
  * Add an Observer to render meshes while modifying
- * @brief ShapePopulationViewer::on_radioButton_2_toggled
+ * @brief ShapePopulationViewer::on_radioButton_delayedSync_toggled
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_radioButton_2_toggled()
+void ShapePopulationViewer::on_radioButton_delayedSync_toggled()
 {
     for (int i = 0; i < this->widgetList->size(); i++)
     {
@@ -809,6 +805,7 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
     {
         this->pushButton_flip->setDisabled(false);
         this->pushButton_delete->setDisabled(false);
+        this->pushButton_center->setDisabled(false);
 
         for (int i = 0; i < this->widgetList->size(); i++)
         {
@@ -823,6 +820,7 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
 
         this->pushButton_flip->setDisabled(true);
         this->pushButton_delete->setDisabled(true);
+        this->pushButton_center->setDisabled(true);
 
         for (int i = 0; i < this->widgetList->size(); i++)
         {
@@ -919,6 +917,33 @@ void ShapePopulationViewer::on_pushButton_flip_clicked()
     }
     ModifiedHandler();
 }
+
+
+void ShapePopulationViewer::on_pushButton_center_clicked()
+{
+    if(this->selectedWindows->empty()) return;
+
+    for (int i = 0; i < this->selectedWindows->size();i++)
+    {
+        //Get the position
+        vtkActor * testActor = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        double * position = testActor->GetPosition();
+        double * center = testActor->GetCenter();
+
+        //Update the position
+        double a =position[0]-center[0];
+        double b =position[1]-center[1];
+        double c =position[2]-center[2];
+        double newposition[3] = {a,b,c};
+        testActor->SetPosition(newposition);
+        testActor->SetOrigin(newposition);
+        this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->ResetCamera();
+
+        //Render
+        this->selectedWindows->value(i)->Render();
+    }
+}
+
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                         AXIS FUNCTIONS                                        * //

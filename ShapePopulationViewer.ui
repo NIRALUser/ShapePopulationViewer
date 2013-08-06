@@ -69,7 +69,7 @@
           <x>0</x>
           <y>30</y>
           <width>161</width>
-          <height>95</height>
+          <height>128</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -105,6 +105,16 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_center">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Center</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </widget>
@@ -131,7 +141,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
-          <widget class="QRadioButton" name="radioButton_4">
+          <widget class="QRadioButton" name="radioButton_viewAll">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -147,7 +157,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="radioButton_5">
+          <widget class="QRadioButton" name="radioButton_viewSquare">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -341,7 +351,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QRadioButton" name="radioButton_1">
+          <widget class="QRadioButton" name="radioButton_realTimeSync">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -357,7 +367,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="radioButton_2">
+          <widget class="QRadioButton" name="radioButton_delayedSync">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -400,7 +410,7 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Datas</string>
+            <string>Data</string>
            </property>
           </widget>
          </item>
