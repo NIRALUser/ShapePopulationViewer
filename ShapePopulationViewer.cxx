@@ -452,8 +452,6 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
  */
 void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* voidEvent)
 {
-    if(checkBox_synchro->isChecked()) return; // Don't do anything if the synchro is on "All"
-
     QKeyEvent * keyEvent = (QKeyEvent*) voidEvent;
     //qDebug()<<QKeySequence(keyEvent->key()).toString();
 
@@ -474,7 +472,14 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
             this->selectedWindows->value(i)->Render();
         }
         this->selectedWindows->clear(); // empty the selected windows list
+
+        //Unselect "Select All"
+        if(checkBox_synchro->isChecked())
+        {
+            this->checkBox_synchro->setChecked(false);
+        }
     }
+
 }
 
 /**
@@ -505,10 +510,8 @@ void ShapePopulationViewer::on_pushButton_delete_clicked()
                 break;
             }
         }
+        this->colNumberSlider->setMaximum(colNumberSlider->maximum()-1); // Readjusting in columns
     }
-
-    // Readjusting in columns
-    colNumberSlider->setMaximum(colNumberSlider->maximum()-1);
     on_colNumberEdit_editingFinished();
 
     // If no more widgets, do as closeAll
