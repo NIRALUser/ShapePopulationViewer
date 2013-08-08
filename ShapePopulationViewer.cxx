@@ -71,6 +71,7 @@ void ShapePopulationViewer::slotExit()
  */
 void ShapePopulationViewer::openDirectory()
 {
+
     // get directory
     QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),lastDirectory,QFileDialog::ShowDirsOnly);
 
@@ -94,6 +95,7 @@ void ShapePopulationViewer::openDirectory()
         }
 
         // Display widgets
+        this->selectedWindows->clear();
         this->updateWidgets();
     }
 }
@@ -118,6 +120,7 @@ void ShapePopulationViewer::openFiles()
         }
 
         // Display widgets
+        this->selectedWindows->clear();
         this->updateWidgets();
     }
 }
@@ -420,13 +423,22 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     selectedWindow->GetRenderers()->GetFirstRenderer()->SetActiveCamera(this->headcam);     //Set renderWindow to headcam
     this->selectedWindows->append(selectedWindow);                                          //Add to the selectedWindows List
 
-    //Update Colormap to the last colormap
-    if(selectedInteractor->GetControlKey()==1)
+    //Update Colormap
+    if(selectedInteractor->GetControlKey()==1)  //to the last colormap if not first selection
     {
         on_colorMapBox_currentIndexChanged();
     }
+    else                                        //or to the one in the combobox if new selection
+    {
+        const char * cmap = selectedWindow->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetName();
+        std::cout<<"Active ColorMap : "<<cmap<<std::endl;
 
-    //if everything is selected
+        int index = colorMapBox->findText(cmap);
+        if (index != -1)
+            colorMapBox->setCurrentIndex(index);
+    }
+
+    //if everything is selected, check Select All
     if(selectedWindows->size()==widgetList->size())
     {
         this->checkBox_synchro->setChecked(true);
