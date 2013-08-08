@@ -15,6 +15,7 @@ ShapePopulationViewer::ShapePopulationViewer()
     this->setupUi(this);
 
     //Vector initialization
+    this->numberOfMeshes = 0;
     this->lastDirectory = "/home";
     this->headcam = vtkCamera::New();
     this->polyDataList = new QVector<vtkPolyData *>(20);
@@ -73,7 +74,7 @@ void ShapePopulationViewer::openDirectory()
     // get directory
     QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),lastDirectory,QFileDialog::ShowDirsOnly);
 
-    // if directory choosen
+    // if directory chosen
     if(dir!="")
     {
         // Add files in the fileList
@@ -115,6 +116,8 @@ void ShapePopulationViewer::openFiles()
         {
             this->fileList.append(QFileInfo(stringList.at(i)));
         }
+
+        // Display widgets
         this->updateWidgets();
     }
 }
@@ -127,9 +130,13 @@ void ShapePopulationViewer::openFiles()
  */
 void ShapePopulationViewer::closeAll()
 {
-    //Empty the meshes FileInfo List
-    fileList.clear();
-    commonColorMaps.clear();
+    //clear any Content from the layout
+    QGridLayout *layout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
+    for (int i = 0; i < this->widgetList->size(); i++)
+    {
+        layout->removeWidget(this->widgetList->value(i));
+        delete this->widgetList->value(i);
+    }
 
     //Disable buttons
     axisButton->setDisabled(true);
@@ -154,13 +161,14 @@ void ShapePopulationViewer::closeAll()
     action_Write_Meshes->setDisabled(true);
     action_Delete_Surfaces->setDisabled(true);
 
-    //clear any Content from the layout
-    QGridLayout *layout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
-    for (int i = 0; i < this->widgetList->size(); i++)
-    {
-        layout->removeWidget(this->widgetList->value(i));
-        delete this->widgetList->value(i);
-    }
+    //Empty the meshes FileInfo List
+    this->fileList.clear();
+    this->polyDataList->clear();
+    this->mapperList->clear();
+    this->rendererList->clear();
+    this->widgetList->clear();
+    this->selectedWindows->clear();
+    this->numberOfMeshes = 0;
 }
 
 
@@ -201,16 +209,17 @@ void ShapePopulationViewer::writeMeshes()
  */
 void ShapePopulationViewer::updateWidgets()
 {
-    //clear all vectors so they might be refilled
-    this->selectedWindows->clear();
-    this->polyDataList->clear();
-    this->mapperList->clear();
-    this->rendererList->clear();
-    this->widgetList->clear();
-    this->colorMapBox->clear();
+    if(numberOfMeshes==0) //clear all vectors so they might be refilled
+    {
+        this->polyDataList->clear();
+        this->mapperList->clear();
+        this->rendererList->clear();
+        this->widgetList->clear();
+        this->selectedWindows->clear();
+    }
 
     // READER
-    for (int i = 0; i < fileList.size(); i++)
+    for (int i = numberOfMeshes; i < fileList.size(); i++)
     {
         //get filepath and fileNames
         QString QFilePath = fileList.at(i).canonicalFilePath();
@@ -226,7 +235,7 @@ void ShapePopulationViewer::updateWidgets()
     }
 
     // SMOOTHER
-    for (int i = 0; i < polyDataList->size(); i++)
+    for (int i = numberOfMeshes; i < polyDataList->size(); i++)
     {
         //smooth the image using a normal generator
         vtkPolyDataNormals * normalGenerator = vtkPolyDataNormals::New();
@@ -239,7 +248,7 @@ void ShapePopulationViewer::updateWidgets()
     }
 
     // PIPELINE VTK VISU
-    for (int i = 0; i < polyDataList->size(); i++)
+    for (int i = numberOfMeshes; i < polyDataList->size(); i++)
     {
         //MAPPER
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -259,7 +268,7 @@ void ShapePopulationViewer::updateWidgets()
     }
 
     // QT WIDGETS
-    for (int i = 0; i < rendererList->size(); i++)
+    for (int i = numberOfMeshes; i < rendererList->size(); i++)
     {
         //QVTKWIDGET
         QVTKWidget *meshWidget = new QVTKWidget(this->scrollAreaWidgetContents);
@@ -273,37 +282,14 @@ void ShapePopulationViewer::updateWidgets()
     }
 
     // COLORMAPS
-    QSet<QString> firstColorMaps;
-    for (int i = 0; i < rendererList->size(); i++)
-    {
-        int numScalars = polyDataList->value(i)->GetPointData()->GetNumberOfArrays();
-        if(i==0)
-        {
-            for (int j = 0; j < numScalars; j++)
-            {
-                QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
-                firstColorMaps.insert(scalarName);
-            }
-        }
-        else
-        {
-            QSet<QString> compareColorMaps;
-            for (int j = 0; j < numScalars; j++)
-            {
-                QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
-                compareColorMaps.insert(scalarName);
-            }
-            firstColorMaps = firstColorMaps.intersect(compareColorMaps);
-        }
-    }
-    commonColorMaps = firstColorMaps.values();  // Gets the QSet values
-    commonColorMaps.sort();                     // to be able to sort them,
+    compute_colorMaps_intersection();
+    colorMapBox->clear();
     colorMapBox->addItems(commonColorMaps);     // and then add them to the GUI.
     on_checkBox_synchro_toggled(true);          // Now we select all windows
     on_colorMapBox_currentIndexChanged();       // to apply the colorMap on all of them.
 
     // SCALAR BAR
-    for (int i = 0; i < rendererList->size(); i++)
+    for (int i = numberOfMeshes; i < rendererList->size(); i++)
     {
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
         scalarBar->SetLookupTable(mapperList->value(i)->GetLookupTable());
@@ -319,7 +305,7 @@ void ShapePopulationViewer::updateWidgets()
     }
 
     // ANNOTATIONS
-    for (int i = 0; i < rendererList->size(); i++)
+    for (int i = numberOfMeshes; i < rendererList->size(); i++)
     {
         //NAME
         QString QFileName = fileList.at(i).fileName();
@@ -344,6 +330,9 @@ void ShapePopulationViewer::updateWidgets()
         cornerAnnotation->SetText( 2,txt_cornerAnnotation);
         rendererList->value(i)->AddViewProp(cornerAnnotation);
     }
+
+    //Update the number of meshes
+    this->numberOfMeshes = fileList.size();
 
     // GUI BUTTONS
     axisButton->setDisabled(false);
@@ -490,7 +479,6 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
  */
 void ShapePopulationViewer::on_pushButton_delete_clicked()
 {
-
     pushButton_delete->setDisabled(true);
 
     // Deleting the selection, the widget, and the data
@@ -501,23 +489,38 @@ void ShapePopulationViewer::on_pushButton_delete_clicked()
         {
             if(this->widgetList->at(j)->GetRenderWindow()==selectedWindows->at(i))
             {
-                layout->removeWidget(this->widgetList->value(j));
+                this->fileList.removeAt(j);
+                this->selectedWindows->remove(i);
+                this->polyDataList->remove(j);
+                this->mapperList->remove(j);
+                this->rendererList->remove(j);
                 delete this->widgetList->value(j);
-                widgetList->remove(j);
-                fileList.removeAt(j);
-                selectedWindows->remove(i);
+                this->widgetList->remove(j);
+                layout->removeWidget(this->widgetList->value(j));
+
                 i--;
                 break;
             }
         }
         this->colNumberSlider->setMaximum(colNumberSlider->maximum()-1); // Readjusting in columns
     }
-    on_colNumberEdit_editingFinished();
+    this->numberOfMeshes = fileList.size();
 
     // If no more widgets, do as closeAll
     if(widgetList->size()==0)
     {
         closeAll();
+    }
+    else
+    {
+        on_colNumberEdit_editingFinished();
+
+        colorMapBox->clear();
+        compute_colorMaps_intersection();
+        colorMapBox->addItems(commonColorMaps);     // and then add them to the GUI.
+        on_checkBox_synchro_toggled(true);          // Now we select all windows
+        on_colorMapBox_currentIndexChanged();       // to apply the colorMap on all of them.
+        on_checkBox_synchro_toggled(false);
     }
 }
 
@@ -544,6 +547,44 @@ void ShapePopulationViewer::ModifiedHandler()
         if(radioButton_realTimeSync->isChecked()) on_radioButton_realTimeSync_toggled();
         else on_radioButton_delayedSync_toggled();
     }
+}
+
+
+/**
+ * Analyzes all the attributes from the meshes to keep the common ones in commonColorMaps.
+ * The selection is processed using intersections.
+ * @brief ShapePopulationViewer::compute_colorMaps_intersection
+ * @author Alexis Girault
+ */
+void ShapePopulationViewer::compute_colorMaps_intersection()
+{
+    commonColorMaps.clear();
+
+    QSet<QString> firstColorMaps;
+    for (int i = 0; i < rendererList->size(); i++)
+    {
+        int numScalars = polyDataList->value(i)->GetPointData()->GetNumberOfArrays();
+        if(i==0)
+        {
+            for (int j = 0; j < numScalars; j++)
+            {
+                QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
+                firstColorMaps.insert(scalarName);
+            }
+        }
+        else
+        {
+            QSet<QString> compareColorMaps;
+            for (int j = 0; j < numScalars; j++)
+            {
+                QString scalarName(polyDataList->value(i)->GetPointData()->GetArrayName(j));
+                compareColorMaps.insert(scalarName);
+            }
+            firstColorMaps = firstColorMaps.intersect(compareColorMaps);
+        }
+    }
+    commonColorMaps = firstColorMaps.values();  // Gets the QSet values
+    commonColorMaps.sort();                     // to be able to sort them,
 }
 
 

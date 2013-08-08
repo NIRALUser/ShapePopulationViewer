@@ -67,6 +67,11 @@ public:
 protected:
 
     /**
+    * Number of meshes already displayed
+    * @brief numberOfMeshes
+    */
+    unsigned int numberOfMeshes;
+    /**
     * Last directory containing opened files
     * @brief lastDirectory
     */
@@ -118,6 +123,7 @@ protected:
    void SelectWidget(vtkObject* selectedObject, unsigned long, void*);
    void UnselectWidget(vtkObject*, unsigned long, void* voidEvent);
    void ModifiedHandler();
+   void compute_colorMaps_intersection();
 
    //PLACING WIDGETS
    void printColNumber(int colNumber);
