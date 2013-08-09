@@ -13,6 +13,8 @@
 #include <vtkPolyDataWriter.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkActor2DCollection.h>
+
 
 // Visualization
 #include <vtkPolyDataMapper.h>

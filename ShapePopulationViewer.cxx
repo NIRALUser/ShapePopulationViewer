@@ -281,30 +281,6 @@ void ShapePopulationViewer::updateWidgets()
         //SELECTION
         meshWidget->GetInteractor()->AddObserver(vtkCommand::StartInteractionEvent, this, &ShapePopulationViewer::SelectWidget);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::KeyPressEvent, this, &ShapePopulationViewer::UnselectWidget);
-
-    }
-
-    // COLORMAPS
-    compute_colorMaps_intersection();
-    colorMapBox->clear();
-    colorMapBox->addItems(commonColorMaps);     // and then add them to the GUI.
-    on_checkBox_synchro_toggled(true);          // Now we select all windows
-    on_colorMapBox_currentIndexChanged();       // to apply the colorMap on all of them.
-
-    // SCALAR BAR
-    for (int i = numberOfMeshes; i < rendererList->size(); i++)
-    {
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar->SetLookupTable(mapperList->value(i)->GetLookupTable());
-        scalarBar->SetNumberOfLabels(3);
-        scalarBar->SetMaximumWidthInPixels(60);
-
-        vtkSmartPointer<vtkTextProperty> LabelProperty = vtkSmartPointer<vtkTextProperty>::New();
-        LabelProperty->SetFontSize(12);
-        LabelProperty->ShadowOn();
-        scalarBar->SetLabelTextProperty(LabelProperty);
-
-        rendererList->value(i)->AddActor2D(scalarBar);
     }
 
     // ANNOTATIONS
@@ -334,6 +310,30 @@ void ShapePopulationViewer::updateWidgets()
         rendererList->value(i)->AddViewProp(cornerAnnotation);
     }
 
+    // SCALAR BAR
+    for (int i = numberOfMeshes; i < rendererList->size(); i++)
+    {
+        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+        scalarBar->SetLookupTable(mapperList->value(i)->GetLookupTable());
+        scalarBar->SetNumberOfLabels(5);
+        scalarBar->SetMaximumWidthInPixels(60);
+
+        vtkSmartPointer<vtkTextProperty> LabelProperty = vtkSmartPointer<vtkTextProperty>::New();
+        LabelProperty->SetFontSize(12);
+        LabelProperty->ShadowOn();
+        scalarBar->SetLabelTextProperty(LabelProperty);
+
+        rendererList->value(i)->AddActor2D(scalarBar);
+    }
+
+    // COLORMAPS
+    compute_colorMaps_intersection();
+    colorMapBox->clear();
+    colorMapBox->addItems(commonColorMaps);     // and then add them to the GUI.
+    on_checkBox_synchro_toggled(true);          // Now we select all windows
+    on_colorMapBox_currentIndexChanged();       // to apply the colorMap on all of them.
+
+
     //Update the number of meshes
     this->numberOfMeshes = fileList.size();
 
@@ -350,7 +350,6 @@ void ShapePopulationViewer::updateWidgets()
     colNumberEdit->setDisabled(false);
     colNumberSlider->setDisabled(false);
     colNumberSlider->setMaximum(fileList.size());
-    colorMapBox->setDisabled(false);
 
     // GUI ACTIONS
     action_Open_Directory->setText("Add directory");
@@ -396,6 +395,7 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     if(this->selectedWindows->contains(selectedWindow)) return;
 
     //if not, allow GUI actions on selections
+    this->colorMapBox->setDisabled(false);
     this->pushButton_flip->setDisabled(false);
     this->pushButton_delete->setDisabled(false);
     this->pushButton_center->setDisabled(false);
@@ -431,8 +431,6 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     else                                        //or to the one in the combobox if new selection
     {
         const char * cmap = selectedWindow->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetName();
-        std::cout<<"Active ColorMap : "<<cmap<<std::endl;
-
         int index = colorMapBox->findText(cmap);
         if (index != -1)
             colorMapBox->setCurrentIndex(index);
@@ -459,9 +457,10 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
     if((keyEvent->key() == Qt::Key_Escape))
     {
         //disallow GUI actions
-        pushButton_flip->setDisabled(true);
-        pushButton_delete->setDisabled(true);
-        pushButton_center->setDisabled(true);
+        this->colorMapBox->setDisabled(true);
+        this->pushButton_flip->setDisabled(true);
+        this->pushButton_delete->setDisabled(true);
+        this->pushButton_center->setDisabled(true);
 
         for (int i = 0; i < this->selectedWindows->size();i++) //reset all backgrounds and cameras
         {
@@ -859,6 +858,7 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
 
     if(checked) // Select all
     {
+        this->colorMapBox->setDisabled(false);
         this->pushButton_flip->setDisabled(false);
         this->pushButton_delete->setDisabled(false);
         this->pushButton_center->setDisabled(false);
@@ -873,7 +873,7 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
     }
     else // No synchro
     {
-
+        this->colorMapBox->setDisabled(true);
         this->pushButton_flip->setDisabled(true);
         this->pushButton_delete->setDisabled(true);
         this->pushButton_center->setDisabled(true);
@@ -911,27 +911,33 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
 
     for (int i = 0; i < this->selectedWindows->size(); i++)
     {
-        this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->SetActiveScalars(cmap);
         vtkMapper * mapper = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper();
+        mapper->GetInput()->GetPointData()->SetActiveScalars(cmap);
 
         vtkColorTransferFunction* DistanceMapTFunc = vtkColorTransferFunction::New();
-        double *rangeLUT =mapper->GetInput()->GetPointData()->GetScalars()->GetRange();
-        double range = fabs(rangeLUT[1] - rangeLUT[0]);
+        double *rangeLUT = mapper->GetInput()->GetPointData()->GetScalars()->GetRange();
+        float range = fabs(rangeLUT[1] - rangeLUT[0]);
 
         DistanceMapTFunc->AdjustRange(rangeLUT);
-        DistanceMapTFunc->SetColorSpaceToDiverging();                                           //this is necessary for the color transfer function to automatically interpolate between the points we set
+        DistanceMapTFunc->SetColorSpaceToDiverging();                               //this is necessary for the color transfer function to automatically interpolate between the points we set
         DistanceMapTFunc->RemoveAllPoints();
-        DistanceMapTFunc->AddRGBPoint(rangeLUT[0] - range / 256.0, 0, 255, 0);                                  // we add a point in the LUT to enforce the min value to be green = 0,255,0
+        DistanceMapTFunc->AddRGBPoint(rangeLUT[0] - range / 256.0, 0, 255, 0);      // we add a point in the LUT to enforce the min value to be green = 0,255,0
         DistanceMapTFunc->AddRGBPoint(rangeLUT[0] + range / 2.0 , 255, 255, 0);     // we add another point in the middle of the range to be yellow = 255,255,0
-        DistanceMapTFunc->AddRGBPoint(rangeLUT[1] + range / 256.0, 255, 0, 0);                                  // we add a last point in the LUT to enforce the max value to be red = 255,0,0
-        DistanceMapTFunc->ClampingOn();//out of range values go to either max or min
+        DistanceMapTFunc->AddRGBPoint(rangeLUT[1] + range / 256.0, 255, 0, 0);      // we add a last point in the LUT to enforce the max value to be red = 255,0,0
+        DistanceMapTFunc->ClampingOn();                                             //out of range values go to either max or min
 
+        // MAPPER
         mapper->SetLookupTable( DistanceMapTFunc );
         mapper->ScalarVisibilityOn();
         //mapper->SetScalarRange(rangeLUT[0],rangeLUT[1]);
-        //mapper->SetScalarModeToUsePointData();  //we want to use point scalars (could have been cell)
+        //mapper->SetScalarModeToUsePointData();
         //mapper->SetColorModeToMapScalars();
         mapper->Update();
+
+        // SCALAR BAR
+        vtkActor2D * oldScalarBar = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
+        vtkScalarBarActor * scalarBar = (vtkScalarBarActor *)oldScalarBar;
+        scalarBar->SetLookupTable(DistanceMapTFunc);
 
     }
 
