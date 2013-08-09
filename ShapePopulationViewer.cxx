@@ -19,7 +19,6 @@ ShapePopulationViewer::ShapePopulationViewer()
     this->lastDirectory = "/home";
     this->headcam = vtkCamera::New();
     this->polyDataList = new QVector<vtkPolyData *>(20);
-    this->mapperList = new QVector<vtkMapper *>(20);
     this->rendererList = new QVector<vtkRenderer *>(20);
     this->widgetList = new QVector<QVTKWidget *>(20);
     this->selectedWindows = new QVector<vtkRenderWindow *>(20);
@@ -167,7 +166,6 @@ void ShapePopulationViewer::closeAll()
     //Empty the meshes FileInfo List
     this->fileList.clear();
     this->polyDataList->clear();
-    this->mapperList->clear();
     this->rendererList->clear();
     this->widgetList->clear();
     this->selectedWindows->clear();
@@ -215,7 +213,6 @@ void ShapePopulationViewer::updateWidgets()
     if(numberOfMeshes==0) //clear all vectors so they might be refilled
     {
         this->polyDataList->clear();
-        this->mapperList->clear();
         this->rendererList->clear();
         this->widgetList->clear();
         this->selectedWindows->clear();
@@ -255,7 +252,6 @@ void ShapePopulationViewer::updateWidgets()
     {
         //MAPPER
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        this->mapperList->append(mapper);
         mapper->SetInputConnection(polyDataList->value(i)->GetProducerPort());
 
         //ACTOR
@@ -314,7 +310,7 @@ void ShapePopulationViewer::updateWidgets()
     for (int i = numberOfMeshes; i < rendererList->size(); i++)
     {
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar->SetLookupTable(mapperList->value(i)->GetLookupTable());
+        scalarBar->SetLookupTable(rendererList->value(i)->GetActors()->GetLastActor()->GetMapper()->GetLookupTable());
         scalarBar->SetNumberOfLabels(5);
         scalarBar->SetMaximumWidthInPixels(60);
 
@@ -503,7 +499,6 @@ void ShapePopulationViewer::on_pushButton_delete_clicked()
                 this->fileList.removeAt(j);
                 this->selectedWindows->remove(i);
                 this->polyDataList->remove(j);
-                this->mapperList->remove(j);
                 this->rendererList->remove(j);
                 delete this->widgetList->value(j);
                 this->widgetList->remove(j);

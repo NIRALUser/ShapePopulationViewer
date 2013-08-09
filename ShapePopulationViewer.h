@@ -94,18 +94,13 @@ protected:
     */
     QFileInfoList fileList;
    /**
-    * vector of QVTKWidget
-    * @brief widgetList
+    * vector of vtkPolyData
+    * @brief polyDataList
     */
     QVector<vtkPolyData *> *polyDataList;
    /**
-    * vector of QVTKWidget
-    * @brief widgetList
-    */
-    QVector<vtkMapper *> *mapperList;
-   /**
-    * vector of QVTKWidget
-    * @brief widgetList
+    * vector of vtkRenderer
+    * @brief rendererList
     */
     QVector<vtkRenderer *> *rendererList;
    /**
