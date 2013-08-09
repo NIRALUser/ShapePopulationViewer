@@ -22,7 +22,7 @@ ShapePopulationViewer::ShapePopulationViewer()
     this->rendererList = new QVector<vtkRenderer *>(20);
     this->widgetList = new QVector<QVTKWidget *>(20);
     this->selectedWindows = new QVector<vtkRenderWindow *>(20);
-
+/*
     // Set up Axes buttons
     QString path = QDir::currentPath();
     QIcon down(path + "/arrows/down.jpg");
@@ -37,7 +37,7 @@ ShapePopulationViewer::ShapePopulationViewer()
     this->toolButton_4->setIcon(left);
     this->toolButton_5->setIcon(up);
     this->toolButton_6->setIcon(down);
-
+*/
     // Set up action signals and slots
     connect(this->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
     connect(this->action_Write_Meshes,SIGNAL(triggered()),this,SLOT(writeMeshes()));
@@ -292,8 +292,8 @@ void ShapePopulationViewer::updateWidgets()
 
         //CREATE THE STRING
         std::stringstream strs;
-        strs << "NAME: "<< fileName <<std::endl
-             << "POINTS: "<< (int)numberOfPoints <<std::endl;
+        strs << fileName <<std::endl
+             << (int)numberOfPoints << " points" <<std::endl;
         std::string temp_str = strs.str();
         const char* txt_cornerAnnotation = temp_str.c_str();
 
@@ -808,7 +808,7 @@ void ShapePopulationViewer::on_colNumberSlider_sliderReleased()
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 /**
- * Callback to the REal-time Synchro Meshes radioButton.
+ * Callback to the Real-time Synchro Meshes radioButton.
  * Add an Observer to render meshes when modification finished
  * @brief ShapePopulationViewer::on_radioButton_realTimeSync_toggled
  * @author Alexis Girault
@@ -891,6 +891,17 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
 // *                                           COLORMAP                                            * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
+double round_nplaces(double value, int to)
+{
+    int places = 1, whole = *(&value);
+    for(int i = 0; i < to; i++) places *= 10;
+    value -= whole; //leave decimals
+    value *= places; //0.1234 -> 123.4
+    value = round(value);//123.4 -> 123
+    value /= places; //123 -> .123
+    value += whole; //bring the whole value back
+    return value;
+}
 
 /**
  * Callback to the colormap dropdown menu.  This will pull the selected text from the menu,
@@ -909,19 +920,28 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
         vtkMapper * mapper = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper();
         mapper->GetInput()->GetPointData()->SetActiveScalars(cmap);
 
-        vtkColorTransferFunction* DistanceMapTFunc = vtkColorTransferFunction::New();
+        //Range
         double *rangeLUT = mapper->GetInput()->GetPointData()->GetScalars()->GetRange();
-        float range = fabs(rangeLUT[1] - rangeLUT[0]);
+        double range = fabs(rangeLUT[1] - rangeLUT[0]);
 
+        //Round
+        double G = round_nplaces(rangeLUT[0] - range/256, 3);
+        double Y = round_nplaces(rangeLUT[0] + range/2.0, 3);
+        double O = round_nplaces(rangeLUT[1] - range/4.0, 3);
+        double R = round_nplaces(rangeLUT[1] + range/256, 3);
+
+        //LookUpTable
+        vtkColorTransferFunction* DistanceMapTFunc = vtkColorTransferFunction::New();
         DistanceMapTFunc->AdjustRange(rangeLUT);
-        DistanceMapTFunc->SetColorSpaceToDiverging();                               //this is necessary for the color transfer function to automatically interpolate between the points we set
+        DistanceMapTFunc->SetColorSpaceToDiverging();       //this is necessary for the color transfer function to automatically interpolate between the points we set
         DistanceMapTFunc->RemoveAllPoints();
-        DistanceMapTFunc->AddRGBPoint(rangeLUT[0] - range / 256.0, 0, 255, 0);      // we add a point in the LUT to enforce the min value to be green = 0,255,0
-        DistanceMapTFunc->AddRGBPoint(rangeLUT[0] + range / 2.0 , 255, 255, 0);     // we add another point in the middle of the range to be yellow = 255,255,0
-        DistanceMapTFunc->AddRGBPoint(rangeLUT[1] + range / 256.0, 255, 0, 0);      // we add a last point in the LUT to enforce the max value to be red = 255,0,0
-        DistanceMapTFunc->ClampingOn();                                             //out of range values go to either max or min
+        DistanceMapTFunc->AddRGBPoint(G, 0, 255, 0);        // Enforce the min value to be green = 0,255,0
+        DistanceMapTFunc->AddRGBPoint(Y, 255, 255, 0);      // Enforce the middle of the range to be yellow = 255,255,0
+        DistanceMapTFunc->AddRGBPoint(O, 255, 127.5, 0);        // Enforce the max value to be red = 255,0,0
+        DistanceMapTFunc->AddRGBPoint(R, 255, 0, 0);        // Enforce the max value to be red = 255,0,0
+        DistanceMapTFunc->ClampingOn();                     //out of range values go to either max or min
 
-        // MAPPER
+        //Mapper Update
         mapper->SetLookupTable( DistanceMapTFunc );
         mapper->ScalarVisibilityOn();
         //mapper->SetScalarRange(rangeLUT[0],rangeLUT[1]);
@@ -929,14 +949,14 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
         //mapper->SetColorModeToMapScalars();
         mapper->Update();
 
-        // SCALAR BAR
+        //ScalarBar Update
         vtkActor2D * oldScalarBar = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
         vtkScalarBarActor * scalarBar = (vtkScalarBarActor *)oldScalarBar;
         scalarBar->SetLookupTable(DistanceMapTFunc);
 
     }
 
-    this->ModifiedHandler();
+    ModifiedHandler();
 }
 
 /**
@@ -997,10 +1017,8 @@ void ShapePopulationViewer::on_pushButton_center_clicked()
         testActor->SetPosition(newposition);
         testActor->SetOrigin(newposition);
         this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->ResetCamera();
-
-        //Render
-        this->selectedWindows->value(i)->Render();
     }
+    ModifiedHandler();
 }
 
 

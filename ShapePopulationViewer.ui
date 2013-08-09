@@ -236,27 +236,27 @@
           <widget class="QToolButton" name="toolButton_1">
            <property name="geometry">
             <rect>
-             <x>60</x>
+             <x>0</x>
              <y>20</y>
              <width>31</width>
              <height>31</height>
             </rect>
            </property>
            <property name="text">
-            <string>-Z</string>
+            <string>P</string>
            </property>
           </widget>
           <widget class="QToolButton" name="toolButton_2">
            <property name="geometry">
             <rect>
-             <x>0</x>
+             <x>60</x>
              <y>80</y>
              <width>31</width>
              <height>31</height>
             </rect>
            </property>
            <property name="text">
-            <string>+Z</string>
+            <string>A</string>
            </property>
           </widget>
           <widget class="QToolButton" name="toolButton_4">
@@ -269,7 +269,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>-X</string>
+            <string>R</string>
            </property>
           </widget>
           <widget class="QToolButton" name="toolButton_3">
@@ -282,7 +282,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>+X</string>
+            <string>L</string>
            </property>
           </widget>
           <widget class="QToolButton" name="toolButton_5">
@@ -295,7 +295,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>+Y</string>
+            <string>S</string>
            </property>
           </widget>
           <widget class="QToolButton" name="toolButton_6">
@@ -308,7 +308,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>-Y</string>
+            <string>I</string>
            </property>
           </widget>
           <widget class="QToolButton" name="toolButton_0">
@@ -321,7 +321,7 @@
             </rect>
            </property>
            <property name="text">
-            <string>0</string>
+            <string>X</string>
            </property>
           </widget>
          </widget>
