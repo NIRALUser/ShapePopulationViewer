@@ -147,8 +147,6 @@ void ShapePopulationViewer::closeAll()
     checkBox_synchro->setDisabled(true);
     radioButton_viewAll->setDisabled(true);
     radioButton_viewSquare->setDisabled(true);
-    radioButton_6->setDisabled(true);
-    radioButton_7->setDisabled(true);
     colNumberTXT->setDisabled(true);
     colNumberEdit->setDisabled(true);
     colNumberSlider->setDisabled(true);
@@ -340,8 +338,6 @@ void ShapePopulationViewer::updateWidgets()
     checkBox_synchro->setDisabled(false);
     radioButton_viewAll->setDisabled(false);
     radioButton_viewSquare->setDisabled(false);
-    radioButton_6->setDisabled(true); //to do : move or select
-    radioButton_7->setDisabled(true); //to do
     colNumberTXT->setDisabled(false);
     colNumberEdit->setDisabled(false);
     colNumberSlider->setDisabled(false);
@@ -927,7 +923,6 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
         //Round
         double G = round_nplaces(rangeLUT[0] - range/256, 3);
         double Y = round_nplaces(rangeLUT[0] + range/2.0, 3);
-        double O = round_nplaces(rangeLUT[1] - range/4.0, 3);
         double R = round_nplaces(rangeLUT[1] + range/256, 3);
 
         //LookUpTable
@@ -937,9 +932,7 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
         DistanceMapTFunc->RemoveAllPoints();
         DistanceMapTFunc->AddRGBPoint(G, 0, 255, 0);        // Enforce the min value to be green = 0,255,0
         DistanceMapTFunc->AddRGBPoint(Y, 255, 255, 0);      // Enforce the middle of the range to be yellow = 255,255,0
-        DistanceMapTFunc->AddRGBPoint(O, 255, 127.5, 0);        // Enforce the max value to be red = 255,0,0
         DistanceMapTFunc->AddRGBPoint(R, 255, 0, 0);        // Enforce the max value to be red = 255,0,0
-        DistanceMapTFunc->ClampingOn();                     //out of range values go to either max or min
 
         //Mapper Update
         mapper->SetLookupTable( DistanceMapTFunc );
