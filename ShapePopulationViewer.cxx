@@ -33,17 +33,26 @@ ShapePopulationViewer::ShapePopulationViewer()
     QIcon ll(path + "/arrows/lower_left.jpg");
     this->toolButton_1->setIcon(ur);
     this->toolButton_2->setIcon(ll);
-    this->toolButton_3->setIcon(right);
+    this->toolButton_VIEW_L->setIcon(right);
     this->toolButton_4->setIcon(left);
-    this->toolButton_5->setIcon(up);
+    this->toolButton_VIEW_S->setIcon(up);
     this->toolButton_6->setIcon(down);
 */
+
+    // GUI disable
+    groupBox_OPTIONS->setDisabled(true);
+    menuEdit->setDisabled(true);
+    actionSave_CSV->setDisabled(true);
+
     // Set up action signals and slots
     connect(this->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
-    connect(this->action_Write_Meshes,SIGNAL(triggered()),this,SLOT(writeMeshes()));
-    connect(this->action_Open_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
-    connect(this->action_Open_Files,SIGNAL(triggered()),this,SLOT(openFiles()));
-    connect(this->action_Delete_Surfaces,SIGNAL(triggered()),this,SLOT(closeAll()));
+    connect(this->actionOpen_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
+    connect(this->actionOpen_VTK_Files,SIGNAL(triggered()),this,SLOT(openFiles()));
+    //connect(this->actionLoad_CSV,SIGNAL(triggered()),this,SLOT(writeMeshes()));
+    connect(this->actionSave_CSV,SIGNAL(triggered()),this,SLOT(writeMeshes()));
+    connect(this->actionDelete,SIGNAL(triggered()),this,SLOT(deleteSelection()));
+    connect(this->actionDelete_All,SIGNAL(triggered()),this,SLOT(deleteAll()));
+    connect(this->actionFlip_Scalars,SIGNAL(triggered()),this,SLOT(flipSelection()));
 }
 
 
@@ -127,10 +136,10 @@ void ShapePopulationViewer::openFiles()
 /**
  * Callback to "Delete All surfaces" menu item, that calls the updateWidgets()
  * helper function after clearing the fileList.
- * @brief ShapePopulationViewer::closeAll
+ * @brief ShapePopulationViewer::deleteAll
  * @author Alexis Girault
  */
-void ShapePopulationViewer::closeAll()
+void ShapePopulationViewer::deleteAll()
 {
     //clear any Content from the layout
     QGridLayout *layout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
@@ -141,25 +150,12 @@ void ShapePopulationViewer::closeAll()
     }
 
     //Disable buttons
-    axisButton->setDisabled(true);
-    radioButton_realTimeSync->setDisabled(true);
-    radioButton_delayedSync->setDisabled(true);
-    checkBox_synchro->setDisabled(true);
-    radioButton_viewAll->setDisabled(true);
-    radioButton_viewSquare->setDisabled(true);
-    colNumberTXT->setDisabled(true);
-    colNumberEdit->setDisabled(true);
-    colNumberSlider->setDisabled(true);
-    colorMapBox->setDisabled(true);
-    pushButton_flip->setDisabled(true);
-    pushButton_delete->setDisabled(true);
-    pushButton_center->setDisabled(true);
+    groupBox_OPTIONS->setDisabled(true);
+    menuEdit->setDisabled(true);
 
     //Initialize Menu actions
-    action_Open_Directory->setText("Open directory");
-    action_Open_Files->setText("Open .vtk files");
-    action_Write_Meshes->setDisabled(true);
-    action_Delete_Surfaces->setDisabled(true);
+    actionOpen_Directory->setText("Open Directory");
+    actionOpen_VTK_Files->setText("Open VTK Files");
 
     //Empty the meshes FileInfo List
     this->fileList.clear();
@@ -181,7 +177,6 @@ void ShapePopulationViewer::writeMeshes()
 {
     if(this->widgetList->size()==0) return;
 
-    int meshes = 0;
     for (int i = 0; i < fileList.size(); i++)
     {
         QString path = fileList.at(i).absoluteFilePath();
@@ -322,32 +317,23 @@ void ShapePopulationViewer::updateWidgets()
 
     // COLORMAPS
     compute_colorMaps_intersection();
-    colorMapBox->clear();
-    colorMapBox->addItems(commonColorMaps);     // and then add them to the GUI.
-    on_checkBox_synchro_toggled(true);          // Now we select all windows
-    on_colorMapBox_currentIndexChanged();       // to apply the colorMap on all of them.
+    comboBox_VISU_colormap->clear();
+    comboBox_VISU_colormap->addItems(commonColorMaps);     // and then add them to the GUI.
+    on_checkBox_SYNC_all_toggled(true);                     // Now we select all windows
+    on_comboBox_VISU_colormap_currentIndexChanged();       // to apply the colorMap on all of them.
 
 
     //Update the number of meshes
     this->numberOfMeshes = fileList.size();
 
     // GUI BUTTONS
-    axisButton->setDisabled(false);
-    radioButton_realTimeSync->setDisabled(false);
-    radioButton_delayedSync->setDisabled(false);
-    checkBox_synchro->setDisabled(false);
-    radioButton_viewAll->setDisabled(false);
-    radioButton_viewSquare->setDisabled(false);
-    colNumberTXT->setDisabled(false);
-    colNumberEdit->setDisabled(false);
-    colNumberSlider->setDisabled(false);
-    colNumberSlider->setMaximum(fileList.size());
+    groupBox_OPTIONS->setDisabled(false);
+    menuEdit->setDisabled(false);
+    slider_DISPLAY_columns->setMaximum(fileList.size());
 
     // GUI ACTIONS
-    action_Open_Directory->setText("Add directory");
-    action_Open_Files->setText("Add .vtk files");
-    action_Write_Meshes->setDisabled(true); // to do
-    action_Delete_Surfaces->setDisabled(false);
+    actionOpen_Directory->setText("Add directory");
+    actionOpen_VTK_Files->setText("Add .vtk files");
 
     // GUI WIDGETS DISPLAY
 
@@ -358,14 +344,14 @@ void ShapePopulationViewer::updateWidgets()
     {
         sum += nextOdd;//simple integer square root, will give the ceiling of the colNumber => cols >= rows
     }
-    printColNumber(colNumber+1);                //Display the number of columns in colNumberEdit,
-    on_colNumberEdit_editingFinished();         //and display the Widgets according to this number.
-    on_radioButton_viewAll_toggled();           //Display All surfaces,
-    this->radioButton_viewAll->toggle();        //and toogle the GUI button.
-    on_radioButton_delayedSync_toggled();       //Start with a delayed synchro,
-    this->radioButton_delayedSync->toggle();    //and toogle the GUI button.
-    on_checkBox_synchro_toggled(false);         //Start with meshes not selected,
-    this->checkBox_synchro->setChecked(false);  //and uncheck the synchro checkBox.
+    printColNumber(colNumber+1);                //Display the number of columns in spinBox_DISPLAY_columns,
+    on_spinBox_DISPLAY_columns_editingFinished();         //and display the Widgets according to this number.
+    on_radioButton_DISPLAY_all_toggled();           //Display All surfaces,
+    this->radioButton_DISPLAY_all->toggle();        //and toogle the GUI button.
+    on_radioButton_SYNC_delayed_toggled();       //Start with a delayed synchro,
+    this->radioButton_SYNC_delayed->toggle();    //and toogle the GUI button.
+    on_checkBox_SYNC_all_toggled(false);;         //Start with meshes not selected,
+    this->checkBox_SYNC_all->setChecked(false);  //and uncheck the synchro checkBox.
 
 }
 
@@ -377,7 +363,7 @@ void ShapePopulationViewer::updateWidgets()
  */
 void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned long, void* )
 {
-    if(checkBox_synchro->isChecked()) return; // Don't do anything if the synchro is on "All"
+    if(checkBox_SYNC_all->isChecked()) return; // Don't do anything if the synchro is on "All"
 
     //Get the interactor used
     vtkSmartPointer<QVTKInteractor> selectedInteractor = (QVTKInteractor*)selectedObject;
@@ -387,10 +373,11 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     if(this->selectedWindows->contains(selectedWindow)) return;
 
     //if not, allow GUI actions on selections
-    this->colorMapBox->setDisabled(false);
-    this->pushButton_flip->setDisabled(false);
-    this->pushButton_delete->setDisabled(false);
-    this->pushButton_center->setDisabled(false);
+    this->actionFlip_Scalars->setDisabled(false);
+    this->actionDelete->setDisabled(false);
+    this->groupBox_VIEW->setDisabled(false);
+    this->groupBox_VISU->setDisabled(false);
+    this->groupBox_CENTER->setDisabled(false);
 
     // NEW SELECTION (Ctrl not pushed)
     if(selectedInteractor->GetControlKey()==0)
@@ -418,20 +405,20 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     //Update Colormap
     if(selectedInteractor->GetControlKey()==1)  //to the last colormap if not first selection
     {
-        on_colorMapBox_currentIndexChanged();
+        on_comboBox_VISU_colormap_currentIndexChanged();
     }
     else                                        //or to the one in the combobox if new selection
     {
         const char * cmap = selectedWindow->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetName();
-        int index = colorMapBox->findText(cmap);
+        int index = comboBox_VISU_colormap->findText(cmap);
         if (index != -1)
-            colorMapBox->setCurrentIndex(index);
+            comboBox_VISU_colormap->setCurrentIndex(index);
     }
 
     //if everything is selected, check Select All
     if(selectedWindows->size()==widgetList->size())
     {
-        this->checkBox_synchro->setChecked(true);
+        this->checkBox_SYNC_all->setChecked(true);
     }
 }
 
@@ -448,28 +435,11 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
 
     if((keyEvent->key() == Qt::Key_Escape))
     {
-        //disallow GUI actions
-        this->colorMapBox->setDisabled(true);
-        this->pushButton_flip->setDisabled(true);
-        this->pushButton_delete->setDisabled(true);
-        this->pushButton_center->setDisabled(true);
-
-        for (int i = 0; i < this->selectedWindows->size();i++) //reset all backgrounds and cameras
+        if(checkBox_SYNC_all->isChecked())
         {
-            this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0,0,0);
-            vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
-
-            camera->DeepCopy(headcam);
-            this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
-            this->selectedWindows->value(i)->Render();
+            this->checkBox_SYNC_all->setChecked(false);
         }
-        this->selectedWindows->clear(); // empty the selected windows list
-
-        //Unselect "Select All"
-        if(checkBox_synchro->isChecked())
-        {
-            this->checkBox_synchro->setChecked(false);
-        }
+        on_checkBox_SYNC_all_toggled(false);
     }
 
 }
@@ -477,12 +447,12 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
 /**
  * Callback for the deletes meshes buttonm that delete le selection, the widget,
  * and the file from all lists, then adjust the remaining widgets.
- * @brief ShapePopulationViewer::on_pushButton_delete_clicked
+ * @brief ShapePopulationViewer::deleteSelection
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_pushButton_delete_clicked()
+void ShapePopulationViewer::deleteSelection()
 {
-    pushButton_delete->setDisabled(true);
+    this->actionDelete->setDisabled(true);
 
     // Deleting the selection, the widget, and the data
     QGridLayout *layout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
@@ -504,25 +474,25 @@ void ShapePopulationViewer::on_pushButton_delete_clicked()
                 break;
             }
         }
-        this->colNumberSlider->setMaximum(colNumberSlider->maximum()-1); // Readjusting in columns
+        this->slider_DISPLAY_columns->setMaximum(slider_DISPLAY_columns->maximum()-1); // Readjusting in columns
     }
     this->numberOfMeshes = fileList.size();
 
-    // If no more widgets, do as closeAll
+    // If no more widgets, do as deleteAll
     if(widgetList->size()==0)
     {
-        closeAll();
+        deleteAll();
     }
     else
     {
-        on_colNumberEdit_editingFinished();
+        on_spinBox_DISPLAY_columns_editingFinished();
 
-        colorMapBox->clear();
+        comboBox_VISU_colormap->clear();
         compute_colorMaps_intersection();
-        colorMapBox->addItems(commonColorMaps);     // and then add them to the GUI.
-        on_checkBox_synchro_toggled(true);          // Now we select all windows
-        on_colorMapBox_currentIndexChanged();       // to apply the colorMap on all of them.
-        on_checkBox_synchro_toggled(false);
+        comboBox_VISU_colormap->addItems(commonColorMaps);     // and then add them to the GUI.
+        on_checkBox_SYNC_all_toggled(true);;          // Now we select all windows
+        on_comboBox_VISU_colormap_currentIndexChanged();       // to apply the colorMap on all of them.
+        on_checkBox_SYNC_all_toggled(false);;
     }
 }
 
@@ -546,8 +516,8 @@ void ShapePopulationViewer::ModifiedHandler()
 
     for (int i = 0; i < this->selectedWindows->size();i++) //attribuate the observers back to the windows the way it used to be
     {
-        if(radioButton_realTimeSync->isChecked()) on_radioButton_realTimeSync_toggled();
-        else on_radioButton_delayedSync_toggled();
+        if(radioButton_SYNC_realtime->isChecked()) on_radioButton_SYNC_realtime_toggled();
+        else on_radioButton_SYNC_delayed_toggled();
     }
 }
 
@@ -601,11 +571,8 @@ void ShapePopulationViewer::compute_colorMaps_intersection()
  */
 void ShapePopulationViewer::printColNumber(int colNumber)
 {
-    char buffer[30];
-    sprintf(buffer,"%d",colNumber);
-    QString line(buffer);
-    this->colNumberEdit->selectAll();
-    this->colNumberEdit->insert(line);
+    this->spinBox_DISPLAY_columns->selectAll();
+    this->spinBox_DISPLAY_columns->setValue(colNumber);
 }
 
 /**
@@ -617,7 +584,7 @@ int ShapePopulationViewer::getNumberOfColumns()
 {
     int meshesNumber = this->widgetList->size();
 
-    QString QStr_colNumber = this->colNumberEdit->text();
+    QString QStr_colNumber = this->spinBox_DISPLAY_columns->text();
     int colNumber = QStr_colNumber.toInt();
 
     if(colNumber > meshesNumber)
@@ -669,6 +636,7 @@ void ShapePopulationViewer::placeWidgetInArea(int colNumber)
 
     for (int i = 0; i < meshesNumber ;i++)
     {
+
         QGridLayout *layout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
         layout->addWidget(this->widgetList->value(i),i_row,i_col);
         if (i_col == colNumber-1)
@@ -693,12 +661,12 @@ void ShapePopulationViewer::resizeWidgetInArea()
 {
     if(this->widgetList->size()==0) return;
 
-    QSize QSize_dockSize = this->dockWidget->size();
-    int dockWidth = QSize_dockSize.width();
+    QSize QSize_scrollArea = this->scrollAreaWidgetContents->size();
+    int scrollAreaWidth = QSize_scrollArea.width();
 
     int colNumber = getNumberOfColumns();
     int rowNumber = getNumberOfRows(colNumber);
-    this->scrollAreaWidgetContents->resize(dockWidth-38,(dockWidth-38)*rowNumber/colNumber);
+    this->scrollAreaWidgetContents->resize(scrollAreaWidth,(scrollAreaWidth)*rowNumber/colNumber);
 }
 
 
@@ -713,10 +681,9 @@ void ShapePopulationViewer::resizeEvent(QResizeEvent *event)
 {
     //Resizing Windows
     QMainWindow::resizeEvent(event);
-    QSize dockSize = this->dockWidget->size();
 
     //According to the View Options
-    if (this->radioButton_viewSquare->isChecked() == true )//view square meshes
+    if (this->radioButton_DISPLAY_square->isChecked() == true )//view square meshes
     {
         resizeWidgetInArea();
     }
@@ -729,11 +696,11 @@ void ShapePopulationViewer::resizeEvent(QResizeEvent *event)
 
 /**
  * Callback for the View All Meshes checkbox.
- * @brief ShapePopulationViewer::on_radioButton_viewAll_toggled
+ * @brief ShapePopulationViewer::on_radioButton_DISPLAY_all_toggled
  * @param checked
  * @author Michael Guarino & Alexis Girault
  */
-void ShapePopulationViewer::on_radioButton_viewAll_toggled()
+void ShapePopulationViewer::on_radioButton_DISPLAY_all_toggled()
 {
     this->scrollArea->setWidgetResizable(true);
 }
@@ -742,11 +709,11 @@ void ShapePopulationViewer::on_radioButton_viewAll_toggled()
 /**
  * Callback for the View in ___ columns checkbox.  This reads from the ___ columns line edit, and then re-arranges the QVTKWidgets
  * according to the integer entry.
- * @brief ShapePopulationViewer::on_radioButton_viewSquare_toggled
+ * @brief ShapePopulationViewer::on_radioButton_DISPLAY_square_toggled
  * @param checked
  * @author Michael Guarino & Alexis Girault
  */
-void ShapePopulationViewer::on_radioButton_viewSquare_toggled()
+void ShapePopulationViewer::on_radioButton_DISPLAY_square_toggled()
 {
     this->scrollArea->setWidgetResizable(false);
     resizeWidgetInArea();
@@ -755,47 +722,47 @@ void ShapePopulationViewer::on_radioButton_viewSquare_toggled()
 
 /**
  * Callback to the ___ columns line edit.
- * A colNumberEdit modification activates column rearrangement.
- * @brief ShapePopulationViewer::on_colNumberEdit_editingFinished
+ * A spinBox_DISPLAY_columns modification activates column rearrangement.
+ * @brief ShapePopulationViewer::on_spinBox_DISPLAY_columns_editingFinished
  * @author Michael Guarino & Alexis Girault
  */
-void ShapePopulationViewer::on_colNumberEdit_editingFinished()
+void ShapePopulationViewer::on_spinBox_DISPLAY_columns_editingFinished()
 {
     if(this->widgetList->size()==0) return;
 
     int colNumber = getNumberOfColumns();
     placeWidgetInArea(colNumber);
 
-    if (this->radioButton_viewSquare->isChecked() == true)
+    if (this->radioButton_DISPLAY_square->isChecked() == true)
     {
-        this->on_radioButton_viewSquare_toggled();
+        this->on_radioButton_DISPLAY_square_toggled();
     }
     else
     {
-        this->on_radioButton_viewAll_toggled();
+        this->on_radioButton_DISPLAY_all_toggled();
     }
 
-    this->colNumberSlider->setValue(colNumber);
+    this->slider_DISPLAY_columns->setValue(colNumber);
 }
 
 /**
- * Display the number of columns selected by the slider into colNumberEdit
- * @brief ShapePopulationViewer::on_colNumberSlider_valueChanged
+ * Display the number of columns selected by the slider into spinBox_DISPLAY_columns
+ * @brief ShapePopulationViewer::on_slider_DISPLAY_columns_valueChanged
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_colNumberSlider_valueChanged()
+void ShapePopulationViewer::on_slider_DISPLAY_columns_valueChanged()
 {
-    printColNumber(colNumberSlider->value());
+    printColNumber(slider_DISPLAY_columns->value());
 }
 
 /**
  * Activates the column rearrangement.
- * @brief ShapePopulationViewer::on_colNumberSlider_sliderReleased
+ * @brief ShapePopulationViewer::on_slider_DISPLAY_columns_sliderReleased
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_colNumberSlider_sliderReleased()
+void ShapePopulationViewer::on_slider_DISPLAY_columns_sliderReleased()
 {
-    on_colNumberEdit_editingFinished();
+    on_spinBox_DISPLAY_columns_editingFinished();
 }
 
 
@@ -806,10 +773,10 @@ void ShapePopulationViewer::on_colNumberSlider_sliderReleased()
 /**
  * Callback to the Real-time Synchro Meshes radioButton.
  * Add an Observer to render meshes when modification finished
- * @brief ShapePopulationViewer::on_radioButton_realTimeSync_toggled
+ * @brief ShapePopulationViewer::on_radioButton_SYNC_realtime_toggled
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_radioButton_realTimeSync_toggled()
+void ShapePopulationViewer::on_radioButton_SYNC_realtime_toggled()
 {
     for (int i = 0; i < this->widgetList->size(); i++)
     {
@@ -823,10 +790,10 @@ void ShapePopulationViewer::on_radioButton_realTimeSync_toggled()
 
  * Callback to the Delayed Synchro Meshes radioButton.
  * Add an Observer to render meshes while modifying
- * @brief ShapePopulationViewer::on_radioButton_delayedSync_toggled
+ * @brief ShapePopulationViewer::on_radioButton_SYNC_delayed_toggled
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_radioButton_delayedSync_toggled()
+void ShapePopulationViewer::on_radioButton_SYNC_delayed_toggled()
 {
     for (int i = 0; i < this->widgetList->size(); i++)
     {
@@ -837,22 +804,23 @@ void ShapePopulationViewer::on_radioButton_delayedSync_toggled()
 }
 
 /**
- * Callback to the "select all meshes" checkbox.
- * Attach or detach widgets to the main camera.
- * @brief ShapePopulationViewer::on_checkBox_synchro_toggled
- * @param checked
- * @author Alexis Girault
- */
-void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
+* Callback to the "select all meshes" checkbox.
+* Attach or detach widgets to the main camera.
+* @brief ShapePopulationViewer::on_checkBox_SYNC_all_toggled
+* @param checked
+* @author Alexis Girault
+*/
+void ShapePopulationViewer::on_checkBox_SYNC_all_toggled(bool checked)
 {
     this->selectedWindows->clear(); // empty the selected windows list
 
     if(checked) // Select all
     {
-        this->colorMapBox->setDisabled(false);
-        this->pushButton_flip->setDisabled(false);
-        this->pushButton_delete->setDisabled(false);
-        this->pushButton_center->setDisabled(false);
+        this->actionFlip_Scalars->setDisabled(false);
+        this->actionDelete->setDisabled(false);
+        this->groupBox_VIEW->setDisabled(false);
+        this->groupBox_VISU->setDisabled(false);
+        this->groupBox_CENTER->setDisabled(false);
 
         for (int i = 0; i < this->widgetList->size(); i++)
         {
@@ -860,14 +828,15 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
             this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(headcam); //connect to headcam for synchro
             this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0.1,0.0,0.3);
         }
-        on_colorMapBox_currentIndexChanged(); //update the same colormap for all
+        on_comboBox_VISU_colormap_currentIndexChanged(); //update the same colormap for all
     }
     else // No synchro
     {
-        this->colorMapBox->setDisabled(true);
-        this->pushButton_flip->setDisabled(true);
-        this->pushButton_delete->setDisabled(true);
-        this->pushButton_center->setDisabled(true);
+        this->actionFlip_Scalars->setDisabled(true);
+        this->actionDelete->setDisabled(true);
+        this->groupBox_VIEW->setDisabled(true);
+        this->groupBox_VISU->setDisabled(true);
+        this->groupBox_CENTER->setDisabled(true);
 
         for (int i = 0; i < this->widgetList->size(); i++)
         {
@@ -881,7 +850,6 @@ void ShapePopulationViewer::on_checkBox_synchro_toggled(bool checked)
     }
 
 }
-
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                           COLORMAP                                            * //
@@ -902,12 +870,12 @@ double round_nplaces(double value, int to)
 /**
  * Callback to the colormap dropdown menu.  This will pull the selected text from the menu,
  * create a new color transfer function and add it to its mapper.
- * @brief ShapePopulationViewer::on_colorMapBox_currentIndexChanged
+ * @brief ShapePopulationViewer::on_comboBox_VISU_colormap_currentIndexChanged
  * @author Michael Guarino & Alexis Girault
  */
-void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
+void ShapePopulationViewer::on_comboBox_VISU_colormap_currentIndexChanged()
 {
-    QString text = this->colorMapBox->currentText();
+    QString text = this->comboBox_VISU_colormap->currentText();
     QByteArray arr = text.toLatin1();
     const char *cmap  = arr.data();
 
@@ -953,12 +921,12 @@ void ShapePopulationViewer::on_colorMapBox_currentIndexChanged()
 }
 
 /**
- * Callback for the flip meshes button this function remaps the scalars in the specified meshes to simulate a polar shift in the
+ * Callback for the flip action menu. This function remaps the scalars in the specified meshes to simulate a polar shift in the
  * parameterization.  No remapping of the pointdata individuals is performed, though.
- * @brief ShapePopulationViewer::on_pushButton_flip_clicked
+ * @brief ShapePopulationViewer::flipSelection
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_pushButton_flip_clicked()
+void ShapePopulationViewer::flipSelection()
 {
     if(this->selectedWindows->empty()) return;
 
@@ -991,7 +959,7 @@ void ShapePopulationViewer::on_pushButton_flip_clicked()
 }
 
 
-void ShapePopulationViewer::on_pushButton_center_clicked()
+void ShapePopulationViewer::on_toolButton_CENTER_origin_clicked()
 {
     if(this->selectedWindows->empty()) return;
 
@@ -1022,10 +990,10 @@ void ShapePopulationViewer::on_pushButton_center_clicked()
 /**
  * Callback to the 0 axis view button.
  * Helper function for restoring the initial distance between the meshes and the camera, and his focal point.
- * @brief ShapePopulationViewer::on_toolButton_0_clicked
+ * @brief ShapePopulationViewer::on_toolButton_VIEW_reset_clicked
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_toolButton_0_clicked()
+void ShapePopulationViewer::on_toolButton_VIEW_reset_clicked()
 {
     if(this->selectedWindows->empty()) return;
 
@@ -1063,60 +1031,60 @@ void ShapePopulationViewer::viewChange(int x, int y, int z)
 
 /**
  * Callback to the +Z axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_1_clicked
+ * @brief ShapePopulationViewer::on_toolButton_VIEW_P_clicked
  * @author Joe Waggoner
  */
-void ShapePopulationViewer::on_toolButton_1_clicked()
+void ShapePopulationViewer::on_toolButton_VIEW_P_clicked()
 {
     viewChange(0,0,-1);
 }
 
 /**
  * Callback to the -Z axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @brief ShapePopulationViewer::on_toolButton_VIEW_A_clicked
  * @author Joe Waggoner
  */
-void ShapePopulationViewer::on_toolButton_2_clicked()
+void ShapePopulationViewer::on_toolButton_VIEW_A_clicked()
 {
     viewChange(0,0,1);
 }
 
 /**
  * Callback to the +X axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @brief ShapePopulationViewer::on_toolButton_VIEW_L_clicked
  * @author Joe Waggoner
  */
-void ShapePopulationViewer::on_toolButton_3_clicked()
+void ShapePopulationViewer::on_toolButton_VIEW_L_clicked()
 {
     viewChange(1,0,0);
 }
 
 /**
  * Callback to the -X axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @brief ShapePopulationViewer::on_toolButton_VIEW_R_clicked
  * @author Joe Waggoner
  */
-void ShapePopulationViewer::on_toolButton_4_clicked()
+void ShapePopulationViewer::on_toolButton_VIEW_R_clicked()
 {
     viewChange(-1,0,0);
 }
 
 /**
  * Callback to the +Y axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @brief ShapePopulationViewer::on_toolButton_VIEW_S_clicked
  * @author Joe Waggoner
  */
-void ShapePopulationViewer::on_toolButton_5_clicked()
+void ShapePopulationViewer::on_toolButton_VIEW_S_clicked()
 {
     viewChange(0,1,0);
 }
 
 /**
  * Callback to the -Y axis view button. See viewChange() for implementation details.
- * @brief ShapePopulationViewer::on_toolButton_clicked
+ * @brief ShapePopulationViewer::on_toolButton_VIEW_I_clicked
  * @author Joe Waggoner
  */
-void ShapePopulationViewer::on_toolButton_6_clicked()
+void ShapePopulationViewer::on_toolButton_VIEW_I_clicked()
 {
     viewChange(0,-1,0);
 }

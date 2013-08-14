@@ -44,6 +44,8 @@
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QDebug>
+#include <QGridLayout>
+
 
 
 /**
@@ -140,35 +142,35 @@ protected slots:
    void writeMeshes();
    void openDirectory();
    void openFiles();
-   void closeAll();
-   void on_pushButton_delete_clicked();
+   void deleteAll();
+   void deleteSelection();
+   void flipSelection();
 
    //VIEW
-   void on_radioButton_viewAll_toggled();  //all
-   void on_radioButton_viewSquare_toggled(); //square
-   void on_colNumberEdit_editingFinished();
-   void on_colNumberSlider_valueChanged();
-   void on_colNumberSlider_sliderReleased();
+   void on_radioButton_DISPLAY_all_toggled();  //all
+   void on_radioButton_DISPLAY_square_toggled(); //square
+   void on_spinBox_DISPLAY_columns_editingFinished();
+   void on_slider_DISPLAY_columns_valueChanged();
+   void on_slider_DISPLAY_columns_sliderReleased();
 
    //SYNCHRONIZATION
-   void on_radioButton_realTimeSync_toggled();
-   void on_radioButton_delayedSync_toggled();
-   void on_checkBox_synchro_toggled(bool checked);
+   void on_radioButton_SYNC_realtime_toggled();
+   void on_radioButton_SYNC_delayed_toggled();
+   void on_checkBox_SYNC_all_toggled(bool checked);
 
    //COLORMAP
-   void on_colorMapBox_currentIndexChanged();
-   void on_pushButton_flip_clicked();
-   void on_pushButton_center_clicked();
+   void on_comboBox_VISU_colormap_currentIndexChanged();
+   void on_toolButton_CENTER_origin_clicked();
 
    //AXIS
    void viewChange(int x, int y, int z);
-   void on_toolButton_0_clicked();
-   void on_toolButton_1_clicked();
-   void on_toolButton_2_clicked();
-   void on_toolButton_3_clicked();
-   void on_toolButton_4_clicked();
-   void on_toolButton_5_clicked();
-   void on_toolButton_6_clicked();
+   void on_toolButton_VIEW_reset_clicked();
+   void on_toolButton_VIEW_P_clicked();
+   void on_toolButton_VIEW_A_clicked();
+   void on_toolButton_VIEW_L_clicked();
+   void on_toolButton_VIEW_R_clicked();
+   void on_toolButton_VIEW_S_clicked();
+   void on_toolButton_VIEW_I_clicked();
 
 };
 
