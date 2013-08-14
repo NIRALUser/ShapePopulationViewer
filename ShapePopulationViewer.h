@@ -131,6 +131,7 @@ protected:
    void placeWidgetInArea(int colNumber);
    void resizeWidgetInArea();
    void resizeEvent(QResizeEvent* event);
+   void keyPressEvent(QKeyEvent * keyEvent);
 
 protected slots:
 \

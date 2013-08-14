@@ -433,6 +433,7 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
     QKeyEvent * keyEvent = (QKeyEvent*) voidEvent;
     //qDebug()<<QKeySequence(keyEvent->key()).toString();
 
+    //UNSELECTING
     if((keyEvent->key() == Qt::Key_Escape))
     {
         if(checkBox_SYNC_all->isChecked())
@@ -444,6 +445,13 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
 
 }
 
+
+void ShapePopulationViewer::keyPressEvent(QKeyEvent * keyEvent)
+{
+    UnselectWidget(NULL,0,keyEvent);
+}
+
+
 /**
  * Callback for the deletes meshes buttonm that delete le selection, the widget,
  * and the file from all lists, then adjust the remaining widgets.
@@ -452,6 +460,8 @@ void ShapePopulationViewer::UnselectWidget(vtkObject*, unsigned long, void* void
  */
 void ShapePopulationViewer::deleteSelection()
 {
+    if(this->selectedWindows->size()==0) return;
+
     this->actionDelete->setDisabled(true);
 
     // Deleting the selection, the widget, and the data
@@ -504,6 +514,8 @@ void ShapePopulationViewer::deleteSelection()
  */
 void ShapePopulationViewer::ModifiedHandler()
 {
+    if(this->selectedWindows->size()==0) return;
+
     for (int i = 0; i < this->selectedWindows->size();i++) //disable the renderWindows to callback ModifiedHandler again
     {
         this->selectedWindows->value(i)->RemoveAllObservers();
@@ -812,8 +824,6 @@ void ShapePopulationViewer::on_radioButton_SYNC_delayed_toggled()
 */
 void ShapePopulationViewer::on_checkBox_SYNC_all_toggled(bool checked)
 {
-    this->selectedWindows->clear(); // empty the selected windows list
-
     if(checked) // Select all
     {
         this->actionFlip_Scalars->setDisabled(false);
@@ -822,6 +832,7 @@ void ShapePopulationViewer::on_checkBox_SYNC_all_toggled(bool checked)
         this->groupBox_VISU->setDisabled(false);
         this->groupBox_CENTER->setDisabled(false);
 
+        this->selectedWindows->clear();
         for (int i = 0; i < this->widgetList->size(); i++)
         {
             this->selectedWindows->append(this->widgetList->value(i)->GetRenderWindow()); //select all renderwindows
@@ -838,15 +849,16 @@ void ShapePopulationViewer::on_checkBox_SYNC_all_toggled(bool checked)
         this->groupBox_VISU->setDisabled(true);
         this->groupBox_CENTER->setDisabled(true);
 
-        for (int i = 0; i < this->widgetList->size(); i++)
+        for (int i = 0; i < this->selectedWindows->size(); i++)
         {
             //Create an independant camera, copy of headcam
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
             camera->DeepCopy(headcam);
-            this->widgetList->value(i)->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
-            this->widgetList->value(i)->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(0,0,0);
-            this->widgetList->value(i)->GetRenderWindow()->Render();
+            this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
+            this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0,0,0);
+            this->selectedWindows->value(i)->Render();
         }
+        this->selectedWindows->clear();
     }
 
 }
