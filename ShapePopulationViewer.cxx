@@ -418,7 +418,7 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     //Update Colormap
     if(selectedInteractor->GetControlKey()==1)  //to the last colormap if not first selection
     {
-        on_comboBox_VISU_colormap_currentIndexChanged();
+        on_comboBox_VISU_colorspace_currentIndexChanged();
     }
     else                                        //or to the one in the combobox if new selection
     {
@@ -426,6 +426,8 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
         int index = comboBox_VISU_colormap->findText(cmap);
         if (index != -1)
             comboBox_VISU_colormap->setCurrentIndex(index);
+
+        //const char * cspace = selectedWindow->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetLookupTable()->
     }
 
     //if everything is selected, check Select All
@@ -906,6 +908,7 @@ void ShapePopulationViewer::on_comboBox_VISU_colormap_currentIndexChanged()
     QString text = this->comboBox_VISU_colormap->currentText();
     QByteArray arr = text.toLatin1();
     const char *cmap  = arr.data();
+    std::string cspace = this->comboBox_VISU_colorspace->currentText().toStdString();
 
     for (int i = 0; i < this->selectedWindows->size(); i++)
     {
@@ -922,13 +925,16 @@ void ShapePopulationViewer::on_comboBox_VISU_colormap_currentIndexChanged()
         double R = round_nplaces(rangeLUT[1] + range/256, 3);
 
         //LookUpTable
-        vtkColorTransferFunction* DistanceMapTFunc = vtkColorTransferFunction::New();
-        DistanceMapTFunc->AdjustRange(rangeLUT);
-        DistanceMapTFunc->SetColorSpaceToDiverging();       //this is necessary for the color transfer function to automatically interpolate between the points we set
-        DistanceMapTFunc->RemoveAllPoints();
-        DistanceMapTFunc->AddRGBPoint(G, 0, 255, 0);        // Enforce the min value to be green = 0,255,0
-        DistanceMapTFunc->AddRGBPoint(Y, 255, 255, 0);      // Enforce the middle of the range to be yellow = 255,255,0
-        DistanceMapTFunc->AddRGBPoint(R, 255, 0, 0);        // Enforce the max value to be red = 255,0,0
+        vtkSmartPointer<vtkColorTransferFunction> DistanceMapTFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
+        DistanceMapTFunc->AddRGBPoint(G, 0.0, 1.0, 0.0);        // Enforce the min value to be green = 0,255,0
+        DistanceMapTFunc->AddRGBPoint(Y, 1.0, 1.0, 0.0);      // Enforce the middle of the range to be yellow = 255,255,0
+        DistanceMapTFunc->AddRGBPoint(R, 1.0, 0.0, 0.0);        // Enforce the max value to be red = 255,0,0
+
+        //Color Space
+        if(cspace == "Diverging")       DistanceMapTFunc->SetColorSpaceToDiverging();
+        else if(cspace == "Lab")        DistanceMapTFunc->SetColorSpaceToLab();
+        else if(cspace == "RGB")        DistanceMapTFunc->SetColorSpaceToRGB();
+        else if(cspace == "HSV")        DistanceMapTFunc->SetColorSpaceToHSV();
 
         //Mapper Update
         mapper->SetLookupTable( DistanceMapTFunc );
@@ -940,12 +946,18 @@ void ShapePopulationViewer::on_comboBox_VISU_colormap_currentIndexChanged()
 
         //ScalarBar Update
         vtkActor2D * oldScalarBar = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
-        vtkScalarBarActor * scalarBar = (vtkScalarBarActor *)oldScalarBar;
+        vtkScalarBarActor * scalarBar = (vtkScalarBarActor*)oldScalarBar;
         scalarBar->SetLookupTable(DistanceMapTFunc);
 
     }
 
     ModifiedHandler();
+}
+
+
+void ShapePopulationViewer::on_comboBox_VISU_colorspace_currentIndexChanged()
+{
+    on_comboBox_VISU_colormap_currentIndexChanged();
 }
 
 /**

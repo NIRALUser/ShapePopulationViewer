@@ -176,6 +176,7 @@ protected slots:
 
    //COLORMAP
    void on_comboBox_VISU_colormap_currentIndexChanged();
+   void on_comboBox_VISU_colorspace_currentIndexChanged();
 
 
 
