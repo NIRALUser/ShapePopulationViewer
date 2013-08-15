@@ -378,6 +378,7 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     this->groupBox_VIEW->setDisabled(false);
     this->groupBox_VISU->setDisabled(false);
     this->groupBox_CENTER->setDisabled(false);
+    this->tabWidget->setDisabled(false);
 
     // NEW SELECTION (Ctrl not pushed)
     if(selectedInteractor->GetControlKey()==0)
@@ -401,6 +402,18 @@ void ShapePopulationViewer::SelectWidget(vtkObject* selectedObject, unsigned lon
     }
     selectedWindow->GetRenderers()->GetFirstRenderer()->SetActiveCamera(this->headcam);     //Set renderWindow to headcam
     this->selectedWindows->append(selectedWindow);                                          //Add to the selectedWindows List
+
+    //Update Center
+    double * center = selectedWindow->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetCenter();
+    if(selectedInteractor->GetControlKey()==1)
+    {
+        printCenter("multiple-selection");
+    }
+    else
+    {
+        if(center[0]==0.0 && center[1]==0.0 && center[2]==0.0) printCenter("CENTERED");
+        else printCenter("ORIGINAL");
+    }
 
     //Update Colormap
     if(selectedInteractor->GetControlKey()==1)  //to the last colormap if not first selection
@@ -831,6 +844,7 @@ void ShapePopulationViewer::on_checkBox_SYNC_all_toggled(bool checked)
         this->groupBox_VIEW->setDisabled(false);
         this->groupBox_VISU->setDisabled(false);
         this->groupBox_CENTER->setDisabled(false);
+        this->tabWidget->setDisabled(false);
 
         this->selectedWindows->clear();
         for (int i = 0; i < this->widgetList->size(); i++)
@@ -840,6 +854,7 @@ void ShapePopulationViewer::on_checkBox_SYNC_all_toggled(bool checked)
             this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->SetBackground(0.1,0.0,0.3);
         }
         on_comboBox_VISU_colormap_currentIndexChanged(); //update the same colormap for all
+        printCenter("multiple-selection");
     }
     else // No synchro
     {
@@ -848,6 +863,7 @@ void ShapePopulationViewer::on_checkBox_SYNC_all_toggled(bool checked)
         this->groupBox_VIEW->setDisabled(true);
         this->groupBox_VISU->setDisabled(true);
         this->groupBox_CENTER->setDisabled(true);
+        this->tabWidget->setDisabled(true);
 
         for (int i = 0; i < this->selectedWindows->size(); i++)
         {
@@ -945,15 +961,15 @@ void ShapePopulationViewer::flipSelection()
     for (int i = 0; i < this->selectedWindows->size();i++)
     {
         //getting the scalars
-        vtkFloatArray *scalars =
-                vtkFloatArray::SafeDownCast(this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars());
+        vtkSmartPointer<vtkFloatArray> scalars = vtkSmartPointer<vtkFloatArray>::New();
+        scalars = vtkFloatArray::SafeDownCast(this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars());
         if (scalars == NULL)
         {
             continue;
         }
 
         //updating the scalars
-        vtkFloatArray *newScalars = vtkFloatArray::New();
+        vtkSmartPointer<vtkFloatArray> newScalars = vtkSmartPointer<vtkFloatArray>::New();
         newScalars->SetName(scalars->GetName());
 
         double *range = scalars->GetRange();
@@ -978,7 +994,7 @@ void ShapePopulationViewer::on_toolButton_CENTER_origin_clicked()
     for (int i = 0; i < this->selectedWindows->size();i++)
     {
         //Get the position
-        vtkActor * testActor = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkSmartPointer<vtkActor> testActor = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
         double * position = testActor->GetPosition();
         double * center = testActor->GetCenter();
 
@@ -989,9 +1005,37 @@ void ShapePopulationViewer::on_toolButton_CENTER_origin_clicked()
         double newposition[3] = {a,b,c};
         testActor->SetPosition(newposition);
         testActor->SetOrigin(newposition);
-        this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->ResetCamera();
+
+        printCenter("CENTERED");
     }
-    ModifiedHandler();
+    on_pushButton_VIEW_reset_clicked();
+}
+
+void ShapePopulationViewer::on_toolButton_CENTER_reset_clicked()
+{
+    if(this->selectedWindows->empty()) return;
+
+    for (int i = 0; i < this->selectedWindows->size();i++)
+    {
+        //Get the position
+        vtkSmartPointer<vtkActor> testActor = this->selectedWindows->value(i)->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+
+        //Update the position
+        double newposition[3] = {0,0,0};
+        testActor->SetPosition(newposition);
+        testActor->SetOrigin(newposition);
+
+        printCenter("ORIGINAL");
+    }
+    on_pushButton_VIEW_reset_clicked();
+}
+
+void ShapePopulationViewer::printCenter(const char *label)
+{
+    char buffer[30];
+    sprintf(buffer,"%s",label);
+    QString line(buffer);
+    this->label_CENTER->setText(line);
 }
 
 
@@ -1002,10 +1046,10 @@ void ShapePopulationViewer::on_toolButton_CENTER_origin_clicked()
 /**
  * Callback to the 0 axis view button.
  * Helper function for restoring the initial distance between the meshes and the camera, and his focal point.
- * @brief ShapePopulationViewer::on_toolButton_VIEW_reset_clicked
+ * @brief ShapePopulationViewer::on_pushButton_VIEW_reset_clicked
  * @author Alexis Girault
  */
-void ShapePopulationViewer::on_toolButton_VIEW_reset_clicked()
+void ShapePopulationViewer::on_pushButton_VIEW_reset_clicked()
 {
     if(this->selectedWindows->empty()) return;
 

@@ -131,13 +131,14 @@ protected:
    void placeWidgetInArea(int colNumber);
    void resizeWidgetInArea();
    void resizeEvent(QResizeEvent* event);
+
    void keyPressEvent(QKeyEvent * keyEvent);
+   void printCenter(const char* label);
 
 protected slots:
 \
    //QUIT
    void slotExit();
-
 
    //MENU
    void writeMeshes();
@@ -147,31 +148,36 @@ protected slots:
    void deleteSelection();
    void flipSelection();
 
-   //VIEW
-   void on_radioButton_DISPLAY_all_toggled();  //all
-   void on_radioButton_DISPLAY_square_toggled(); //square
+   //DISPLAY
+   void on_radioButton_DISPLAY_all_toggled();
+   void on_radioButton_DISPLAY_square_toggled();
    void on_spinBox_DISPLAY_columns_editingFinished();
    void on_slider_DISPLAY_columns_valueChanged();
    void on_slider_DISPLAY_columns_sliderReleased();
 
-   //SYNCHRONIZATION
+   //SYNCHRO
    void on_radioButton_SYNC_realtime_toggled();
    void on_radioButton_SYNC_delayed_toggled();
    void on_checkBox_SYNC_all_toggled(bool checked);
 
-   //COLORMAP
-   void on_comboBox_VISU_colormap_currentIndexChanged();
-   void on_toolButton_CENTER_origin_clicked();
-
-   //AXIS
+   //VIEW (axis)
    void viewChange(int x, int y, int z);
-   void on_toolButton_VIEW_reset_clicked();
+   void on_pushButton_VIEW_reset_clicked();
    void on_toolButton_VIEW_P_clicked();
    void on_toolButton_VIEW_A_clicked();
    void on_toolButton_VIEW_L_clicked();
    void on_toolButton_VIEW_R_clicked();
    void on_toolButton_VIEW_S_clicked();
    void on_toolButton_VIEW_I_clicked();
+
+   //CENTER
+   void on_toolButton_CENTER_origin_clicked();
+   void on_toolButton_CENTER_reset_clicked();
+
+   //COLORMAP
+   void on_comboBox_VISU_colormap_currentIndexChanged();
+
+
 
 };
 
