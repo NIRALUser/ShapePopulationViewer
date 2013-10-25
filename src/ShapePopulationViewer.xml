@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Surface Models</category>
+  <title>ShapePopulationViewer</title>
+  <version>1.0.0</version>
+  <description>
+ShapePopulationViewer is a software that allows you to dynamically interact with multiple surfaces at the same time. It is very useful for visualisation and comparison of 3D surfaces by also displaying their scalars attributes and allowing the user to simply modify the colormap gradient.
+  </description>
+  <contributor>Alexis Girault, Michael Guarino, Joe Waggoner</contributor>
+
+  <parameters>
+    <label>Input surfaces</label>
+    <description><![CDATA[Input/output parameters]]></description>
+
+    <geometry fileExtensions="vtk" multiple="true" >
+      <name>vtkFiles</name>
+      <label>VTK Files</label>
+      <channel>input</channel>
+      <longflag>--vtkfiles</longflag>
+      <flag>-v</flag>
+      <description><![CDATA[.vtk Input files]]></description>
+    </geometry>
+
+    <file fileExtensions="csv" >
+      <name >CSVFile</name>
+      <label>Load from CSV File</label>
+      <longflag>--csv</longflag>
+      <description><![CDATA[.csv Input file]]></description>
+    </file>
+
+    <directory>
+      <name >vtkDirectory</name>
+      <label>Load from Directory</label>
+      <longflag>--directory</longflag>
+      <flag>-d</flag>
+      <description><![CDATA[Input directory]]></description>
+    </directory>
+  </parameters>
+
+  <parameters>
+    <label>Configuration</label>
+    <description><![CDATA[Configuration files]]></description>
+
+    <file fileExtensions="spvcm">
+      <name>colormapConfig</name>
+      <label>Colormap Configuration File</label>
+      <longflag>--gradient</longflag>
+      <flag>-g</flag>
+      <description><![CDATA[.spvcm Colormap Configuration]]></description>
+    </file>
+
+    <file fileExtensions="pvcc">
+      <name>cameraConfig</name>
+      <label>Camera Configuration File</label>
+      <longflag>--camera</longflag>
+      <flag>-c</flag>
+      <description><![CDATA[.pvcc Camera Configuration File]]></description>
+    </file>
+  </parameters>
+
+</executable>

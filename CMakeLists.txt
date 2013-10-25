@@ -1,49 +1,37 @@
+cmake_minimum_required(VERSION 2.8.3)
+cmake_policy(VERSION 2.8.3)
 
-cmake_minimum_required(VERSION 2.8)
- 
-PROJECT(ShapePopulationViewer)
- 
-find_package(VTK REQUIRED)
-include(${VTK_USE_FILE})
+set(LOCAL_PROJECT_NAME ShapePopulationViewer)
 
-find_package(Qt4 REQUIRED)
-include(${QT_USE_FILE})
+## NOTE THERE SHOULD BE NO PROJECT STATEMENT HERE!
+## This file acts as a simple switch to initiate
+## two completely independant CMake build environments.
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}) 
+#-----------------------------------------------------------------------------
+# Superbuild Option - Enabled by default
+#                   Phase I:  ${LOCAL_PROJECT_NAME}_SUPERBUILD is set to ON, and the
+#                             supporting packages defined in "SuperBuild.cmake"
+#                             are built.  The last package in "SuperBuild.cmake"
+#                             to be built is a recursive call to this
+#                             file with ${LOCAL_PROJECT_NAME}_SUPERBUILD explicitly
+#                             set to "OFF" to initiate Phase II
+#
+#                   Phase II: Build the ${LOCAL_PROJECT_NAME}, referencing the support
+#                             packages built in Phase I.
+#-----------------------------------------------------------------------------
+option(${LOCAL_PROJECT_NAME}_SUPERBUILD "Build ${LOCAL_PROJECT_NAME} and the projects it depends on via SuperBuild.cmake." ON)
 
-file(GLOB UI_FILES *.ui)
-file(GLOB QT_WRAP *.h)
-file(GLOB CXX_FILES *.cxx)
-
-QT4_WRAP_UI(UISrcs ${UI_FILES})
-QT4_WRAP_CPP(MOCSrcs ${QT_WRAP})
-add_executable(ShapePopulationViewer MACOSX_BUNDLE ${CXX_FILES} ${UISrcs} ${MOCSrcs})
- 
-if(VTK_LIBRARIES)
-  if(${VTK_VERSION} VERSION_LESS "6")
-    target_link_libraries(ShapePopulationViewer ${VTK_LIBRARIES} QVTK)
-  else()
-    target_link_libraries(ShapePopulationViewer ${VTK_LIBRARIES})
-  endif()
+#-----------------------------------------------------------------------------
+# Superbuild script
+#-----------------------------------------------------------------------------
+if(${LOCAL_PROJECT_NAME}_SUPERBUILD)
+  project(${LOCAL_PROJECT_NAME}_SUPERBUILD)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/SuperBuild.cmake")
+  return()
 else()
-  target_link_libraries(ShapePopulationViewer vtkHybrid QVTK vtkViews ${QT_LIBRARIES})
+  project(${LOCAL_PROJECT_NAME})
+  include("${CMAKE_CURRENT_SOURCE_DIR}/${LOCAL_PROJECT_NAME}.cmake")
+  return()
 endif()
 
-
-#######################################################################################################
-
-#ENABLE_TESTING()
-#add_executable(Testing/filePathTest Testing/filePathTest.cxx)
-#target_link_libraries(Testing/filePathTest ${QT_LIBRARIES} ${VTK_LIBRARIES} QVTK vtkViews vtkHybrid)
-#add_test(Testing/filePathTest  ${CMAKE_CURRENT_BINARY_DIR}/Testing/filePathTest)
-
-
-#add_executable(Testing/mapperTest Testing/mapper.cxx)
-#target_link_libraries(Testing/mapperTest ${QT_LIBRARIES} ${VTK_LIBRARIES} QVTK vtkViews vtkHybrid)
-#add_test(Testing/mapperTest  ${CMAKE_CURRENT_BINARY_DIR}/Testing/mapperTest)
-
-
-#add_executable(Testing/qVectorTests Testing/qVectorTests.cxx)
-#target_link_libraries(Testing/qVectorTests ${QT_LIBRARIES} ${VTK_LIBRARIES} QVTK vtkViews vtkHybrid)
-#add_test(Testing/qVectorTests  ${CMAKE_CURRENT_BINARY_DIR}/Testing/qVectorTests)
-
+message(FATAL_ERROR "You should never reach this point !")
