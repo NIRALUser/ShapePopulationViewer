@@ -1,6 +1,12 @@
 
 #-----------------------------------------------------------------------------
 set(verbose FALSE)
+
+#If CMAKE_BUILD_TYPE is not defined, it creates problem when EP_Autoconf_Utils.cmake is called on Windows
+if(WIN32)
+ set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMAKE_BUILD_TYPE"  )
+endif()
+ 
 #-----------------------------------------------------------------------------
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake)

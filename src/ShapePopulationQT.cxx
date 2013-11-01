@@ -153,7 +153,7 @@ void ShapePopulationQT::openDirectory()
 
     // get directory
     QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),m_lastDirectory,QFileDialog::ShowDirsOnly);
-    if(dir.isEmpty()) return;
+    if(dir.isEmpty() || !QDir(dir).exists()) return;
 
     // Add files in the fileList
     m_lastDirectory = dir;
@@ -185,7 +185,8 @@ void ShapePopulationQT::openFiles()
 
     for(int i=0; i < stringList.size(); i++)
     {
-        this->m_fileList.append(QFileInfo(stringList.at(i)));
+        if(QFileInfo(stringList.at(i)).exists())
+            this->m_fileList.append(QFileInfo(stringList.at(i)));
     }
 
     // Display widgets
@@ -197,7 +198,7 @@ void ShapePopulationQT::loadCSV()
 {
     // get directory
     QString filename = QFileDialog::getOpenFileName(this,tr("Open .csv file"),m_lastDirectory,"CSV file (*.csv)");
-    if(filename.isEmpty()) return;
+    if(filename.isEmpty() || !QFileInfo(filename).exists()) return;
 
     //MAJ lastDirectory
     QFileInfo file(filename);
@@ -618,19 +619,19 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
         for (int i = 0; i < urlList.size(); ++i)
         {
             QString filePath = urlList.at(i).toLocalFile();
-            if(filePath.endsWith(".vtk"))
+            if(filePath.endsWith(".vtk") && QFileInfo(filePath).exists())
             {
                 this->loadVTKFileCLP(QFileInfo(filePath));
             }
-            else if(filePath.endsWith(".csv"))
+            else if(filePath.endsWith(".csv") && QFileInfo(filePath).exists())
             {
                 this->loadCSVFileCLP(QFileInfo(filePath));
             }
-            else if(filePath.endsWith(".spvcm") && m_numberOfMeshes > 0)
+            else if(filePath.endsWith(".spvcm") && m_numberOfMeshes > 0 && QFileInfo(filePath).exists())
             {
                 loadColorMapCLP(filePath.toStdString());
             }
-            else if(filePath.endsWith(".pvcc") && m_numberOfMeshes > 0)
+            else if(filePath.endsWith(".pvcc") && m_numberOfMeshes > 0 && QFileInfo(filePath).exists())
             {
                 loadCameraCLP(filePath.toStdString());
             }
@@ -1113,13 +1114,16 @@ void ShapePopulationQT::displayInfo()
     model->setHorizontalHeaderItem(0, new QStandardItem(QString("Name")));
     model->setHorizontalHeaderItem(1, new QStandardItem(QString("Range")));
 
+	std::ostringstream strs;
+
     if(m_selectedIndex.size() > 1)
     {
-        char buffer[20];
+		strs.str(""); strs.clear();
+		strs << (int)m_selectedIndex.size()
+             <<" surfaces selected, select only one"<< std::endl;
 
         //Infos
-        sprintf(buffer,"%i surfaces selected, select only one",(int)m_selectedIndex.size());
-        this->lineEdit_filename->setText(QString(buffer));
+		this->lineEdit_filename->setText(QString(strs.str().c_str()));
         this->lineEdit_dir->setText(QString(""));
         this->lineEdit_points->setText(QString(""));
         this->lineEdit_cells->setText(QString(""));
@@ -1133,14 +1137,14 @@ void ShapePopulationQT::displayInfo()
 
             //Range
             double * range = computeCommonRange(m_commonAttributes[i].c_str(), m_selectedIndex);
-            sprintf(buffer,"[ %.5g ; %.5g ]",range[0],range[1]);
-            QStandardItem * dataRange = new QStandardItem(QString(buffer));
+			strs.str(""); strs.clear();
+			strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
+            QStandardItem * dataRange = new QStandardItem(QString(strs.str().c_str()));
             model->setItem(i,1,dataRange);
         }
     }
     else
     {
-        char buffer[20];
 
         //Infos
         unsigned int index = m_selectedIndex[0];
@@ -1148,10 +1152,12 @@ void ShapePopulationQT::displayInfo()
 
         this->lineEdit_filename->setText(QString(m_meshList[index]->GetFileName().c_str()));
         this->lineEdit_dir->setText(QString(m_meshList[index]->GetFileDir().c_str()));
-        sprintf(buffer,"%i",(int)selectedData->GetNumberOfPoints());
-        this->lineEdit_points->setText(QString(buffer));
-        sprintf(buffer,"%i",(int)selectedData->GetNumberOfCells());
-        this->lineEdit_cells->setText(QString(buffer));
+		strs.str(""); strs.clear();
+		strs << (int)selectedData->GetNumberOfPoints()<< std::endl;
+		this->lineEdit_points->setText(QString(strs.str().c_str()));
+		strs.str(""); strs.clear();
+		strs << (int)selectedData->GetNumberOfCells()<< std::endl;
+        this->lineEdit_cells->setText(QString(strs.str().c_str()));
 
 
         // Data Array Values
@@ -1165,8 +1171,9 @@ void ShapePopulationQT::displayInfo()
 
             //Range
             double * range = selectedData->GetPointData()->GetScalars(AttributesList[i].c_str())->GetRange();
-            sprintf(buffer,"[ %.5g ; %.5g ]",range[0],range[1]);
-            QStandardItem * dataRange = new QStandardItem(QString(buffer));
+			strs.str(""); strs.clear();
+			strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
+            QStandardItem * dataRange = new QStandardItem(QString(strs.str().c_str()));
             model->setItem(i,1,dataRange);
         }
     }

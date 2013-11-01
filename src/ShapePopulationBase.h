@@ -60,7 +60,6 @@ class ShapePopulationBase
     double* computeCommonRange(const char * a_cmap, std::vector<unsigned int> a_windowIndex);
     void UpdateAttribute(const char *a_cmap, std::vector<unsigned int> a_windowIndex);
     void UpdateColorMap(std::vector<unsigned int> a_windowIndex);
-    double round_nplaces(double value, int to);
     double* m_commonRange;
 
     //CAMERA

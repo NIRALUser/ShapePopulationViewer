@@ -1,5 +1,29 @@
 #include "ShapePopulationBase.h"
 
+
+namespace spv_math
+{
+	#ifdef WIN32
+	long round(double a) // round not defined on windows // no positive/negative statement because always called for exp()>0 (see l.156)
+	{
+	  return ((a-(long)a)>=0.5)?(long)a+1:(long)a;
+	}
+    #endif
+
+double round_nplaces(double value, int to)
+{
+    int places = 1, whole = *(&value);
+    for(int i = 0; i < to; i++) places *= 10;
+    value -= whole; //leave decimals
+    value *= places; //0.1234 -> 123.4
+	value = round(value);//123.4 -> 123
+    value /= places; //123 -> .123
+    value += whole; //bring the whole value back
+    return value;
+}
+}
+
+
 ShapePopulationBase::ShapePopulationBase()
 {
     m_headcam = vtkSmartPointer<vtkCamera>::New();
@@ -393,14 +417,14 @@ void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowInd
         for (unsigned int j = 0; j < m_colorPointList->size(); j++)
         {
             double position = m_colorPointList->at(j).pos;
-            double x = round_nplaces(m_commonRange[0] + range * position, 2);
+			double x = spv_math::round_nplaces(m_commonRange[0] + range * position,2);
             double r = m_colorPointList->at(j).r;
             double g = m_colorPointList->at(j).g;
             double b = m_colorPointList->at(j).b;
             DistanceMapTFunc->AddRGBPoint(x,r,g,b);
         }
-        m_commonRange[0] = round_nplaces(m_commonRange[0], 2);
-        m_commonRange[1] = round_nplaces(m_commonRange[1], 2);
+        m_commonRange[0] = spv_math::round_nplaces(m_commonRange[0],2);
+        m_commonRange[1] = spv_math::round_nplaces(m_commonRange[1],2);
         DistanceMapTFunc->AdjustRange(m_commonRange);
         DistanceMapTFunc->SetColorSpaceToRGB();
 
@@ -416,17 +440,11 @@ void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowInd
         scalarBar->SetLookupTable(DistanceMapTFunc);
     }
 }
-double ShapePopulationBase::round_nplaces(double value, int to)
-{
-    int places = 1, whole = *(&value);
-    for(int i = 0; i < to; i++) places *= 10;
-    value -= whole; //leave decimals
-    value *= places; //0.1234 -> 123.4
-    value = round(value);//123.4 -> 123
-    value /= places; //123 -> .123
-    value += whole; //bring the whole value back
-    return value;
-}
+
+
+
+
+
 
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
