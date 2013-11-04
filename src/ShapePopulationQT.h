@@ -44,6 +44,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
 
   protected:
 
+    bool m_toolsDisplayed;
     unsigned int m_numberOfMeshes;
     QString m_lastDirectory;
     QString m_colormapDirectory;
@@ -86,6 +87,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
 
     //QUIT
     void slotExit();
+    void on_pushButton_displayTools_clicked();
 
     //FILE
     void openDirectory();

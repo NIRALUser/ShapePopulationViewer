@@ -5,7 +5,8 @@ ShapePopulationQT::ShapePopulationQT()
 {
     this->setupUi(this);
 
-    //Enitializations
+    //Intializations
+    m_toolsDisplayed = true;
     m_numberOfMeshes = 0;
     m_lastDirectory = "~";
     m_colormapDirectory = "~";
@@ -14,7 +15,7 @@ ShapePopulationQT::ShapePopulationQT()
     m_CSVloaderDialog = new CSVloaderQT(this);
 
     // GUI disable
-    groupBox_OPTIONS->setDisabled(true);
+    toolBox->setDisabled(true);
     this->gradientWidget_VISU->disable();
     menuOptions->setDisabled(true);
     actionDelete->setDisabled(true);
@@ -81,6 +82,23 @@ void ShapePopulationQT::slotExit()
     qApp->exit();
 }
 
+
+void ShapePopulationQT::on_pushButton_displayTools_clicked()
+{
+    if(m_toolsDisplayed)
+    {
+        this->toolBox->hide();
+        this->pushButton_displayTools->setText(QString::fromUtf8("\u25B2"));
+        m_toolsDisplayed = false;
+    }
+    else
+    {
+        this->toolBox->show();
+        this->pushButton_displayTools->setText(QString::fromUtf8("\u25BC"));
+        m_toolsDisplayed = true;
+    }
+
+}
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                         CLP FUNCTIONS                                         * //
@@ -242,7 +260,7 @@ void ShapePopulationQT::deleteAll()
     }
 
     //Disable buttons
-    groupBox_OPTIONS->setDisabled(true);
+    toolBox->setDisabled(true);
     gradientWidget_VISU->disable();
     actionDelete_All->setDisabled(true);
     actionDelete->setDisabled(true);
@@ -390,13 +408,13 @@ void ShapePopulationQT::CreateWidgets()
     slider_DISPLAY_columns->setMaximum(m_fileList.size());
 
     /* GUI BUTTONS & ACTIONS */
-    groupBox_OPTIONS->setEnabled(true);
+    this->toolBox->setEnabled(true);
     this->gradientWidget_VISU->enable(m_colorPointList);
-    menuOptions->setEnabled(true);
-    actionDelete_All->setEnabled(true);
-    actionOpen_Directory->setText("Add Directory");
-    actionOpen_VTK_Files->setText("Add VTK files");
-    actionLoad_CSV->setText("Add CSV file");
+    this->menuOptions->setEnabled(true);
+    this->actionDelete_All->setEnabled(true);
+    this->actionOpen_Directory->setText("Add Directory");
+    this->actionOpen_VTK_Files->setText("Add VTK files");
+    this->actionLoad_CSV->setText("Add CSV file");
 
     /* GUI WIDGETS DISPLAY */
     unsigned int sum = 0;
@@ -446,18 +464,17 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
     }
     else
     {
+        /* ENABLE GUI ACTIONS */
+        this->actionDelete->setEnabled(true);
+        this->groupBox_VIEW->setEnabled(true);
+        this->groupBox_VISU->setEnabled(true);
+        this->gradientWidget_VISU->enable(m_colorPointList);
+        this->tabWidget->setEnabled(true);
+
         /* DISPLAY INFOS */
         this->displayInfo();
         this->displayAttribute();
         this->displayPosition();
-
-        /* ENABLE GUI ACTIONS */
-        actionDelete->setEnabled(true);
-        groupBox_VIEW->setEnabled(true);
-        groupBox_VISU->setEnabled(true);
-        this->gradientWidget_VISU->enable(m_colorPointList);
-        tabWidget->setEnabled(true);
-
 
         this->UpdateArrowPosition();
     }
@@ -470,19 +487,20 @@ void ShapePopulationQT::SelectAll()
 
     ShapePopulationBase::SelectAll();
 
+
+    /* ENABLE GUI ACTIONS */
+    this->actionDelete->setEnabled(true);
+    this->groupBox_VIEW->setEnabled(true);
+    this->groupBox_VISU->setEnabled(true);
+    this->gradientWidget_VISU->enable(m_colorPointList);
+    this->tabWidget->setEnabled(true);
+
     /* UPDATE WINDOWS */
     this->UpdateCenterPosition();
     this->UpdateAttribute_QT();
 
     /* DISPLAY INFOS */
     this->displayInfo();
-
-    /* ENABLE GUI ACTIONS */
-    actionDelete->setEnabled(true);
-    groupBox_VIEW->setEnabled(true);
-    groupBox_VISU->setEnabled(true);
-    this->gradientWidget_VISU->enable(m_colorPointList);
-    tabWidget->setEnabled(true);
 }
 
 
@@ -599,6 +617,9 @@ void ShapePopulationQT::resizeEvent(QResizeEvent *Qevent)
     {
         resizeWidgetInArea();
     }
+
+    //data range column
+    tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-20);
 }
 
 void ShapePopulationQT::dragEnterEvent(QDragEnterEvent *Qevent)
@@ -1073,7 +1094,6 @@ void ShapePopulationQT::slot_gradArrow_moved(qreal newPos)
 
     //set the spinbox value
     spinBox_VISU_position->setValue(absPos);
-
 }
 
 void ShapePopulationQT::slot_gradArrow_selected(qreal newPos)
@@ -1179,10 +1199,9 @@ void ShapePopulationQT::displayInfo()
     }
 
     /* Adapt Columns size */
-    tableView->resizeRowsToContents();
     tableView->resizeColumnToContents(1);
-    if (tableView->columnWidth(1) < 165) tableView->setColumnWidth(1,165);
-    tableView->setColumnWidth(0,386 - tableView->columnWidth(1));
+    tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-20);
+
 }
 
 void ShapePopulationQT::displayAttribute()

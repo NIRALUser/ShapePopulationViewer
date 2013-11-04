@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1308</width>
-    <height>862</height>
+    <width>1250</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1300</width>
-    <height>850</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="acceptDrops">
@@ -27,10 +27,6 @@
   </property>
   <property name="windowTitle">
    <string>ShapePopulationViewer</string>
-  </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>:/Icons/help.png</normaloff>:/Icons/help.png</iconset>
   </property>
   <property name="iconSize">
    <size>
@@ -42,15 +38,85 @@
    <property name="acceptDrops">
     <bool>false</bool>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QGroupBox" name="groupBox_OPTIONS">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>524287</width>
+        <height>524287</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="acceptDrops">
+       <bool>false</bool>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>0</width>
+         <height>0</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>1</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="acceptDrops">
+        <bool>false</bool>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_5"/>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_displayTools">
+      <property name="text">
+       <string>▼</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="toolBox">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="minimumSize">
        <size>
-        <width>1290</width>
+        <width>1150</width>
         <height>250</height>
        </size>
       </property>
@@ -69,842 +135,719 @@
       <property name="checkable">
        <bool>false</bool>
       </property>
-      <widget class="QGroupBox" name="groupBox_VISU">
-       <property name="geometry">
-        <rect>
-         <x>420</x>
-         <y>10</y>
-         <width>321</width>
-         <height>230</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>ColorMap</string>
-       </property>
-       <widget class="QLabel" name="label_VISU_attribute">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>30</y>
-          <width>71</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Attribute :</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="comboBox_VISU_attribute">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>30</y>
-          <width>181</width>
-          <height>31</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="gradientWidgetQT" name="gradientWidget_VISU" native="true">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>120</y>
-          <width>301</width>
-          <height>60</height>
-         </rect>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>70</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QWidget" name="widget_VISU_arrowOptions" native="true">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>180</y>
-          <width>301</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <widget class="QPushButton" name="pushButton_VISU_delete">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>0</y>
-           <width>101</width>
-           <height>27</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Delete Point</string>
-         </property>
-        </widget>
-        <widget class="QDoubleSpinBox" name="spinBox_VISU_position">
-         <property name="geometry">
-          <rect>
-           <x>160</x>
-           <y>0</y>
-           <width>101</width>
-           <height>27</height>
-          </rect>
-         </property>
-         <property name="decimals">
-          <number>5</number>
-         </property>
-         <property name="minimum">
-          <double>-999999999.000000000000000</double>
-         </property>
-         <property name="maximum">
-          <double>999999999.000000000000000</double>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QPushButton" name="pushButton_VISU_reset">
-        <property name="geometry">
-         <rect>
-          <x>170</x>
-          <y>80</y>
-          <width>101</width>
-          <height>27</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Reset</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_VISU_add">
-        <property name="geometry">
-         <rect>
-          <x>50</x>
-          <y>80</y>
-          <width>101</width>
-          <height>27</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Add Point</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_DISPLAY">
-       <property name="geometry">
-        <rect>
-         <x>1120</x>
-         <y>10</y>
-         <width>161</width>
-         <height>230</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Display Options</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-       <widget class="QRadioButton" name="radioButton_DISPLAY_all">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>40</y>
-          <width>141</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>All Surfaces</string>
-        </property>
-       </widget>
-       <widget class="QRadioButton" name="radioButton_DISPLAY_square">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>70</y>
-          <width>141</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Square Windows</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="spinBox_DISPLAY_columns">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>102</y>
-          <width>41</width>
-          <height>27</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_DISPLAY_columns">
-        <property name="geometry">
-         <rect>
-          <x>60</x>
-          <y>100</y>
-          <width>63</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>columns</string>
-        </property>
-       </widget>
-       <widget class="QSlider" name="slider_DISPLAY_columns">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>139</y>
-          <width>141</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_SYNC">
-       <property name="geometry">
-        <rect>
-         <x>940</x>
-         <y>10</y>
-         <width>161</width>
-         <height>230</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Synchronization</string>
-       </property>
-       <widget class="QRadioButton" name="radioButton_SYNC_realtime">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>40</y>
-          <width>121</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Real-Time</string>
-        </property>
-       </widget>
-       <widget class="QRadioButton" name="radioButton_SYNC_delayed">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>70</y>
-          <width>121</width>
-          <height>22</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Delayed</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_SYNC_all">
-        <property name="geometry">
-         <rect>
-          <x>32</x>
-          <y>110</y>
-          <width>101</width>
-          <height>27</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Select All</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_SYNC_unselect">
-        <property name="geometry">
-         <rect>
-          <x>32</x>
-          <y>140</y>
-          <width>101</width>
-          <height>27</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Unselect</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QGroupBox" name="groupBox_VIEW">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>760</x>
-         <y>10</y>
-         <width>161</width>
-         <height>230</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>View Options</string>
-       </property>
-       <widget class="QToolButton" name="toolButton_VIEW_S">
-        <property name="geometry">
-         <rect>
-          <x>70</x>
-          <y>40</y>
-          <width>20</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>S</string>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_VIEW_L">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>70</y>
-          <width>20</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>L</string>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_VIEW_I">
-        <property name="geometry">
-         <rect>
-          <x>70</x>
-          <y>100</y>
-          <width>20</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>I</string>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_VIEW_R">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>70</y>
-          <width>20</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>R</string>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_VIEW_P">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>40</y>
-          <width>20</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>P</string>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_VIEW_A">
-        <property name="geometry">
-         <rect>
-          <x>100</x>
-          <y>100</y>
-          <width>20</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>A</string>
-        </property>
-       </widget>
-       <widget class="Line" name="line_VIEW_hori">
-        <property name="geometry">
-         <rect>
-          <x>47</x>
-          <y>70</y>
-          <width>61</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-       <widget class="Line" name="line_VIEW_vert">
-        <property name="geometry">
-         <rect>
-          <x>80</x>
-          <y>50</y>
-          <width>3</width>
-          <height>61</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_VIEW_reset">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>140</y>
-          <width>101</width>
-          <height>27</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Reset</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="comboBox_SYNC_position">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>180</y>
-          <width>101</width>
-          <height>27</height>
-         </rect>
-        </property>
-        <item>
-         <property name="text">
-          <string>Original</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Centered</string>
-         </property>
-        </item>
-       </widget>
-       <zorder>line_VIEW_hori</zorder>
-       <zorder>line_VIEW_vert</zorder>
-       <zorder>toolButton_VIEW_S</zorder>
-       <zorder>toolButton_VIEW_L</zorder>
-       <zorder>toolButton_VIEW_I</zorder>
-       <zorder>toolButton_VIEW_R</zorder>
-       <zorder>toolButton_VIEW_P</zorder>
-       <zorder>toolButton_VIEW_A</zorder>
-       <zorder>pushButton_VIEW_reset</zorder>
-       <zorder>comboBox_SYNC_position</zorder>
-      </widget>
-      <widget class="QTabWidget" name="tabWidget">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>391</width>
-         <height>230</height>
-        </rect>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="tab_INFO">
-        <attribute name="title">
-         <string>File information</string>
-        </attribute>
-        <widget class="QLabel" name="label_filename">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>30</y>
-           <width>71</width>
-           <height>17</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Filename:</string>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_dir">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>60</y>
-           <width>71</width>
-           <height>17</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Directory:</string>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_cells">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>150</y>
-           <width>121</width>
-           <height>17</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Number of Cells:</string>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_points">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>120</y>
-           <width>121</width>
-           <height>17</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Number of Points:</string>
-         </property>
-        </widget>
-        <widget class="Line" name="line_INFO">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>100</y>
-           <width>250</width>
-           <height>3</height>
-          </rect>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="lineEdit_filename">
-         <property name="geometry">
-          <rect>
-           <x>80</x>
-           <y>30</y>
-           <width>261</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="lineEdit_dir">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QTabWidget" name="tabWidget">
          <property name="enabled">
           <bool>true</bool>
          </property>
-         <property name="geometry">
-          <rect>
-           <x>80</x>
-           <y>60</y>
-           <width>261</width>
-           <height>21</height>
-          </rect>
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>230</height>
+          </size>
          </property>
-         <property name="readOnly">
-          <bool>true</bool>
+         <property name="maximumSize">
+          <size>
+           <width>600</width>
+           <height>230</height>
+          </size>
          </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tab_INFO">
+          <attribute name="title">
+           <string>File information</string>
+          </attribute>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_filename">
+             <property name="text">
+              <string>Filename:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" colspan="2">
+            <widget class="QLineEdit" name="lineEdit_filename">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_dir">
+             <property name="text">
+              <string>Directory:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2">
+            <widget class="QLineEdit" name="lineEdit_dir">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="3">
+            <widget class="Line" name="line_INFO">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QLabel" name="label_points">
+             <property name="text">
+              <string>Number of Points:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QLineEdit" name="lineEdit_points">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="2">
+            <widget class="QLabel" name="label_cells">
+             <property name="text">
+              <string>Number of Cells:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
+            <widget class="QLineEdit" name="lineEdit_cells">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_data">
+          <attribute name="title">
+           <string>Attributes/Ranges</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QTableView" name="tableView">
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAsNeeded</enum>
+             </property>
+             <property name="showDropIndicator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dragDropOverwriteMode">
+              <bool>false</bool>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>false</bool>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+             <property name="cornerButtonEnabled">
+              <bool>true</bool>
+             </property>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_points">
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_VISU">
+         <property name="minimumSize">
+          <size>
+           <width>321</width>
+           <height>230</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>321</width>
+           <height>230</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>ColorMap</string>
+         </property>
+         <widget class="QLabel" name="label_VISU_attribute">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>30</y>
+            <width>71</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Attribute :</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+         <widget class="QComboBox" name="comboBox_VISU_attribute">
+          <property name="geometry">
+           <rect>
+            <x>110</x>
+            <y>30</y>
+            <width>181</width>
+            <height>31</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="gradientWidgetQT" name="gradientWidget_VISU" native="true">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>120</y>
+            <width>301</width>
+            <height>60</height>
+           </rect>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>70</height>
+           </size>
+          </property>
+         </widget>
+         <widget class="QWidget" name="widget_VISU_arrowOptions" native="true">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>180</y>
+            <width>301</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <widget class="QPushButton" name="pushButton_VISU_delete">
+           <property name="geometry">
+            <rect>
+             <x>40</x>
+             <y>0</y>
+             <width>101</width>
+             <height>27</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Delete Point</string>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="spinBox_VISU_position">
+           <property name="geometry">
+            <rect>
+             <x>160</x>
+             <y>0</y>
+             <width>101</width>
+             <height>27</height>
+            </rect>
+           </property>
+           <property name="decimals">
+            <number>5</number>
+           </property>
+           <property name="minimum">
+            <double>-999999999.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>999999999.000000000000000</double>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QPushButton" name="pushButton_VISU_reset">
+          <property name="geometry">
+           <rect>
+            <x>170</x>
+            <y>80</y>
+            <width>101</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_VISU_add">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>80</y>
+            <width>101</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Add Point</string>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_VIEW">
          <property name="enabled">
           <bool>true</bool>
          </property>
-         <property name="geometry">
-          <rect>
-           <x>150</x>
-           <y>120</y>
-           <width>91</width>
-           <height>21</height>
-          </rect>
+         <property name="minimumSize">
+          <size>
+           <width>161</width>
+           <height>230</height>
+          </size>
          </property>
-         <property name="readOnly">
-          <bool>true</bool>
+         <property name="maximumSize">
+          <size>
+           <width>161</width>
+           <height>230</height>
+          </size>
          </property>
+         <property name="title">
+          <string>View Options</string>
+         </property>
+         <widget class="QToolButton" name="toolButton_VIEW_S">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>40</y>
+            <width>20</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>S</string>
+          </property>
+         </widget>
+         <widget class="QToolButton" name="toolButton_VIEW_L">
+          <property name="geometry">
+           <rect>
+            <x>100</x>
+            <y>70</y>
+            <width>20</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>L</string>
+          </property>
+         </widget>
+         <widget class="QToolButton" name="toolButton_VIEW_I">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>100</y>
+            <width>20</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>I</string>
+          </property>
+         </widget>
+         <widget class="QToolButton" name="toolButton_VIEW_R">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>70</y>
+            <width>20</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>R</string>
+          </property>
+         </widget>
+         <widget class="QToolButton" name="toolButton_VIEW_P">
+          <property name="geometry">
+           <rect>
+            <x>40</x>
+            <y>40</y>
+            <width>20</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>P</string>
+          </property>
+         </widget>
+         <widget class="QToolButton" name="toolButton_VIEW_A">
+          <property name="geometry">
+           <rect>
+            <x>100</x>
+            <y>100</y>
+            <width>20</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>A</string>
+          </property>
+         </widget>
+         <widget class="Line" name="line_VIEW_hori">
+          <property name="geometry">
+           <rect>
+            <x>47</x>
+            <y>70</y>
+            <width>61</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+         <widget class="Line" name="line_VIEW_vert">
+          <property name="geometry">
+           <rect>
+            <x>80</x>
+            <y>50</y>
+            <width>3</width>
+            <height>61</height>
+           </rect>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_VIEW_reset">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>140</y>
+            <width>101</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+         <widget class="QComboBox" name="comboBox_SYNC_position">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>180</y>
+            <width>101</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <item>
+           <property name="text">
+            <string>Original</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Centered</string>
+           </property>
+          </item>
+         </widget>
+         <zorder>line_VIEW_hori</zorder>
+         <zorder>line_VIEW_vert</zorder>
+         <zorder>toolButton_VIEW_S</zorder>
+         <zorder>toolButton_VIEW_L</zorder>
+         <zorder>toolButton_VIEW_I</zorder>
+         <zorder>toolButton_VIEW_R</zorder>
+         <zorder>toolButton_VIEW_P</zorder>
+         <zorder>toolButton_VIEW_A</zorder>
+         <zorder>pushButton_VIEW_reset</zorder>
+         <zorder>comboBox_SYNC_position</zorder>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_cells">
-         <property name="enabled">
-          <bool>true</bool>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_SYNC">
+         <property name="minimumSize">
+          <size>
+           <width>161</width>
+           <height>230</height>
+          </size>
          </property>
-         <property name="geometry">
-          <rect>
-           <x>150</x>
-           <y>150</y>
-           <width>91</width>
-           <height>21</height>
-          </rect>
+         <property name="maximumSize">
+          <size>
+           <width>161</width>
+           <height>230</height>
+          </size>
          </property>
-         <property name="readOnly">
-          <bool>true</bool>
+         <property name="title">
+          <string>Synchronization</string>
          </property>
+         <widget class="QRadioButton" name="radioButton_SYNC_realtime">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>40</y>
+            <width>121</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Real-Time</string>
+          </property>
+         </widget>
+         <widget class="QRadioButton" name="radioButton_SYNC_delayed">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>70</y>
+            <width>121</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Delayed</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_SYNC_all">
+          <property name="geometry">
+           <rect>
+            <x>32</x>
+            <y>110</y>
+            <width>101</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Select All</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_SYNC_unselect">
+          <property name="geometry">
+           <rect>
+            <x>32</x>
+            <y>140</y>
+            <width>101</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Unselect</string>
+          </property>
+         </widget>
         </widget>
-       </widget>
-       <widget class="QWidget" name="tab_data">
-        <attribute name="title">
-         <string>Attributes/Ranges</string>
-        </attribute>
-        <widget class="QTableView" name="tableView">
-         <property name="geometry">
-          <rect>
-           <x>-1</x>
-           <y>-1</y>
-           <width>391</width>
-           <height>201</height>
-          </rect>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_DISPLAY">
+         <property name="minimumSize">
+          <size>
+           <width>161</width>
+           <height>230</height>
+          </size>
          </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAsNeeded</enum>
+         <property name="maximumSize">
+          <size>
+           <width>161</width>
+           <height>230</height>
+          </size>
          </property>
-         <property name="showDropIndicator" stdset="0">
-          <bool>false</bool>
+         <property name="title">
+          <string>Display Options</string>
          </property>
-         <property name="dragDropOverwriteMode">
-          <bool>false</bool>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
          </property>
-         <property name="alternatingRowColors">
-          <bool>false</bool>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-         <property name="cornerButtonEnabled">
-          <bool>true</bool>
-         </property>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
+         <widget class="QRadioButton" name="radioButton_DISPLAY_all">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>40</y>
+            <width>141</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>All Surfaces</string>
+          </property>
+         </widget>
+         <widget class="QRadioButton" name="radioButton_DISPLAY_square">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>70</y>
+            <width>141</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Square Windows</string>
+          </property>
+         </widget>
+         <widget class="QSpinBox" name="spinBox_DISPLAY_columns">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>102</y>
+            <width>41</width>
+            <height>27</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_DISPLAY_columns">
+          <property name="geometry">
+           <rect>
+            <x>60</x>
+            <y>100</y>
+            <width>63</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>columns</string>
+          </property>
+         </widget>
+         <widget class="QSlider" name="slider_DISPLAY_columns">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="geometry">
+           <rect>
+            <x>6</x>
+            <y>139</y>
+            <width>141</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
         </widget>
-       </widget>
-      </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QDockWidget" name="dockWidget">
-   <property name="minimumSize">
-    <size>
-     <width>1290</width>
-     <height>550</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>524287</width>
-     <height>524287</height>
-    </size>
-   </property>
-   <property name="acceptDrops">
-    <bool>false</bool>
-   </property>
-   <property name="features">
-    <set>QDockWidget::DockWidgetFloatable</set>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>4</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>1</horstretch>
-      <verstretch>1</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="acceptDrops">
-     <bool>false</bool>
-    </property>
-    <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="0">
-      <widget class="QScrollArea" name="scrollArea">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>1</horstretch>
-         <verstretch>1</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>524287</width>
-         <height>524287</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>true</bool>
-       </property>
-       <property name="acceptDrops">
-        <bool>false</bool>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAsNeeded</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAsNeeded</enum>
-       </property>
-       <property name="widgetResizable">
-        <bool>false</bool>
-       </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>1094</width>
-          <height>475</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>1</horstretch>
-          <verstretch>1</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="mouseTracking">
-         <bool>true</bool>
-        </property>
-        <property name="acceptDrops">
-         <bool>false</bool>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_5"/>
-       </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1308</width>
-     <height>22</height>
+     <width>1250</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1003,12 +946,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1179</x>
-     <y>749</y>
+     <x>1187</x>
+     <y>711</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1157</x>
-     <y>721</y>
+     <x>1091</x>
+     <y>670</y>
     </hint>
    </hints>
   </connection>
@@ -1019,12 +962,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1177</x>
-     <y>722</y>
+     <x>1091</x>
+     <y>670</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1192</x>
-     <y>749</y>
+     <x>1187</x>
+     <y>711</y>
     </hint>
    </hints>
   </connection>
