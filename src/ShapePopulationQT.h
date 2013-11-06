@@ -68,6 +68,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     int getNumberOfRows(unsigned int colNumber);
     void placeWidgetInArea(unsigned int colNumber);
     void resizeWidgetInArea();
+    void on_tabWidget_currentChanged(int index);
     void resizeEvent(QResizeEvent* Qevent);
 
     // DRAG & DROP FILES
@@ -157,7 +158,6 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void UpdateCameraConfig();
   signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
-
 };
 
 #endif

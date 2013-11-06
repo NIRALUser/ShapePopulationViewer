@@ -605,6 +605,21 @@ void ShapePopulationQT::resizeWidgetInArea()
 }
 
 
+void ShapePopulationQT::on_tabWidget_currentChanged(int index)
+{
+    if(index == 1)
+    {
+        if(m_commonAttributes.size()<6)
+        {
+            tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-5);
+        }
+        else
+        {
+            tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-20);
+        }
+    }
+}
+
 void ShapePopulationQT::resizeEvent(QResizeEvent *Qevent)
 {
     //Resizing Windows
@@ -617,7 +632,7 @@ void ShapePopulationQT::resizeEvent(QResizeEvent *Qevent)
     }
 
     //data range column
-    tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-20);
+    on_tabWidget_currentChanged(1);
 }
 
 void ShapePopulationQT::dragEnterEvent(QDragEnterEvent *Qevent)
@@ -1195,9 +1210,8 @@ void ShapePopulationQT::displayInfo()
     }
 
     /* Adapt Columns size */
-    tableView->resizeColumnToContents(1);
-    tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-20);
-
+    tableView->resizeColumnToContents(0);
+    on_tabWidget_currentChanged(1);
 }
 
 void ShapePopulationQT::displayAttribute()
