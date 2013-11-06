@@ -605,6 +605,21 @@ void ShapePopulationQT::resizeWidgetInArea()
 }
 
 
+void ShapePopulationQT::on_tabWidget_currentChanged(int index)
+{
+    if(index == 1)
+    {
+        if(m_commonAttributes.size()<6)
+        {
+            tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-5);
+        }
+        else
+        {
+            tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-20);
+        }
+    }
+}
+
 void ShapePopulationQT::resizeEvent(QResizeEvent *Qevent)
 {
     //Resizing Windows
@@ -617,7 +632,7 @@ void ShapePopulationQT::resizeEvent(QResizeEvent *Qevent)
     }
 
     //data range column
-    tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-20);
+    on_tabWidget_currentChanged(1);
 }
 
 void ShapePopulationQT::dragEnterEvent(QDragEnterEvent *Qevent)
@@ -909,7 +924,7 @@ void ShapePopulationQT::slot_newCameraConfig(cameraConfigStruct cam)
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 void ShapePopulationQT::on_pushButton_VIEW_reset_clicked()
-{    
+{
     if(m_selectedIndex.size() == 0) return;
 
     this->ResetHeadcam();
@@ -1130,16 +1145,16 @@ void ShapePopulationQT::displayInfo()
     model->setHorizontalHeaderItem(0, new QStandardItem(QString("Name")));
     model->setHorizontalHeaderItem(1, new QStandardItem(QString("Range")));
 
-	std::ostringstream strs;
+    std::ostringstream strs;
 
     if(m_selectedIndex.size() > 1)
     {
-		strs.str(""); strs.clear();
-		strs << (int)m_selectedIndex.size()
+        strs.str(""); strs.clear();
+        strs << (int)m_selectedIndex.size()
              <<" surfaces selected, select only one"<< std::endl;
 
         //Infos
-		this->lineEdit_filename->setText(QString(strs.str().c_str()));
+        this->lineEdit_filename->setText(QString(strs.str().c_str()));
         this->lineEdit_dir->setText(QString(""));
         this->lineEdit_points->setText(QString(""));
         this->lineEdit_cells->setText(QString(""));
@@ -1153,8 +1168,8 @@ void ShapePopulationQT::displayInfo()
 
             //Range
             double * range = computeCommonRange(m_commonAttributes[i].c_str(), m_selectedIndex);
-			strs.str(""); strs.clear();
-			strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
+            strs.str(""); strs.clear();
+            strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
             QStandardItem * dataRange = new QStandardItem(QString(strs.str().c_str()));
             model->setItem(i,1,dataRange);
         }
@@ -1168,11 +1183,11 @@ void ShapePopulationQT::displayInfo()
 
         this->lineEdit_filename->setText(QString(m_meshList[index]->GetFileName().c_str()));
         this->lineEdit_dir->setText(QString(m_meshList[index]->GetFileDir().c_str()));
-		strs.str(""); strs.clear();
-		strs << (int)selectedData->GetNumberOfPoints()<< std::endl;
-		this->lineEdit_points->setText(QString(strs.str().c_str()));
-		strs.str(""); strs.clear();
-		strs << (int)selectedData->GetNumberOfCells()<< std::endl;
+        strs.str(""); strs.clear();
+        strs << (int)selectedData->GetNumberOfPoints()<< std::endl;
+        this->lineEdit_points->setText(QString(strs.str().c_str()));
+        strs.str(""); strs.clear();
+        strs << (int)selectedData->GetNumberOfCells()<< std::endl;
         this->lineEdit_cells->setText(QString(strs.str().c_str()));
 
 
@@ -1187,17 +1202,16 @@ void ShapePopulationQT::displayInfo()
 
             //Range
             double * range = selectedData->GetPointData()->GetScalars(AttributesList[i].c_str())->GetRange();
-			strs.str(""); strs.clear();
-			strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
+            strs.str(""); strs.clear();
+            strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
             QStandardItem * dataRange = new QStandardItem(QString(strs.str().c_str()));
             model->setItem(i,1,dataRange);
         }
     }
 
     /* Adapt Columns size */
-    tableView->resizeColumnToContents(1);
-    tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-20);
-
+    tableView->resizeColumnToContents(0);
+    on_tabWidget_currentChanged(1);
 }
 
 void ShapePopulationQT::displayAttribute()

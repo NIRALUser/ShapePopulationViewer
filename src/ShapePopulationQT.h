@@ -128,6 +128,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void slot_textColor_valueChanged(QColor color);
 
     //CAMERA CONFIG
+    void UpdateCameraConfig();
     void slot_position_x_valueChanged(double arg1);
     void slot_position_y_valueChanged(double arg1);
     void slot_position_z_valueChanged(double arg1);
@@ -154,10 +155,12 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void slot_no_gradArrow_selected();
 
 
-    void UpdateCameraConfig();
+    //INFO/ATTRIBUTES/RANGES
+    void on_tabWidget_currentChanged(int index);
+
+
   signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
-
 };
 
 #endif
