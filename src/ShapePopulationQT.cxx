@@ -474,7 +474,6 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         /* DISPLAY INFOS */
         this->displayInfo();
         this->displayAttribute();
-        this->displayPosition();
 
         this->UpdateArrowPosition();
     }
@@ -496,7 +495,6 @@ void ShapePopulationQT::SelectAll()
     this->tabWidget->setEnabled(true);
 
     /* UPDATE WINDOWS */
-    this->UpdateCenterPosition();
     this->UpdateAttribute_QT();
 
     /* DISPLAY INFOS */
@@ -732,14 +730,6 @@ void ShapePopulationQT::on_pushButton_SYNC_unselect_clicked()
 
 void ShapePopulationQT::on_comboBox_SYNC_position_currentIndexChanged()
 {
-    if(m_selectedIndex.size() == 0) return;
-
-    this->UpdateCenterPosition();
-    this->RenderSelection();
-}
-
-void ShapePopulationQT::UpdateCenterPosition()
-{
     // Get Attribute in ComboBox
     QString position = this->comboBox_SYNC_position->currentText();
 
@@ -751,7 +741,13 @@ void ShapePopulationQT::UpdateCenterPosition()
     {
         this->PositionToOriginal();
     }
+
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+        m_windowsList[i]->Render();
+    }
 }
+
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                     BACKGROUND FUNCTIONS                                      * //
@@ -1220,17 +1216,5 @@ void ShapePopulationQT::displayAttribute()
         {
             comboBox_VISU_attribute->setCurrentIndex(index);
         }
-    }
-}
-
-void ShapePopulationQT::displayPosition()
-{
-    if(m_selectedIndex.size() == 1)  // if new selection
-    {
-        std::string position = m_meshList[m_selectedIndex[0]]->GetPosition();
-
-        int index = comboBox_SYNC_position->findText(position.c_str());
-        if (index != -1)
-            comboBox_SYNC_position->setCurrentIndex(index);
     }
 }

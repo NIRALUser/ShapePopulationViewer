@@ -196,18 +196,6 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
         const char * cmap = m_windowsList[m_selectedIndex[0]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetName();
         this->UpdateAttribute(cmap, m_selectedIndex);
         this->UpdateColorMap(m_selectedIndex);
-
-        //Update Center to the first selected window position
-        std::string position = m_meshList[m_selectedIndex[0]]->GetPosition();
-
-        if(strcmp(position.c_str(),"Centered") == 0)
-        {
-            this->PositionToCentered();
-        }
-        else if(strcmp(position.c_str(),"Original") == 0)
-        {
-            this->PositionToOriginal();
-        }
     }
 
     this->RenderSelection();
@@ -471,6 +459,13 @@ void ShapePopulationBase::ChangeView(int x, int y, int z)
 
 void ShapePopulationBase::ResetHeadcam()
 {
+
+    if(m_selectedIndex.empty())
+    {
+        vtkSmartPointer<vtkRenderer> firstRenderer = m_windowsList[0]->GetRenderers()->GetFirstRenderer();
+        firstRenderer->ResetCamera();
+        m_headcam->DeepCopy(firstRenderer->GetActiveCamera());
+    }
     vtkSmartPointer<vtkRenderer> firstRenderer = m_windowsList[m_selectedIndex[0]]->GetRenderers()->GetFirstRenderer();
     firstRenderer->ResetCamera();
     this->UpdateCameraConfig();
@@ -500,34 +495,35 @@ void ShapePopulationBase::UpdateCameraConfig()
 
 void ShapePopulationBase::PositionToOriginal()
 {
-    if(m_selectedIndex.empty()) return;
-
-    for (unsigned int i = 0; i < m_selectedIndex.size();i++)
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
     {
         //Get the position
-        vtkSmartPointer<vtkActor> testActor = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkSmartPointer<vtkActor> testActor = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
 
         //Update the position
         double newposition[3] = {0,0,0};
         testActor->SetPosition(newposition);
         testActor->SetOrigin(newposition);
-
-        //Update the mesh info
-        m_meshList[m_selectedIndex[i]]->SetPosition("Original");
     }
-
     this->ResetHeadcam();
-    this->UpdateCameraConfig();
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+        vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
+        camera->DeepCopy(m_headcam);
+        m_windowsList[i]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
+    }
+    for (unsigned int i = 0; i < m_selectedIndex.size();i++)
+    {
+        m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(m_headcam);
+    }
 }
 
 void ShapePopulationBase::PositionToCentered()
 {
-    if(m_selectedIndex.empty()) return;
-
-    for (unsigned int i = 0; i < m_selectedIndex.size();i++)
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
     {
         //Get the position
-        vtkSmartPointer<vtkActor> testActor = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkSmartPointer<vtkActor> testActor = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
         double * position = testActor->GetPosition();
         double * center = testActor->GetCenter();
 
@@ -538,13 +534,18 @@ void ShapePopulationBase::PositionToCentered()
         double newposition[3] = {a,b,c};
         testActor->SetPosition(newposition);
         testActor->SetOrigin(newposition);
-
-        //Update the mesh info
-        m_meshList[m_selectedIndex[i]]->SetPosition("Centered");
     }
-
     this->ResetHeadcam();
-    this->UpdateCameraConfig();
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+            vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
+            camera->DeepCopy(m_headcam);
+            m_windowsList[i]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
+    }
+    for (unsigned int i = 0; i < m_selectedIndex.size();i++)
+    {
+        m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(m_headcam);
+    }
 }
 
 unsigned int ShapePopulationBase::getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow)

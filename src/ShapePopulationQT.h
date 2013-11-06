@@ -75,13 +75,11 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void dropEvent(QDropEvent* Qevent);
 
     // UPDATES & DISPLAY INFO
-    void UpdateCenterPosition();
     void UpdateAttribute_QT();
     void UpdateColorbar_QT();
     void UpdateArrowPosition();
     void displayInfo();
     void displayAttribute();
-    void displayPosition();
 
   protected slots:
 

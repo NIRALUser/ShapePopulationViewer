@@ -38,17 +38,4 @@ void ShapePopulationData::ReadMesh(std::string a_filePath)
         m_AttributeList.push_back(AttributeString);
     }
     std::sort(m_AttributeList.begin(),m_AttributeList.end());
-
-    m_Position = "Original";
-}
-
-
-int ShapePopulationData::SetPosition(std::string a_Position)
-{
-    if ( strcmp(a_Position.c_str(),"Centered") == 0 || strcmp(a_Position.c_str(),"Original") == 0)
-    {
-        m_Position = a_Position;
-        return 0;
-    }
-    else return -1;
 }
