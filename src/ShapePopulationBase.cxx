@@ -365,7 +365,7 @@ void ShapePopulationBase::computeCommonAttributes()
 
 double * ShapePopulationBase::computeCommonRange(const char * a_cmap, std::vector< unsigned int > a_windowIndex)
 {
-    double * commonRange = m_commonRange; //to avoid warning for not being initialized
+    double * commonRange = NULL; //to avoid warning for not being initialized
     for (unsigned int i = 0; i < a_windowIndex.size(); i++)
     {
         double * newRange = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars(a_cmap)->GetRange();
@@ -387,9 +387,11 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
         vtkSmartPointer<vtkMapper> mapper = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper();
         mapper->GetInput()->GetPointData()->SetActiveScalars(a_cmap);
     }
-
     // Compute the largest range
-    m_commonRange = computeCommonRange(a_cmap, a_windowIndex);
+    double * commonRange = computeCommonRange(a_cmap, a_windowIndex);
+    m_commonRange[0] = commonRange[0];
+    m_commonRange[1] = commonRange[1];
+
 }
 
 void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowIndex)
@@ -400,20 +402,20 @@ void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowInd
     {
         vtkSmartPointer<vtkMapper> mapper = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper();
         vtkSmartPointer<vtkColorTransferFunction> DistanceMapTFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
-        double range = fabs(m_commonRange[1] - m_commonRange[0]);
+        double range = fabs(m_usedColorBar->range[1] - m_usedColorBar->range[0]);
 
-        for (unsigned int j = 0; j < m_colorPointList->size(); j++)
+        for (unsigned int j = 0; j < m_usedColorBar->colorPointList.size(); j++)
         {
-            double position = m_colorPointList->at(j).pos;
-			double x = spv_math::round_nplaces(m_commonRange[0] + range * position,2);
-            double r = m_colorPointList->at(j).r;
-            double g = m_colorPointList->at(j).g;
-            double b = m_colorPointList->at(j).b;
+            double position = m_usedColorBar->colorPointList[j].pos;
+            double x = spv_math::round_nplaces(m_usedColorBar->range[0] + range * position,2);
+            double r = m_usedColorBar->colorPointList[j].r;
+            double g = m_usedColorBar->colorPointList[j].g;
+            double b = m_usedColorBar->colorPointList[j].b;
             DistanceMapTFunc->AddRGBPoint(x,r,g,b);
         }
-        m_commonRange[0] = spv_math::round_nplaces(m_commonRange[0],2);
-        m_commonRange[1] = spv_math::round_nplaces(m_commonRange[1],2);
-        DistanceMapTFunc->AdjustRange(m_commonRange);
+        m_usedColorBar->range[0] = spv_math::round_nplaces(m_usedColorBar->range[0],2);
+        m_usedColorBar->range[1] = spv_math::round_nplaces(m_usedColorBar->range[1],2);
+        DistanceMapTFunc->AdjustRange(m_usedColorBar->range);
         DistanceMapTFunc->SetColorSpaceToRGB();
 
         //Mapper Update

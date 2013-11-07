@@ -2,7 +2,7 @@
 #define SHAPEPOPULATIONBASE_H
 
 #include "ShapePopulationData.h"
-#include "colorPointStruct.h"
+#include "colorBarStruct.h"
 #include "cameraConfigStruct.h"
 
 #include <vtkCamera.h>                  //Camera
@@ -40,8 +40,8 @@ class ShapePopulationBase
     vtkSmartPointer<vtkCamera> m_headcam;
     cameraConfigStruct m_headcamConfig;
     std::vector<std::string> m_commonAttributes;
-    std::vector<colorPointStruct> * m_colorPointList;
-    std::vector< std::vector<colorPointStruct> *> m_colorBarList;
+    colorBarStruct * m_usedColorBar;
+    std::vector< colorBarStruct *> m_colorBarList;
 
     void CreateNewWindow(std::string a_filePath);
 
@@ -60,7 +60,7 @@ class ShapePopulationBase
     double* computeCommonRange(const char * a_cmap, std::vector<unsigned int> a_windowIndex);
     void UpdateAttribute(const char *a_cmap, std::vector<unsigned int> a_windowIndex);
     void UpdateColorMap(std::vector<unsigned int> a_windowIndex);
-    double* m_commonRange;
+    double m_commonRange[2];
 
     //CAMERA
     void ChangeView(int x, int y, int z);

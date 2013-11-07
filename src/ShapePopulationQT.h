@@ -68,7 +68,6 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     int getNumberOfRows(unsigned int colNumber);
     void placeWidgetInArea(unsigned int colNumber);
     void resizeWidgetInArea();
-    void on_tabWidget_currentChanged(int index);
     void resizeEvent(QResizeEvent* Qevent);
 
     // DRAG & DROP FILES
@@ -76,11 +75,11 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void dropEvent(QDropEvent* Qevent);
 
     // UPDATES & DISPLAY INFO
-    void UpdateAttribute_QT();
     void UpdateColorbar_QT();
     void UpdateArrowPosition();
     void displayInfo();
     void displayAttribute();
+
 
   protected slots:
 
@@ -101,6 +100,9 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void showBackgroundConfigWindow();
     void loadColorMap();
     void saveColorMap();
+
+    //DISPLAY INFO RANGE
+    void on_tabWidget_currentChanged(int index);
 
     //DISPLAY
     void on_radioButton_DISPLAY_all_toggled();
@@ -144,6 +146,9 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
 
     //COLORMAP
     void on_comboBox_VISU_attribute_currentIndexChanged();
+    void on_spinBox_VISU_min_valueChanged(double arg1);
+    void on_pushButton_VISU_resetRange_clicked();
+    void on_spinBox_VISU_max_valueChanged(double arg1);
     void on_spinBox_VISU_position_valueChanged(double arg1);
     void on_pushButton_VISU_delete_clicked();
     void on_pushButton_VISU_add_clicked();
@@ -158,6 +163,8 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void UpdateCameraConfig();
   signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
+
+private slots:
 };
 
 #endif

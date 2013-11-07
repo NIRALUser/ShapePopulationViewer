@@ -147,11 +147,10 @@ void ShapePopulationQT::loadVTKDirCLP(QDir vtkDir)
 void ShapePopulationQT::loadColorMapCLP(std::string a_filePath)
 {
     QString QFilePath(a_filePath.c_str());
-    gradientWidget_VISU->loadColorPointList(QFilePath, m_colorPointList);
+    gradientWidget_VISU->loadColorPointList(QFilePath, &m_usedColorBar->colorPointList);
     for(unsigned int i=0 ; i< m_colorBarList.size(); i++)
     {
-        *m_colorBarList[i] = *m_colorPointList;
-        //gradientWidget_VISU->setAllColors(m_colorPointList);
+        *m_colorBarList[i] = *m_usedColorBar;
     }
     this->UpdateColorbar_QT();
     this->RenderSelection();
@@ -342,6 +341,192 @@ void ShapePopulationQT::deleteSelection()
 
 
 
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                     BACKGROUND FUNCTIONS                                      * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
+void ShapePopulationQT::showBackgroundConfigWindow()
+{
+    m_backgroundDialog->show();
+}
+
+void ShapePopulationQT::slot_selectedColor_valueChanged(QColor color)
+{
+    double selectedColor[3];
+
+    //Colors conversion from 0-255 to 0-1
+    selectedColor[0] = (double)color.red()/255.0;
+    selectedColor[1] = (double)color.green()/255.0;
+    selectedColor[2] = (double)color.blue()/255.0;
+
+    this->setBackgroundSelectedColor(selectedColor);
+}
+
+
+void ShapePopulationQT::slot_unselectedColor_valueChanged(QColor color)
+{
+    double unselectedColor[3];
+
+    //Colors conversion from 0-255 to 0-1
+    unselectedColor[0] = (double)color.red()/255.0;
+    unselectedColor[1] = (double)color.green()/255.0;
+    unselectedColor[2] = (double)color.blue()/255.0;
+
+    this->setBackgroundUnselectedColor(unselectedColor);
+}
+
+
+void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
+{
+    double textColor[3];
+
+    //Colors conversion from 0-255 to 0-1
+    textColor[0] = (double)color.red()/255.0;
+    textColor[1] = (double)color.green()/255.0;
+    textColor[2] = (double)color.blue()/255.0;
+
+    for (unsigned int i = 0; i < m_windowsList.size(); i++)
+    {
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+
+        //CornerAnnotation Update
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(1);
+        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
+        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkSmartPointer<vtkTextProperty> cornerProperty = cornerAnnotation->GetTextProperty();
+        cornerProperty->SetColor(textColor);
+
+        //ScalarBar Update
+        viewPropObject = propCollection->GetItemAsObject(2);
+        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkSmartPointer<vtkTextProperty> labelProperty = scalarBar->GetLabelTextProperty();
+        labelProperty->SetColor(textColor);
+
+        m_windowsList[i]->Render();
+    }
+}
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                       CAMERA FUNCTIONS                                        * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
+void ShapePopulationQT::showCameraConfigWindow()
+{
+    m_cameraDialog->show();
+    this->UpdateCameraConfig();
+}
+
+
+void ShapePopulationQT::UpdateCameraConfig()
+{
+    if(m_cameraDialog->isVisible())
+    {
+        ShapePopulationBase::UpdateCameraConfig();
+        emit sig_updateCameraConfig(m_headcamConfig);
+    }
+}
+
+void ShapePopulationQT::slot_position_x_valueChanged(double arg1)
+{
+    double * position = m_headcam->GetPosition();
+    m_headcam->SetPosition(arg1,position[1],position[2]);
+    this->RenderSelection();
+}
+void ShapePopulationQT::slot_position_y_valueChanged(double arg1)
+{
+    double * position = m_headcam->GetPosition();
+    m_headcam->SetPosition(position[0],arg1,position[2]);
+    this->RenderSelection();
+}
+void ShapePopulationQT::slot_position_z_valueChanged(double arg1)
+{
+    double * position = m_headcam->GetPosition();
+    m_headcam->SetPosition(position[0],position[1],arg1);
+    this->RenderSelection();
+}
+void ShapePopulationQT::slot_focalpoint_x_valueChanged(double arg1)
+{
+    double * focalpoint = m_headcam->GetFocalPoint();
+    m_headcam->SetFocalPoint(arg1,focalpoint[1],focalpoint[2]);
+    this->RenderSelection();
+}
+void ShapePopulationQT::slot_focalpoint_y_valueChanged(double arg1)
+{
+    double * focalpoint = m_headcam->GetFocalPoint();
+    m_headcam->SetFocalPoint(focalpoint[0],arg1,focalpoint[2]);
+    this->RenderSelection();
+}
+void ShapePopulationQT::slot_focalpoint_z_valueChanged(double arg1)
+{
+    double * focalpoint = m_headcam->GetFocalPoint();
+    m_headcam->SetFocalPoint(focalpoint[0],focalpoint[1],arg1);
+    this->RenderSelection();
+}
+void ShapePopulationQT::slot_viewup_vx_valueChanged(double arg1)
+{
+    double * viewup = m_headcam->GetViewUp();
+    m_headcam->SetViewUp(arg1,viewup[1],viewup[2]);
+    this->RenderSelection();
+}
+void ShapePopulationQT::slot_viewup_vy_valueChanged(double arg1)
+{
+    double * viewup = m_headcam->GetViewUp();
+    m_headcam->SetViewUp(viewup[0],arg1,viewup[2]);
+    this->RenderSelection();
+}
+void ShapePopulationQT::slot_viewup_vz_valueChanged(double arg1)
+{
+    double * viewup = m_headcam->GetViewUp();
+    m_headcam->SetViewUp(viewup[0],viewup[1],arg1);
+    this->RenderSelection();
+}
+void ShapePopulationQT::slot_scale_valueChanged(double arg1)
+{
+    m_headcam->SetParallelScale(arg1);
+    this->RenderSelection();
+}
+
+void ShapePopulationQT::slot_newCameraConfig(cameraConfigStruct cam)
+{
+    m_headcam->SetPosition(cam.pos_x,cam.pos_y,cam.pos_z);
+    m_headcam->SetFocalPoint(cam.foc_x,cam.foc_y,cam.foc_z);
+    m_headcam->SetViewUp(cam.view_vx,cam.view_vy,cam.view_vz);
+    m_headcam->SetParallelScale(cam.scale);
+    this->RenderSelection();
+}
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                       LOAD/SAVE COLORBAR                                      * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
+void ShapePopulationQT::loadColorMap()
+{
+    QString filename = QFileDialog::getOpenFileName(this,tr("Open .spvcm file"),m_colormapDirectory,"SPVCM file (*.spvcm)");
+    if(filename == "") return;
+
+    QFileInfo file(filename);
+    m_colormapDirectory= file.path();
+    gradientWidget_VISU->loadColorPointList(filename, &m_usedColorBar->colorPointList);
+
+    this->UpdateColorbar_QT();
+    this->RenderSelection();
+}
+
+
+void ShapePopulationQT::saveColorMap()
+{
+    QString filename = QFileDialog::getSaveFileName(this,tr("Save .spvcm file"),m_colormapDirectory,"SPVCM file (*.spvcm)");
+    if(filename == "") return;
+
+    QFileInfo file(filename);
+    m_colormapDirectory= file.path();
+    if(file.suffix() != QString("spvcm")) filename += ".spvcm";
+    gradientWidget_VISU->saveColorPointList(filename);
+}
+
+
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                       CREATE WIDGETS                                          * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -377,6 +562,7 @@ void ShapePopulationQT::CreateWidgets()
         meshWidget->GetInteractor()->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::CameraChangedEventVTK);
     }
 
+
     /* WINDOWS */
     m_windowsList.clear();
     for (unsigned int i = 0; i < m_widgetList.size(); i++)
@@ -384,39 +570,52 @@ void ShapePopulationQT::CreateWidgets()
         m_windowsList.push_back(m_widgetList.at(i)->GetRenderWindow());
     }
 
-    /* COLORMAPS */
-    computeCommonAttributes();                                  // get the common attributes
-    comboBox_VISU_attribute->clear();
-    m_colorBarList.clear();
+    /* ATTRIBUTES & COLORBARS */
+    ShapePopulationBase::SelectAll();
+
+    computeCommonAttributes();                                                  // get the common attributes in m_commonAttributes
+    comboBox_VISU_attribute->clear();                                           // clear the Attributes in the comboBox
+    m_colorBarList.clear();                                                     // clear the existing colorbars
     for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
     {
-        gradientWidget_VISU->reset();
-        std::vector<colorPointStruct> * colorPointList = new std::vector<colorPointStruct>;
-        gradientWidget_VISU->getAllColors(colorPointList);
-        m_colorBarList.push_back(colorPointList);
+        colorBarStruct * colorBar = new colorBarStruct;                         //new colorbar for this attribute
+        gradientWidget_VISU->reset();                                           //create points
+        gradientWidget_VISU->getAllColors(&colorBar->colorPointList);           //get the points into the colorbar
+        this->UpdateAttribute(m_commonAttributes[i].c_str(), m_selectedIndex);  //create the range
+        colorBar->range[0] = m_commonRange[0];                                  //get the range into the colorbar
+        colorBar->range[1] = m_commonRange[1];
+        m_colorBarList.push_back(colorBar);                                     //add the colorbar to the list
 
-        QString Q_Attribute(m_commonAttributes.at(i).c_str());
-        comboBox_VISU_attribute->addItem(Q_Attribute);           // and then add them to the GUI.
+        comboBox_VISU_attribute->addItem(QString(m_commonAttributes[i].c_str()));   // Then add the attribute to the comboBox
     }
-    m_colorPointList = m_colorBarList[0];
-    this->gradientWidget_VISU->setAllColors(m_colorPointList);
 
-    SelectAll();                                                // Now we select all windows to update them
-    RenderSelection();
+    /* RENDER WINDOWS */
+    this->UpdateAttribute(m_commonAttributes[0].c_str(), m_selectedIndex);
+    m_usedColorBar = m_colorBarList[0];
+    std::cout<<"chosed : ["<<m_usedColorBar->range[0]<<";"<<m_usedColorBar->range[1]<<"]"<<std::endl
+               <<"common : ["<<m_commonRange[0]<<";"<<m_commonRange[1]<<"]"<<std::endl<<std::endl;
+    this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
+    spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
+    spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
+    this->UpdateColorbar_QT();
+    this->UpdateArrowPosition();
 
     m_numberOfMeshes = m_fileList.size();
-    slider_DISPLAY_columns->setMaximum(m_fileList.size());
 
     /* GUI BUTTONS & ACTIONS */
     this->toolBox->setEnabled(true);
-    this->gradientWidget_VISU->enable(m_colorPointList);
+    this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
     this->menuOptions->setEnabled(true);
     this->actionDelete_All->setEnabled(true);
     this->actionOpen_Directory->setText("Add Directory");
     this->actionOpen_VTK_Files->setText("Add VTK files");
-    this->actionLoad_CSV->setText("Add CSV file");
+    this->actionLoad_CSV->setText("Add CSV file");\
+
+    /* DISPLAY INFOS */
+    this->displayInfo();
 
     /* GUI WIDGETS DISPLAY */
+    this->slider_DISPLAY_columns->setMaximum(m_fileList.size());
     unsigned int sum = 0;
     int colNumber = 0;
     int nextOdd = 1;
@@ -468,14 +667,12 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         this->actionDelete->setEnabled(true);
         this->groupBox_VIEW->setEnabled(true);
         this->groupBox_VISU->setEnabled(true);
-        this->gradientWidget_VISU->enable(m_colorPointList);
+        this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
         this->tabWidget->setEnabled(true);
 
         /* DISPLAY INFOS */
         this->displayInfo();
         this->displayAttribute();
-
-        this->UpdateArrowPosition();
     }
 }
 
@@ -491,11 +688,21 @@ void ShapePopulationQT::SelectAll()
     this->actionDelete->setEnabled(true);
     this->groupBox_VIEW->setEnabled(true);
     this->groupBox_VISU->setEnabled(true);
-    this->gradientWidget_VISU->enable(m_colorPointList);
+    this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
     this->tabWidget->setEnabled(true);
 
     /* UPDATE WINDOWS */
-    this->UpdateAttribute_QT();
+
+    // Get Attribute in ComboBox
+    QString text = this->comboBox_VISU_attribute->currentText();
+    QByteArray arr = text.toLatin1();
+    const char *cmap  = arr.data();
+
+    // Update color with this attribute
+    this->UpdateAttribute(cmap, m_selectedIndex);
+    this->UpdateColorMap(m_selectedIndex);
+    this->RenderSelection();
+
 
     /* DISPLAY INFOS */
     this->displayInfo();
@@ -763,162 +970,6 @@ void ShapePopulationQT::on_comboBox_SYNC_position_currentIndexChanged()
     }
 }
 
-
-// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-// *                                     BACKGROUND FUNCTIONS                                      * //
-// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-
-void ShapePopulationQT::showBackgroundConfigWindow()
-{
-    m_backgroundDialog->show();
-}
-
-void ShapePopulationQT::slot_selectedColor_valueChanged(QColor color)
-{
-    double selectedColor[3];
-
-    //Colors conversion from 0-255 to 0-1
-    selectedColor[0] = (double)color.red()/255.0;
-    selectedColor[1] = (double)color.green()/255.0;
-    selectedColor[2] = (double)color.blue()/255.0;
-
-    this->setBackgroundSelectedColor(selectedColor);
-}
-
-
-void ShapePopulationQT::slot_unselectedColor_valueChanged(QColor color)
-{
-    double unselectedColor[3];
-
-    //Colors conversion from 0-255 to 0-1
-    unselectedColor[0] = (double)color.red()/255.0;
-    unselectedColor[1] = (double)color.green()/255.0;
-    unselectedColor[2] = (double)color.blue()/255.0;
-
-    this->setBackgroundUnselectedColor(unselectedColor);
-}
-
-
-void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
-{
-    double textColor[3];
-
-    //Colors conversion from 0-255 to 0-1
-    textColor[0] = (double)color.red()/255.0;
-    textColor[1] = (double)color.green()/255.0;
-    textColor[2] = (double)color.blue()/255.0;
-
-    for (unsigned int i = 0; i < m_windowsList.size(); i++)
-    {
-        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
-
-        //CornerAnnotation Update
-        vtkObject * viewPropObject = propCollection->GetItemAsObject(1);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
-        vtkSmartPointer<vtkTextProperty> cornerProperty = cornerAnnotation->GetTextProperty();
-        cornerProperty->SetColor(textColor);
-
-        //ScalarBar Update
-        viewPropObject = propCollection->GetItemAsObject(2);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
-        vtkSmartPointer<vtkTextProperty> labelProperty = scalarBar->GetLabelTextProperty();
-        labelProperty->SetColor(textColor);
-
-        m_windowsList[i]->Render();
-    }
-}
-
-// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-// *                                       CAMERA FUNCTIONS                                        * //
-// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-
-void ShapePopulationQT::showCameraConfigWindow()
-{
-    m_cameraDialog->show();
-    this->UpdateCameraConfig();
-}
-
-
-void ShapePopulationQT::UpdateCameraConfig()
-{
-    if(m_cameraDialog->isVisible())
-    {
-        ShapePopulationBase::UpdateCameraConfig();
-        emit sig_updateCameraConfig(m_headcamConfig);
-    }
-}
-
-void ShapePopulationQT::slot_position_x_valueChanged(double arg1)
-{
-    double * position = m_headcam->GetPosition();
-    m_headcam->SetPosition(arg1,position[1],position[2]);
-    this->RenderSelection();
-}
-void ShapePopulationQT::slot_position_y_valueChanged(double arg1)
-{
-    double * position = m_headcam->GetPosition();
-    m_headcam->SetPosition(position[0],arg1,position[2]);
-    this->RenderSelection();
-}
-void ShapePopulationQT::slot_position_z_valueChanged(double arg1)
-{
-    double * position = m_headcam->GetPosition();
-    m_headcam->SetPosition(position[0],position[1],arg1);
-    this->RenderSelection();
-}
-void ShapePopulationQT::slot_focalpoint_x_valueChanged(double arg1)
-{
-    double * focalpoint = m_headcam->GetFocalPoint();
-    m_headcam->SetFocalPoint(arg1,focalpoint[1],focalpoint[2]);
-    this->RenderSelection();
-}
-void ShapePopulationQT::slot_focalpoint_y_valueChanged(double arg1)
-{
-    double * focalpoint = m_headcam->GetFocalPoint();
-    m_headcam->SetFocalPoint(focalpoint[0],arg1,focalpoint[2]);
-    this->RenderSelection();
-}
-void ShapePopulationQT::slot_focalpoint_z_valueChanged(double arg1)
-{
-    double * focalpoint = m_headcam->GetFocalPoint();
-    m_headcam->SetFocalPoint(focalpoint[0],focalpoint[1],arg1);
-    this->RenderSelection();
-}
-void ShapePopulationQT::slot_viewup_vx_valueChanged(double arg1)
-{
-    double * viewup = m_headcam->GetViewUp();
-    m_headcam->SetViewUp(arg1,viewup[1],viewup[2]);
-    this->RenderSelection();
-}
-void ShapePopulationQT::slot_viewup_vy_valueChanged(double arg1)
-{
-    double * viewup = m_headcam->GetViewUp();
-    m_headcam->SetViewUp(viewup[0],arg1,viewup[2]);
-    this->RenderSelection();
-}
-void ShapePopulationQT::slot_viewup_vz_valueChanged(double arg1)
-{
-    double * viewup = m_headcam->GetViewUp();
-    m_headcam->SetViewUp(viewup[0],viewup[1],arg1);
-    this->RenderSelection();
-}
-void ShapePopulationQT::slot_scale_valueChanged(double arg1)
-{
-    m_headcam->SetParallelScale(arg1);
-    this->RenderSelection();
-}
-
-void ShapePopulationQT::slot_newCameraConfig(cameraConfigStruct cam)
-{
-    m_headcam->SetPosition(cam.pos_x,cam.pos_y,cam.pos_z);
-    m_headcam->SetFocalPoint(cam.foc_x,cam.foc_y,cam.foc_z);
-    m_headcam->SetViewUp(cam.view_vx,cam.view_vy,cam.view_vz);
-    m_headcam->SetParallelScale(cam.scale);
-    this->RenderSelection();
-}
-
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                         AXIS FUNCTIONS                                        * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -950,38 +1001,36 @@ void ShapePopulationQT::on_toolButton_VIEW_I_clicked() {ChangeView(0,-1,0);}
 
 void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
 {
-    if(m_selectedIndex.size() == 0) return;
+    if(m_selectedIndex.size() == 0 || m_numberOfMeshes == 0) return;
+
+    // Update Attribute and commonRange
+    QString text = this->comboBox_VISU_attribute->currentText();
+    QByteArray arr = text.toLatin1();
+    const char *cmap  = arr.data();
+    this->UpdateAttribute(cmap, m_selectedIndex);
 
     // Change the colorbar selected
     int index = this->comboBox_VISU_attribute->currentIndex();
     if (index != -1)
     {
-        m_colorPointList = m_colorBarList[index]; //the colorbar depends of the attribute
-        this->gradientWidget_VISU->setAllColors(m_colorPointList);
+        m_usedColorBar = m_colorBarList[index]; //the colorbar depends of the attribute
+        this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
+        spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
+        spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
     }
 
-    this->UpdateAttribute_QT();
-    this->RenderSelection();
-}
-
-void ShapePopulationQT::UpdateAttribute_QT()
-{
-    // Get Attribute in ComboBox
-    QString text = this->comboBox_VISU_attribute->currentText();
-    QByteArray arr = text.toLatin1();
-    const char *cmap  = arr.data();
-
-    // Update color with this attribute
-    this->UpdateAttribute(cmap, m_selectedIndex);
+    // Display colormap
     this->UpdateColorMap(m_selectedIndex);
     this->UpdateArrowPosition();
+    this->RenderSelection();
+
 
 }
 
 void ShapePopulationQT::UpdateColorbar_QT()
 {
     // Update m_colorPointList from colorbar
-    gradientWidget_VISU->getAllColors(m_colorPointList);
+    gradientWidget_VISU->getAllColors(&m_usedColorBar->colorPointList);
 
     // Get Attribute in ComboBox
     QString text = this->comboBox_VISU_attribute->currentText();
@@ -1006,51 +1055,66 @@ void ShapePopulationQT::UpdateColorbar_QT()
     //Rendering those windows...
     for(unsigned int i = 0 ; i < windowsIndex.size() ; i++)
     {
-        //... if they are not already selected
-        if( (std::find(m_selectedIndex.begin(), m_selectedIndex.end(), windowsIndex[i])) == (m_selectedIndex.end()) )
-        {
-            m_windowsList[windowsIndex[i]]->Render();
-        }
+        m_windowsList[windowsIndex[i]]->Render();
     }
 }
 
 void ShapePopulationQT::UpdateArrowPosition()
 {
     // Update Spinbox ranges
-    this->spinBox_VISU_position->setMinimum(m_commonRange[0]);
-    this->spinBox_VISU_position->setMaximum(m_commonRange[1]);
-    double range = fabs(m_commonRange[1] - m_commonRange[0]);
+    this->spinBox_VISU_position->setMinimum(m_usedColorBar->range[0]);
+    this->spinBox_VISU_position->setMaximum(m_usedColorBar->range[1]);
+    double range = fabs(m_usedColorBar->range[1] - m_usedColorBar->range[0]);
     this->spinBox_VISU_position->setSingleStep(range/100);
-    //this->spinBox_VISU_position->setDecimals(splitter[1].length());
 
     // Update Spinbox value
     qreal newPos = this->gradientWidget_VISU->getFocusPosition();
     this->slot_gradArrow_moved(newPos);
 }
 
-void ShapePopulationQT::loadColorMap()
+
+void ShapePopulationQT::on_spinBox_VISU_min_valueChanged(double arg1)
 {
-    QString filename = QFileDialog::getOpenFileName(this,tr("Open .spvcm file"),m_colormapDirectory,"SPVCM file (*.spvcm)");
-    if(filename == "") return;
+    if(arg1 > spinBox_VISU_max->value())
+    {
+        spinBox_VISU_min->setValue(spinBox_VISU_max->value());
+        return;
+    }
 
-    QFileInfo file(filename);
-    m_colormapDirectory= file.path();
-    gradientWidget_VISU->loadColorPointList(filename, m_colorPointList);
-
+    m_usedColorBar->range[0] = arg1;
     this->UpdateColorbar_QT();
-    this->RenderSelection();
+    this->UpdateArrowPosition();
+}
+
+void ShapePopulationQT::on_spinBox_VISU_max_valueChanged(double arg1)
+{
+    if(arg1 < spinBox_VISU_min->value())
+    {
+        spinBox_VISU_max->setValue(spinBox_VISU_min->value());
+        return;
+    }
+    m_usedColorBar->range[1] = arg1;
+    this->UpdateColorbar_QT();
+    this->UpdateArrowPosition();
 }
 
 
-void ShapePopulationQT::saveColorMap()
+void ShapePopulationQT::on_pushButton_VISU_resetRange_clicked()
 {
-    QString filename = QFileDialog::getSaveFileName(this,tr("Save .spvcm file"),m_colormapDirectory,"SPVCM file (*.spvcm)");
-    if(filename == "") return;
+    m_usedColorBar->range[0] = m_commonRange[0];
+    m_usedColorBar->range[1] = m_commonRange[1];
+    spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
+    spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
 
-    QFileInfo file(filename);
-    m_colormapDirectory= file.path();
-    if(file.suffix() != QString("spvcm")) filename += ".spvcm";
-    gradientWidget_VISU->saveColorPointList(filename);
+    this->UpdateColorbar_QT();
+    this->UpdateArrowPosition();
+
+}
+
+void ShapePopulationQT::on_pushButton_VISU_delete_clicked()
+{
+    gradientWidget_VISU->deleteFocusArrow();
+    this->UpdateColorbar_QT();
 }
 
 void ShapePopulationQT::on_spinBox_VISU_position_valueChanged(double arg1)
@@ -1058,8 +1122,8 @@ void ShapePopulationQT::on_spinBox_VISU_position_valueChanged(double arg1)
     if (m_colorBarList.size() == 0) return;
 
     //get relative position depending on the range
-    double range = fabs(m_commonRange[1] - m_commonRange[0]);
-    qreal newPos = (arg1-m_commonRange[0])/range;
+    double range = fabs(m_usedColorBar->range[1] - m_usedColorBar->range[0]);
+    qreal newPos = (arg1-m_usedColorBar->range[0])/range;
 
     //setting the position to the arrow
     if (newPos >= 0.0 && newPos <= 1.0) gradientWidget_VISU->setFocusPosition(newPos);
@@ -1068,14 +1132,6 @@ void ShapePopulationQT::on_spinBox_VISU_position_valueChanged(double arg1)
 
     //update
     this->UpdateColorbar_QT();
-    this->RenderSelection();
-}
-
-void ShapePopulationQT::on_pushButton_VISU_delete_clicked()
-{
-    gradientWidget_VISU->deleteFocusArrow();
-    this->UpdateColorbar_QT();
-    this->RenderSelection();
 }
 
 void ShapePopulationQT::on_pushButton_VISU_add_clicked()
@@ -1086,7 +1142,6 @@ void ShapePopulationQT::on_pushButton_VISU_add_clicked()
     {
         gradientWidget_VISU->addArrow(color, 0.7, true);
         this->UpdateColorbar_QT();
-        this->RenderSelection();
     }
 }
 
@@ -1094,14 +1149,17 @@ void ShapePopulationQT::on_pushButton_VISU_reset_clicked()
 {
     gradientWidget_VISU->reset();
     this->UpdateColorbar_QT();
-    this->RenderSelection();
 }
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                         COLOR ARROWS                                          * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 void ShapePopulationQT::slot_gradArrow_moved(qreal newPos)
 {
     //Get the absolute position of the arrow
-    double range = fabs(m_commonRange[1] - m_commonRange[0]);
-    double absPos = m_commonRange[0] + range * newPos;
+    double range = fabs(m_usedColorBar->range[1] - m_usedColorBar->range[0]);
+    double absPos = m_usedColorBar->range[0] + range * newPos;
 
     //set the spinbox value
     spinBox_VISU_position->setValue(absPos);
@@ -1221,14 +1279,15 @@ void ShapePopulationQT::displayAttribute()
         const char * cmap =
                 m_windowsList[m_selectedIndex[0]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetName();
         int index = comboBox_VISU_attribute->findText(cmap);
-        if (index == comboBox_VISU_attribute->currentIndex())
-        {
-            this->UpdateAttribute(cmap, m_selectedIndex); // to adapt the Range within the same attribute
-            this->UpdateColorMap(m_selectedIndex);
-        }
-        if (index != -1)
+        if (index !=comboBox_VISU_attribute->currentIndex() && index != -1)
         {
             comboBox_VISU_attribute->setCurrentIndex(index);
+        }
+        else if (index == comboBox_VISU_attribute->currentIndex())
+        {
+            double * commonRange = computeCommonRange(cmap, m_selectedIndex);
+            m_commonRange[0] = commonRange[0];
+            m_commonRange[1] = commonRange[1];
         }
     }
 }
