@@ -153,10 +153,7 @@ void ShapePopulationQT::loadColorMapCLP(std::string a_filePath)
 {
     QString QFilePath(a_filePath.c_str());
     gradientWidget_VISU->loadColorPointList(QFilePath, &m_usedColorBar->colorPointList);
-    for(unsigned int i=0 ; i< m_colorBarList.size(); i++)
-    {
-        *m_colorBarList[i] = *m_usedColorBar;
-    }
+
     this->UpdateColorbar_QT();
     this->RenderSelection();
 }
@@ -623,6 +620,7 @@ void ShapePopulationQT::CreateWidgets()
     this->toolBox->setEnabled(true);
     this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
     this->menuOptions->setEnabled(true);
+    this->actionDelete->setEnabled(true);
     this->actionDelete_All->setEnabled(true);
     this->actionOpen_Directory->setText("Add Directory");
     this->actionOpen_VTK_Files->setText("Add VTK files");
