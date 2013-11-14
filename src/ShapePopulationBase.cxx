@@ -278,7 +278,6 @@ void ShapePopulationBase::CameraChangedEventVTK(vtkObject*, unsigned long, void*
 void ShapePopulationBase::RenderSelection()
 {
     if(m_selectedIndex.size()==0 || m_renderAllSelection == false) return;
-    std::cout<<"select - "<<std::endl;
 
     int test_realtime = m_windowsList[m_selectedIndex[0]]->HasObserver(vtkCommand::RenderEvent);
     int test_delayed = m_windowsList[m_selectedIndex[0]]->HasObserver(vtkCommand::ModifiedEvent);

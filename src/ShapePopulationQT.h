@@ -46,6 +46,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
 
     bool m_toolsDisplayed;
     bool m_updateOnPositionChanged;
+    bool m_updateOnAttributeChanged;
     unsigned int m_numberOfMeshes;
     QString m_lastDirectory;
     QString m_colormapDirectory;

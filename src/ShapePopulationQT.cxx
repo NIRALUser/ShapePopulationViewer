@@ -8,6 +8,7 @@ ShapePopulationQT::ShapePopulationQT()
     //Intializations
     m_toolsDisplayed = true;
     m_updateOnPositionChanged = true;
+    m_updateOnAttributeChanged = true;
     m_numberOfMeshes = 0;
     m_lastDirectory = "~";
     m_colormapDirectory = "~";
@@ -539,6 +540,8 @@ void ShapePopulationQT::saveColorMap()
 
 void ShapePopulationQT::CreateWidgets()
 {
+    this->scrollArea->setVisible(false);
+
     if(m_numberOfMeshes==0) //clear all vectors so they might be refilled
     {
         m_meshList.clear();
@@ -546,6 +549,7 @@ void ShapePopulationQT::CreateWidgets()
         m_widgetList.clear();
     }
     m_selectedIndex.clear();
+
 
     /* VTK WINDOWS */
     for (int i = m_numberOfMeshes; i < m_fileList.size(); i++)
@@ -575,7 +579,8 @@ void ShapePopulationQT::CreateWidgets()
     {
         m_windowsList.push_back(m_widgetList.at(i)->GetRenderWindow());
     }
-    radioButton_SYNC_delayed->toggle();                         //Start with a delayed synchro
+    radioButton_SYNC_delayed->toggle();
+    RealTimeRenderSynchro(false);                         //Start with a delayed synchro
 
     /* ATTRIBUTES & COLORBARS */
     ShapePopulationBase::SelectAll();
@@ -583,6 +588,8 @@ void ShapePopulationQT::CreateWidgets()
     computeCommonAttributes();                                                  // get the common attributes in m_commonAttributes
     comboBox_VISU_attribute->clear();                                           // clear the Attributes in the comboBox
     m_colorBarList.clear();                                                     // clear the existing colorbars
+
+    m_updateOnAttributeChanged = false;
     for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
     {
         colorBarStruct * colorBar = new colorBarStruct;                         //new colorbar for this attribute
@@ -595,6 +602,7 @@ void ShapePopulationQT::CreateWidgets()
 
         comboBox_VISU_attribute->addItem(QString(m_commonAttributes[i].c_str()));   // Then add the attribute to the comboBox
     }
+    m_updateOnAttributeChanged = true;
 
     /* RENDER WINDOWS */
     this->UpdateAttribute(m_commonAttributes[0].c_str(), m_selectedIndex);
@@ -633,6 +641,7 @@ void ShapePopulationQT::CreateWidgets()
     }
     spinBox_DISPLAY_columns->setValue(colNumber+1);             //Display the number of columns in spinBox_DISPLAY_columns,
     on_spinBox_DISPLAY_columns_editingFinished();                  //and display the Widgets according to this number.
+
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -908,16 +917,14 @@ void ShapePopulationQT::on_radioButton_DISPLAY_square_toggled()
 void ShapePopulationQT::on_spinBox_DISPLAY_columns_editingFinished()
 {
     if(m_numberOfMeshes == 0) return;
-
-    this->scrollArea->setWidgetResizable(false);
+    this->scrollArea->setVisible(false);
 
     placeWidgetInArea(spinBox_DISPLAY_columns->value());
+    if (radioButton_DISPLAY_square->isChecked()) resizeWidgetInArea();
 
-    if (radioButton_DISPLAY_all->isChecked())
-    {
-        this->scrollArea->setWidgetResizable(true);
-    }
-    else resizeWidgetInArea();
+    m_renderAllSelection = false;
+    this->scrollArea->setVisible(true);
+    m_renderAllSelection = true;
 }
 
 
@@ -1005,7 +1012,7 @@ void ShapePopulationQT::on_toolButton_VIEW_I_clicked() {ChangeView(0,-1,0);}
 
 void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
 {
-    if(m_selectedIndex.size() == 0) return;
+    if(m_selectedIndex.size() == 0 || m_updateOnAttributeChanged == false) return;
 
     int index = this->comboBox_VISU_attribute->currentIndex();
     if (index != -1)
