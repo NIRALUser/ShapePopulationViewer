@@ -58,6 +58,7 @@ int main( int argc, char** argv )
     if(!vtkFiles.empty())
     {
         bool load = false;
+        QFileInfoList fileList;
         for(unsigned int i = 0 ; i < vtkFiles.size(); i++)
         {
             QString QFilePath(vtkFiles[i].c_str());
@@ -66,11 +67,16 @@ int main( int argc, char** argv )
             else if(!vtkFileInfo.exists()) fileDoesNotExist(vtkFiles[i], &window);                  // Control that the file exists
             else
             {
-                window.loadVTKFileCLP(vtkFileInfo);
+                //window.loadVTKFileCLP(vtkFileInfo);
+                fileList.append(vtkFileInfo);
                 load = true;
             }
         }
-        if(load == true) checkConfigurationFiles(cameraConfig, colormapConfig, &window);
+        if(load == true)
+        {
+            window.loadVTKFilesCLP(fileList);
+            checkConfigurationFiles(cameraConfig, colormapConfig, &window);
+        }
     }
     if(!vtkDirectory.empty())
     {

@@ -7,6 +7,7 @@ ShapePopulationQT::ShapePopulationQT()
 
     //Intializations
     m_toolsDisplayed = true;
+    m_updateOnPositionChanged = true;
     m_numberOfMeshes = 0;
     m_lastDirectory = "~";
     m_colormapDirectory = "~";
@@ -66,6 +67,8 @@ ShapePopulationQT::ShapePopulationQT()
     tableView->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
+    //Display
+    radioButton_DISPLAY_all->toggle();                          //Display All surfaces,
 }
 
 
@@ -104,9 +107,10 @@ void ShapePopulationQT::on_pushButton_displayTools_clicked()
 // *                                         CLP FUNCTIONS                                         * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
-void ShapePopulationQT::loadVTKFileCLP(QFileInfo file)
+void ShapePopulationQT::loadVTKFilesCLP(QFileInfoList a_fileList)
 {
-    this->m_fileList.append(file);                      // Add to filelist
+    //m_fileList.append(file);                      // Add to filelist
+    m_fileList.append(a_fileList);
     if(!m_fileList.isEmpty()) this->CreateWidgets();    // Display widgets
 }
 
@@ -318,7 +322,7 @@ void ShapePopulationQT::deleteSelection()
         }
     }
     m_numberOfMeshes = m_fileList.size();
-    this->slider_DISPLAY_columns->setMaximum(m_numberOfMeshes);
+    spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
 
     // If no more widgets, do as deleteAll
     if(m_numberOfMeshes == 0)
@@ -327,7 +331,7 @@ void ShapePopulationQT::deleteSelection()
     }
     else
     {
-        on_spinBox_DISPLAY_columns_valueChanged();
+        placeWidgetInArea(spinBox_DISPLAY_columns->value());
 
         computeCommonAttributes();                                  // get the common attributes
         comboBox_VISU_attribute->clear();
@@ -386,6 +390,7 @@ void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
     textColor[1] = (double)color.green()/255.0;
     textColor[2] = (double)color.blue()/255.0;
 
+    m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_windowsList.size(); i++)
     {
         vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
@@ -406,6 +411,7 @@ void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
 
         m_windowsList[i]->Render();
     }
+    m_renderAllSelection = true;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -569,6 +575,7 @@ void ShapePopulationQT::CreateWidgets()
     {
         m_windowsList.push_back(m_widgetList.at(i)->GetRenderWindow());
     }
+    radioButton_SYNC_delayed->toggle();                         //Start with a delayed synchro
 
     /* ATTRIBUTES & COLORBARS */
     ShapePopulationBase::SelectAll();
@@ -592,8 +599,6 @@ void ShapePopulationQT::CreateWidgets()
     /* RENDER WINDOWS */
     this->UpdateAttribute(m_commonAttributes[0].c_str(), m_selectedIndex);
     m_usedColorBar = m_colorBarList[0];
-    std::cout<<"chosed : ["<<m_usedColorBar->range[0]<<";"<<m_usedColorBar->range[1]<<"]"<<std::endl
-               <<"common : ["<<m_commonRange[0]<<";"<<m_commonRange[1]<<"]"<<std::endl<<std::endl;
     this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
     spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
     spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
@@ -601,6 +606,10 @@ void ShapePopulationQT::CreateWidgets()
     this->UpdateArrowPosition();
 
     m_numberOfMeshes = m_fileList.size();
+    spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
+
+    /* CHECK POSITION */
+    on_comboBox_SYNC_position_currentIndexChanged();
 
     /* GUI BUTTONS & ACTIONS */
     this->toolBox->setEnabled(true);
@@ -615,18 +624,15 @@ void ShapePopulationQT::CreateWidgets()
     this->displayInfo();
 
     /* GUI WIDGETS DISPLAY */
-    this->slider_DISPLAY_columns->setMaximum(m_fileList.size());
     unsigned int sum = 0;
     int colNumber = 0;
     int nextOdd = 1;
-    for ( ; sum < m_windowsList.size() ; colNumber++ , nextOdd += 2)
+    for ( ; sum < m_numberOfMeshes ; colNumber++ , nextOdd += 2)
     {
         sum += nextOdd;                                         //simple integer square root, will give the ceiling of the colNumber => cols >= rows
     }
-    printColNumber(colNumber+1);                                //Display the number of columns in spinBox_DISPLAY_columns,
-    on_spinBox_DISPLAY_columns_valueChanged();               //and display the Widgets according to this number.
-    radioButton_DISPLAY_all->toggle();                          //Display All surfaces,
-    radioButton_SYNC_realtime->toggle();                         //Start with a delayed synchro,
+    spinBox_DISPLAY_columns->setValue(colNumber+1);             //Display the number of columns in spinBox_DISPLAY_columns,
+    on_spinBox_DISPLAY_columns_editingFinished();                  //and display the Widgets according to this number.
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -739,13 +745,6 @@ void ShapePopulationQT::keyPressEvent(QKeyEvent * keyEvent)
 // *                                       PLACING FUNCTIONS                                       * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
-void ShapePopulationQT::printColNumber(unsigned int colNumber)
-{
-    spinBox_DISPLAY_columns->selectAll();
-    spinBox_DISPLAY_columns->setValue(colNumber);
-}
-
-
 int ShapePopulationQT::getNumberOfColumns()
 {
     QString QStr_colNumber = this->spinBox_DISPLAY_columns->text();
@@ -754,12 +753,12 @@ int ShapePopulationQT::getNumberOfColumns()
     if(colNumber > m_numberOfMeshes)
     {
         colNumber = m_numberOfMeshes;
-        printColNumber(colNumber);
+        spinBox_DISPLAY_columns->setValue(colNumber);
     }
     else if(colNumber <= 0)
     {
         colNumber = 1;
-        printColNumber(colNumber);
+        spinBox_DISPLAY_columns->setValue(colNumber);
     }
     return colNumber;
 }
@@ -783,18 +782,15 @@ void ShapePopulationQT::placeWidgetInArea(unsigned int colNumber)
 
     for (unsigned int i = 0; i < m_numberOfMeshes ;i++)
     {
-
         QGridLayout *Qlayout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
         Qlayout->addWidget(m_widgetList.at(i),i_row,i_col);
+
         if (i_col == colNumber-1)
         {
             i_col = 0;
             i_row++;
         }
-        else
-        {
-            i_col++;
-        }
+        else i_col++;
     }
 }
 
@@ -855,6 +851,8 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
     if (mimeData->hasUrls())
     {
         QList<QUrl> urlList = mimeData->urls();
+        bool load = false;
+        QFileInfoList fileList;
 
         // extract the local paths of the files
         for (int i = 0; i < urlList.size(); ++i)
@@ -862,7 +860,9 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
             QString filePath = urlList.at(i).toLocalFile();
             if(filePath.endsWith(".vtk") && QFileInfo(filePath).exists())
             {
-                this->loadVTKFileCLP(QFileInfo(filePath));
+                fileList.append(QFileInfo(filePath));
+                load = true;
+                //this->loadVTKFileCLP(QFileInfo(filePath));
             }
             else if(filePath.endsWith(".csv") && QFileInfo(filePath).exists())
             {
@@ -880,6 +880,10 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
             {
                 this->loadVTKDirCLP(QDir(filePath));
             }
+        }
+        if(load == true)
+        {
+            this->loadVTKFilesCLP(fileList);
         }
     }
 }
@@ -901,21 +905,19 @@ void ShapePopulationQT::on_radioButton_DISPLAY_square_toggled()
     resizeWidgetInArea();
 }
 
-void ShapePopulationQT::on_spinBox_DISPLAY_columns_valueChanged()
+void ShapePopulationQT::on_spinBox_DISPLAY_columns_editingFinished()
 {
     if(m_numberOfMeshes == 0) return;
 
-    int colNumber = getNumberOfColumns();
-    placeWidgetInArea(colNumber);
+    this->scrollArea->setWidgetResizable(false);
 
-    if (radioButton_DISPLAY_square->isChecked() == true)
+    placeWidgetInArea(spinBox_DISPLAY_columns->value());
+
+    if (radioButton_DISPLAY_all->isChecked())
     {
-        this->on_radioButton_DISPLAY_square_toggled();
+        this->scrollArea->setWidgetResizable(true);
     }
-    else
-    {
-        this->on_radioButton_DISPLAY_all_toggled();
-    }
+    else resizeWidgetInArea();
 }
 
 
@@ -964,10 +966,12 @@ void ShapePopulationQT::on_comboBox_SYNC_position_currentIndexChanged()
         this->PositionToOriginal();
     }
 
+    m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_windowsList.size();i++)
     {
         m_windowsList[i]->Render();
     }
+    m_renderAllSelection = true;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -1001,30 +1005,28 @@ void ShapePopulationQT::on_toolButton_VIEW_I_clicked() {ChangeView(0,-1,0);}
 
 void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
 {
-    if(m_selectedIndex.size() == 0 || m_numberOfMeshes == 0) return;
+    if(m_selectedIndex.size() == 0) return;
 
-    // Update Attribute and commonRange
-    QString text = this->comboBox_VISU_attribute->currentText();
-    QByteArray arr = text.toLatin1();
-    const char *cmap  = arr.data();
-    this->UpdateAttribute(cmap, m_selectedIndex);
-
-    // Change the colorbar selected
     int index = this->comboBox_VISU_attribute->currentIndex();
     if (index != -1)
     {
+        // Update Attribute and commonRange
+        QString text = this->comboBox_VISU_attribute->currentText();
+        QByteArray arr = text.toLatin1();
+        const char *cmap  = arr.data();
+        this->UpdateAttribute(cmap, m_selectedIndex);
+
+        // Change the colorbar selected
         m_usedColorBar = m_colorBarList[index]; //the colorbar depends of the attribute
         this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
         spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
         spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
+
+        // Display colormap
+        this->UpdateColorMap(m_selectedIndex);
+        this->UpdateArrowPosition();
+        this->RenderSelection();
     }
-
-    // Display colormap
-    this->UpdateColorMap(m_selectedIndex);
-    this->UpdateArrowPosition();
-    this->RenderSelection();
-
-
 }
 
 void ShapePopulationQT::UpdateColorbar_QT()
@@ -1053,14 +1055,18 @@ void ShapePopulationQT::UpdateColorbar_QT()
     this->UpdateColorMap(windowsIndex);
 
     //Rendering those windows...
+    m_renderAllSelection = false;
     for(unsigned int i = 0 ; i < windowsIndex.size() ; i++)
     {
         m_windowsList[windowsIndex[i]]->Render();
     }
+    m_renderAllSelection = true;
 }
 
 void ShapePopulationQT::UpdateArrowPosition()
 {
+    m_updateOnPositionChanged = false;
+
     // Update Spinbox ranges
     this->spinBox_VISU_position->setMinimum(m_usedColorBar->range[0]);
     this->spinBox_VISU_position->setMaximum(m_usedColorBar->range[1]);
@@ -1070,30 +1076,32 @@ void ShapePopulationQT::UpdateArrowPosition()
     // Update Spinbox value
     qreal newPos = this->gradientWidget_VISU->getFocusPosition();
     this->slot_gradArrow_moved(newPos);
+
+    m_updateOnPositionChanged = true;
 }
 
 
-void ShapePopulationQT::on_spinBox_VISU_min_valueChanged(double arg1)
+void ShapePopulationQT::on_spinBox_VISU_min_editingFinished()
 {
-    if(arg1 > spinBox_VISU_max->value())
+    if(spinBox_VISU_min->value() > spinBox_VISU_max->value())
     {
         spinBox_VISU_min->setValue(spinBox_VISU_max->value());
         return;
     }
 
-    m_usedColorBar->range[0] = arg1;
+    m_usedColorBar->range[0] = spinBox_VISU_min->value();
     this->UpdateColorbar_QT();
     this->UpdateArrowPosition();
 }
 
-void ShapePopulationQT::on_spinBox_VISU_max_valueChanged(double arg1)
+void ShapePopulationQT::on_spinBox_VISU_max_editingFinished()
 {
-    if(arg1 < spinBox_VISU_min->value())
+    if(spinBox_VISU_max->value() < spinBox_VISU_min->value())
     {
         spinBox_VISU_max->setValue(spinBox_VISU_min->value());
         return;
     }
-    m_usedColorBar->range[1] = arg1;
+    m_usedColorBar->range[1] = spinBox_VISU_max->value();
     this->UpdateColorbar_QT();
     this->UpdateArrowPosition();
 }
@@ -1119,7 +1127,7 @@ void ShapePopulationQT::on_pushButton_VISU_delete_clicked()
 
 void ShapePopulationQT::on_spinBox_VISU_position_valueChanged(double arg1)
 {
-    if (m_colorBarList.size() == 0) return;
+    if (m_colorBarList.size() == 0 || m_updateOnPositionChanged == false) return;
 
     //get relative position depending on the range
     double range = fabs(m_usedColorBar->range[1] - m_usedColorBar->range[0]);
@@ -1183,7 +1191,6 @@ void ShapePopulationQT::slot_gradArrow_doubleClicked()
     }
 
     this->UpdateColorbar_QT();
-    this->RenderSelection();
 }
 
 void ShapePopulationQT::slot_no_gradArrow_selected()

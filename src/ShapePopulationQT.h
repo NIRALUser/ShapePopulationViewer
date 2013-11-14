@@ -35,7 +35,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     ShapePopulationQT();
     ~ShapePopulationQT();
 
-    void loadVTKFileCLP(QFileInfo file);
+    void loadVTKFilesCLP(QFileInfoList a_fileList);
     void loadCSVFileCLP(QFileInfo file);
     void loadVTKDirCLP(QDir vtkDir);
     void loadColorMapCLP(std::string a_filePath);
@@ -45,6 +45,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
   protected:
 
     bool m_toolsDisplayed;
+    bool m_updateOnPositionChanged;
     unsigned int m_numberOfMeshes;
     QString m_lastDirectory;
     QString m_colormapDirectory;
@@ -63,7 +64,6 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void keyPressEvent(QKeyEvent * keyEvent);
 
     //PLACING WIDGETS
-    void printColNumber(unsigned int colNumber);
     int getNumberOfColumns();
     int getNumberOfRows(unsigned int colNumber);
     void placeWidgetInArea(unsigned int colNumber);
@@ -107,7 +107,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     //DISPLAY
     void on_radioButton_DISPLAY_all_toggled();
     void on_radioButton_DISPLAY_square_toggled();
-    void on_spinBox_DISPLAY_columns_valueChanged();
+    void on_spinBox_DISPLAY_columns_editingFinished();
 
     //SYNCHRO
     void on_radioButton_SYNC_realtime_toggled();
@@ -146,9 +146,9 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
 
     //COLORMAP
     void on_comboBox_VISU_attribute_currentIndexChanged();
-    void on_spinBox_VISU_min_valueChanged(double arg1);
+    void on_spinBox_VISU_min_editingFinished();
     void on_pushButton_VISU_resetRange_clicked();
-    void on_spinBox_VISU_max_valueChanged(double arg1);
+    void on_spinBox_VISU_max_editingFinished();
     void on_spinBox_VISU_position_valueChanged(double arg1);
     void on_pushButton_VISU_delete_clicked();
     void on_pushButton_VISU_add_clicked();

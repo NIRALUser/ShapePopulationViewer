@@ -34,6 +34,7 @@ ShapePopulationBase::ShapePopulationBase()
     m_selectedColor[0] = 0.1;
     m_selectedColor[1] = 0.0;
     m_selectedColor[2] = 0.3;
+    m_renderAllSelection = true;
 }
 
 void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
@@ -42,11 +43,13 @@ void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
     m_selectedColor[1] = a_selectedColor[1];
     m_selectedColor[2] = a_selectedColor[2];
 
+    m_renderAllSelection = false;
     for(unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_selectedColor);
         m_windowsList[m_selectedIndex[i]]->Render();
     }
+    m_renderAllSelection = true;
 }
 
 void ShapePopulationBase::setBackgroundUnselectedColor(double a_unselectedColor[])
@@ -65,10 +68,12 @@ void ShapePopulationBase::setBackgroundUnselectedColor(double a_unselectedColor[
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_selectedColor);
     }
 
+    m_renderAllSelection = false;
     for(unsigned int i = 0; i < m_windowsList.size(); i++)
     {
         m_windowsList[i]->Render();
     }
+    m_renderAllSelection = true;
 }
 
 void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
@@ -121,11 +126,6 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 
     renderer->AddActor2D(scalarBar);
 
-/*  //TEST VTK without GUI
-    renderWindow->Render();
-    interactor->Start();
-    */
-
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -160,7 +160,9 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
             camera->DeepCopy(m_headcam);
             selectedWindow->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
+            m_renderAllSelection = false;
             selectedWindow->Render();
+            m_renderAllSelection = true;
             m_selectedIndex.erase((std::find(m_selectedIndex.begin(), m_selectedIndex.end(), index)));
         }
         return;
@@ -169,6 +171,7 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
     // NEW SELECTION (Ctrl not pushed)
     if(selectedInteractor->GetControlKey()==0)
     {
+        m_renderAllSelection = false;
         for (unsigned int i = 0; i < m_selectedIndex.size();i++)                              //reset backgrounds and cameras
         {
             m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_unselectedColor);
@@ -177,6 +180,7 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
             m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
             m_windowsList[m_selectedIndex[i]]->Render();
         }
+        m_renderAllSelection = true;
         m_selectedIndex.clear();                                                             // empty the selectedWindows list
     }
 
@@ -227,6 +231,7 @@ void ShapePopulationBase::UnselectAll()
      ** uncheck Select All if needed
      */
 
+    m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
         //Create an independant camera, copy of headcam
@@ -237,6 +242,7 @@ void ShapePopulationBase::UnselectAll()
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_unselectedColor);
         m_windowsList[m_selectedIndex[i]]->Render();
     }
+    m_renderAllSelection = true;
     m_selectedIndex.clear();
 }
 
@@ -271,7 +277,8 @@ void ShapePopulationBase::CameraChangedEventVTK(vtkObject*, unsigned long, void*
 
 void ShapePopulationBase::RenderSelection()
 {
-    if(m_selectedIndex.size()==0) return;
+    if(m_selectedIndex.size()==0 || m_renderAllSelection == false) return;
+    std::cout<<"select - "<<std::endl;
 
     int test_realtime = m_windowsList[m_selectedIndex[0]]->HasObserver(vtkCommand::RenderEvent);
     int test_delayed = m_windowsList[m_selectedIndex[0]]->HasObserver(vtkCommand::ModifiedEvent);

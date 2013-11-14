@@ -401,7 +401,7 @@
            <rect>
             <x>10</x>
             <y>80</y>
-            <width>101</width>
+            <width>81</width>
             <height>27</height>
            </rect>
           </property>
@@ -418,9 +418,9 @@
          <widget class="QDoubleSpinBox" name="spinBox_VISU_max">
           <property name="geometry">
            <rect>
-            <x>210</x>
+            <x>230</x>
             <y>80</y>
-            <width>101</width>
+            <width>81</width>
             <height>27</height>
            </rect>
           </property>
@@ -783,26 +783,6 @@
            <string>Unselect</string>
           </property>
          </widget>
-         <widget class="QComboBox" name="comboBox_SYNC_position">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>180</y>
-            <width>101</width>
-            <height>27</height>
-           </rect>
-          </property>
-          <item>
-           <property name="text">
-            <string>Original</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Centered</string>
-           </property>
-          </item>
-         </widget>
         </widget>
        </item>
        <item>
@@ -874,24 +854,25 @@
            <string>columns</string>
           </property>
          </widget>
-         <widget class="QSlider" name="slider_DISPLAY_columns">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
+         <widget class="QComboBox" name="comboBox_SYNC_position">
           <property name="geometry">
            <rect>
-            <x>6</x>
-            <y>139</y>
-            <width>141</width>
-            <height>31</height>
+            <x>30</x>
+            <y>140</y>
+            <width>101</width>
+            <height>27</height>
            </rect>
           </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
+          <item>
+           <property name="text">
+            <string>Original</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Centered</string>
+           </property>
+          </item>
          </widget>
         </widget>
        </item>
@@ -997,38 +978,5 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>slider_DISPLAY_columns</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinBox_DISPLAY_columns</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1187</x>
-     <y>711</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1091</x>
-     <y>670</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_DISPLAY_columns</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>slider_DISPLAY_columns</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1091</x>
-     <y>670</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1187</x>
-     <y>711</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

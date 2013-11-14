@@ -414,33 +414,6 @@ void gradientWidgetQT::deleteFocusArrow()
       GradientArrow arrow = it.value();
       if(arrow.hasFocus())
       {
-         this->removeArrow(arrow.index());
-         break;
-      }
-   }
-   it.toBack();
-   if(it.hasPrevious())
-   {
-      it.previous();
-      GradientArrow newFocus = it.value();
-      newFocus.setHasFocus(true);
-      it.setValue(newFocus);
-       emit arrowSelectedSignal(newFocus.position());
-   }
-}
-
-void gradientWidgetQT::removeArrow(int index)
-{
-   if(!m_arrows.contains(index) || m_arrows.size() <= 2)
-   {
-      return;
-   }
-   QMutableHashIterator<int, GradientArrow> it(m_arrows);
-   while(it.hasNext())
-   {
-      it.next();
-      if(it.key() == index)
-      {
          it.remove();
          break;
       }
@@ -452,6 +425,7 @@ void gradientWidgetQT::removeArrow(int index)
       GradientArrow newFocus = it.value();
       newFocus.setHasFocus(true);
       it.setValue(newFocus);
+      emit arrowSelectedSignal(newFocus.position());
    }
    update();
 }

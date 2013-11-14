@@ -75,7 +75,6 @@ protected:
    void createBackground(int vertLineSpace = 5, int horLineSpace = 5);
    QPixmap *getBackGround();
 
-   void removeArrow(int index);
    void newFocusColor(const QColor &col, int index);
 
 

@@ -42,6 +42,7 @@ class ShapePopulationBase
     std::vector<std::string> m_commonAttributes;
     colorBarStruct * m_usedColorBar;
     std::vector< colorBarStruct *> m_colorBarList;
+    bool m_renderAllSelection;
 
     void CreateNewWindow(std::string a_filePath);
 
