@@ -31,6 +31,8 @@ class ShapePopulationBase
 
     void KeyPressEventVTK(vtkObject* a_selectedObject, unsigned long, void*);
     void CameraChangedEventVTK(vtkObject*, unsigned long, void*);
+    void StartEventVTK(vtkObject*, unsigned long, void*);
+    void EndEventVTK(vtkObject*, unsigned long, void*);
 
   protected :
 

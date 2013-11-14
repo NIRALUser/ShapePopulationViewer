@@ -34,7 +34,7 @@ ShapePopulationBase::ShapePopulationBase()
     m_selectedColor[0] = 0.1;
     m_selectedColor[1] = 0.0;
     m_selectedColor[2] = 0.3;
-    m_renderAllSelection = true;
+    m_renderAllSelection = false; //changed
 }
 
 void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
@@ -43,13 +43,13 @@ void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
     m_selectedColor[1] = a_selectedColor[1];
     m_selectedColor[2] = a_selectedColor[2];
 
-    m_renderAllSelection = false;
+    //m_renderAllSelection = false;
     for(unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_selectedColor);
         m_windowsList[m_selectedIndex[i]]->Render();
     }
-    m_renderAllSelection = true;
+    //m_renderAllSelection = true;
 }
 
 void ShapePopulationBase::setBackgroundUnselectedColor(double a_unselectedColor[])
@@ -68,12 +68,12 @@ void ShapePopulationBase::setBackgroundUnselectedColor(double a_unselectedColor[
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_selectedColor);
     }
 
-    m_renderAllSelection = false;
+    //m_renderAllSelection = false;
     for(unsigned int i = 0; i < m_windowsList.size(); i++)
     {
         m_windowsList[i]->Render();
     }
-    m_renderAllSelection = true;
+    //m_renderAllSelection = true;
 }
 
 void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
@@ -160,9 +160,9 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
             camera->DeepCopy(m_headcam);
             selectedWindow->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
-            m_renderAllSelection = false;
+            //m_renderAllSelection = false;
             selectedWindow->Render();
-            m_renderAllSelection = true;
+            //m_renderAllSelection = true;
             m_selectedIndex.erase((std::find(m_selectedIndex.begin(), m_selectedIndex.end(), index)));
         }
         return;
@@ -171,7 +171,7 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
     // NEW SELECTION (Ctrl not pushed)
     if(selectedInteractor->GetControlKey()==0)
     {
-        m_renderAllSelection = false;
+        //m_renderAllSelection = false;
         for (unsigned int i = 0; i < m_selectedIndex.size();i++)                              //reset backgrounds and cameras
         {
             m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_unselectedColor);
@@ -180,7 +180,7 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
             m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
             m_windowsList[m_selectedIndex[i]]->Render();
         }
-        m_renderAllSelection = true;
+        //m_renderAllSelection = true;
         m_selectedIndex.clear();                                                             // empty the selectedWindows list
     }
 
@@ -202,7 +202,9 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
         this->UpdateColorMap(m_selectedIndex);
     }
 
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 
 void ShapePopulationBase::SelectAll()
@@ -220,6 +222,7 @@ void ShapePopulationBase::SelectAll()
         m_selectedIndex.push_back(i);
         m_windowsList[i]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(m_headcam); //connect to headcam for synchro
         m_windowsList[i]->GetRenderers()->GetFirstRenderer()->SetBackground(m_selectedColor);
+        m_windowsList[i]->Render();
     }
 }
 
@@ -231,7 +234,7 @@ void ShapePopulationBase::UnselectAll()
      ** uncheck Select All if needed
      */
 
-    m_renderAllSelection = false;
+    //m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
         //Create an independant camera, copy of headcam
@@ -242,7 +245,7 @@ void ShapePopulationBase::UnselectAll()
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_unselectedColor);
         m_windowsList[m_selectedIndex[i]]->Render();
     }
-    m_renderAllSelection = true;
+    //m_renderAllSelection = true;
     m_selectedIndex.clear();
 }
 
@@ -255,19 +258,27 @@ void ShapePopulationBase::KeyPressEventVTK(vtkObject* a_selectedObject, unsigned
     if(selectedInteractor->GetKeyCode() == (char)27 )
     {
         UnselectAll();
-        this->RenderSelection();
     }
     //SELECT ALL - GetControlKey != 0 & GetKeySym()="a"
     else if(selectedInteractor->GetControlKey() != 0 && strcmp(selectedInteractor->GetKeySym(),"a") == 0)
     {
         SelectAll();
-        this->RenderSelection();
     }
 }
 
 void ShapePopulationBase::CameraChangedEventVTK(vtkObject*, unsigned long, void*)
 {
     this->UpdateCameraConfig();
+}
+
+void ShapePopulationBase::StartEventVTK(vtkObject*, unsigned long, void*)
+{
+    m_renderAllSelection = true;
+}
+
+void ShapePopulationBase::EndEventVTK(vtkObject*, unsigned long, void*)
+{
+    m_renderAllSelection = false;
 }
 
 
@@ -314,8 +325,8 @@ void ShapePopulationBase::RealTimeRenderSynchro(bool realtime)
         for (unsigned int i = 0; i < m_windowsList.size(); i++)
         {
             //syncronize when rendering
-            m_windowsList.at(i)->RemoveAllObservers();
-            m_windowsList.at(i)->AddObserver(vtkCommand::RenderEvent, this, &ShapePopulationBase::RenderSelection);
+            m_windowsList[i]->RemoveAllObservers();
+            m_windowsList[i]->AddObserver(vtkCommand::RenderEvent, this, &ShapePopulationBase::RenderSelection);
         }
     }
     if(!realtime)
@@ -323,8 +334,8 @@ void ShapePopulationBase::RealTimeRenderSynchro(bool realtime)
         for (unsigned int i = 0; i < m_windowsList.size(); i++)
         {
             //syncronize when render modified
-            m_windowsList.at(i)->RemoveAllObservers();
-            m_windowsList.at(i)->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::RenderSelection);
+            m_windowsList[i]->RemoveAllObservers();
+            m_windowsList[i]->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::RenderSelection);
         }
     }
 }
@@ -460,7 +471,9 @@ void ShapePopulationBase::ChangeView(int x, int y, int z)
     //setroll to .001, because it breaks on y axis if roll = 0
     firstRenderer->GetActiveCamera()->SetRoll(.001);
 
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
     this->UpdateCameraConfig();
 
 }

@@ -89,6 +89,7 @@ void ShapePopulationQT::slotExit()
 
 void ShapePopulationQT::on_pushButton_displayTools_clicked()
 {
+    //m_renderAllSelection = false;
     if(m_toolsDisplayed)
     {
         this->toolBox->hide();
@@ -101,7 +102,7 @@ void ShapePopulationQT::on_pushButton_displayTools_clicked()
         this->pushButton_displayTools->setText(QString::fromUtf8("\u25BC"));
         m_toolsDisplayed = true;
     }
-
+    //m_renderAllSelection = true;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -155,7 +156,6 @@ void ShapePopulationQT::loadColorMapCLP(std::string a_filePath)
     gradientWidget_VISU->loadColorPointList(QFilePath, &m_usedColorBar->colorPointList);
 
     this->UpdateColorbar_QT();
-    this->RenderSelection();
 }
 
 void ShapePopulationQT::loadCameraCLP(std::string a_filePath)
@@ -388,7 +388,7 @@ void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
     textColor[1] = (double)color.green()/255.0;
     textColor[2] = (double)color.blue()/255.0;
 
-    m_renderAllSelection = false;
+    //m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_windowsList.size(); i++)
     {
         vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
@@ -409,7 +409,7 @@ void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
 
         m_windowsList[i]->Render();
     }
-    m_renderAllSelection = true;
+    //m_renderAllSelection = true;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -436,60 +436,80 @@ void ShapePopulationQT::slot_position_x_valueChanged(double arg1)
 {
     double * position = m_headcam->GetPosition();
     m_headcam->SetPosition(arg1,position[1],position[2]);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 void ShapePopulationQT::slot_position_y_valueChanged(double arg1)
 {
     double * position = m_headcam->GetPosition();
     m_headcam->SetPosition(position[0],arg1,position[2]);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 void ShapePopulationQT::slot_position_z_valueChanged(double arg1)
 {
     double * position = m_headcam->GetPosition();
     m_headcam->SetPosition(position[0],position[1],arg1);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 void ShapePopulationQT::slot_focalpoint_x_valueChanged(double arg1)
 {
     double * focalpoint = m_headcam->GetFocalPoint();
     m_headcam->SetFocalPoint(arg1,focalpoint[1],focalpoint[2]);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 void ShapePopulationQT::slot_focalpoint_y_valueChanged(double arg1)
 {
     double * focalpoint = m_headcam->GetFocalPoint();
     m_headcam->SetFocalPoint(focalpoint[0],arg1,focalpoint[2]);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 void ShapePopulationQT::slot_focalpoint_z_valueChanged(double arg1)
 {
     double * focalpoint = m_headcam->GetFocalPoint();
     m_headcam->SetFocalPoint(focalpoint[0],focalpoint[1],arg1);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 void ShapePopulationQT::slot_viewup_vx_valueChanged(double arg1)
 {
     double * viewup = m_headcam->GetViewUp();
     m_headcam->SetViewUp(arg1,viewup[1],viewup[2]);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 void ShapePopulationQT::slot_viewup_vy_valueChanged(double arg1)
 {
     double * viewup = m_headcam->GetViewUp();
     m_headcam->SetViewUp(viewup[0],arg1,viewup[2]);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 void ShapePopulationQT::slot_viewup_vz_valueChanged(double arg1)
 {
     double * viewup = m_headcam->GetViewUp();
     m_headcam->SetViewUp(viewup[0],viewup[1],arg1);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 void ShapePopulationQT::slot_scale_valueChanged(double arg1)
 {
     m_headcam->SetParallelScale(arg1);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 
 void ShapePopulationQT::slot_newCameraConfig(cameraConfigStruct cam)
@@ -498,7 +518,9 @@ void ShapePopulationQT::slot_newCameraConfig(cameraConfigStruct cam)
     m_headcam->SetFocalPoint(cam.foc_x,cam.foc_y,cam.foc_z);
     m_headcam->SetViewUp(cam.view_vx,cam.view_vy,cam.view_vz);
     m_headcam->SetParallelScale(cam.scale);
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -515,7 +537,6 @@ void ShapePopulationQT::loadColorMap()
     gradientWidget_VISU->loadColorPointList(filename, &m_usedColorBar->colorPointList);
 
     this->UpdateColorbar_QT();
-    this->RenderSelection();
 }
 
 
@@ -567,6 +588,8 @@ void ShapePopulationQT::CreateWidgets()
         meshWidget->GetInteractor()->AddObserver(vtkCommand::LeftButtonPressEvent, this, &ShapePopulationQT::ClickEvent);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::KeyPressEvent, this, &ShapePopulationBase::KeyPressEventVTK);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::CameraChangedEventVTK);
+        meshWidget->GetInteractor()->AddObserver(vtkCommand::StartInteractionEvent, this, &ShapePopulationBase::StartEventVTK);
+        meshWidget->GetInteractor()->AddObserver(vtkCommand::EndInteractionEvent, this, &ShapePopulationBase::EndEventVTK);
     }
 
 
@@ -714,8 +737,11 @@ void ShapePopulationQT::SelectAll()
     // Update color with this attribute
     this->UpdateAttribute(cmap, m_selectedIndex);
     this->UpdateColorMap(m_selectedIndex);
-    this->RenderSelection();
 
+    // Render
+    m_renderAllSelection = true;
+    this->RenderSelection();
+    m_renderAllSelection = false;
 
     /* DISPLAY INFOS */
     this->displayInfo();
@@ -743,9 +769,7 @@ void ShapePopulationQT::keyPressEvent(QKeyEvent * keyEvent)
    if((keyEvent->key() == Qt::Key_Escape))
    {
        UnselectAll();
-       this->RenderSelection();
    }
-
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -920,9 +944,9 @@ void ShapePopulationQT::on_spinBox_DISPLAY_columns_editingFinished()
     placeWidgetInArea(spinBox_DISPLAY_columns->value());
     if (radioButton_DISPLAY_square->isChecked()) resizeWidgetInArea();
 
-    m_renderAllSelection = false;
+    //m_renderAllSelection = false;
     this->scrollArea->setVisible(true);
-    m_renderAllSelection = true;
+    //m_renderAllSelection = true;
 }
 
 
@@ -945,12 +969,10 @@ void ShapePopulationQT::on_radioButton_SYNC_delayed_toggled()
 void ShapePopulationQT::on_pushButton_SYNC_all_clicked()
 {
     SelectAll();
-    this->RenderSelection();
 }
 void ShapePopulationQT::on_pushButton_SYNC_unselect_clicked()
 {
     UnselectAll();
-    this->RenderSelection();
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -971,12 +993,12 @@ void ShapePopulationQT::on_comboBox_SYNC_position_currentIndexChanged()
         this->PositionToOriginal();
     }
 
-    m_renderAllSelection = false;
+    //m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_windowsList.size();i++)
     {
         m_windowsList[i]->Render();
     }
-    m_renderAllSelection = true;
+    //m_renderAllSelection = true;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -988,7 +1010,10 @@ void ShapePopulationQT::on_pushButton_VIEW_reset_clicked()
     if(m_selectedIndex.size() == 0) return;
 
     this->ResetHeadcam();
+
+    m_renderAllSelection = true;
     this->RenderSelection();
+    m_renderAllSelection = false;
 }
 
 void ShapePopulationQT::on_toolButton_VIEW_P_clicked() {ChangeView(0,0,-1);}
@@ -1030,7 +1055,11 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         // Display colormap
         this->UpdateColorMap(m_selectedIndex);
         this->UpdateArrowPosition();
+
+        // Render
+        m_renderAllSelection = true;
         this->RenderSelection();
+        m_renderAllSelection = false;
     }
 }
 
@@ -1060,12 +1089,12 @@ void ShapePopulationQT::UpdateColorbar_QT()
     this->UpdateColorMap(windowsIndex);
 
     //Rendering those windows...
-    m_renderAllSelection = false;
+    //m_renderAllSelection = false;
     for(unsigned int i = 0 ; i < windowsIndex.size() ; i++)
     {
         m_windowsList[windowsIndex[i]]->Render();
     }
-    m_renderAllSelection = true;
+    //m_renderAllSelection = true;
 }
 
 void ShapePopulationQT::UpdateArrowPosition()
