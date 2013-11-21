@@ -19,6 +19,11 @@
 #include <vtkRendererCollection.h>      //GetRenderers
 #include <vtkActor2DCollection.h>       //GetActors2D
 
+#include "vtkGlyph3D.h"
+#include "vtkArrowSource.h"
+#include "vtkAssignAttribute.h"
+#include "vtkGradientFilter.h"
+
 #include <set>
 
 class ShapePopulationBase
@@ -37,6 +42,7 @@ class ShapePopulationBase
   protected :
 
     std::vector<ShapePopulationData *> m_meshList;
+    std::vector< vtkSmartPointer<vtkGlyph3D> > m_glyphList;
     std::vector< vtkSmartPointer<vtkRenderWindow> > m_windowsList;
     std::vector< unsigned int > m_selectedIndex;
     vtkSmartPointer<vtkCamera> m_headcam;

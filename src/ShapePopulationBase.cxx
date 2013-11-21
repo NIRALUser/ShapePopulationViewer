@@ -91,9 +91,34 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
 
+    /* VECTORS */
+
+        //Arrow
+        //vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+        vtkSmartPointer<vtkGlyph3D> glyph = vtkSmartPointer<vtkGlyph3D>::New();
+        //glyph->SetSourceConnection(arrow->GetOutputPort());
+        glyph->SetInputConnection(Mesh->GetPolyData()->GetProducerPort());
+        glyph->ScalingOn();
+        glyph->OrientOn();
+        glyph->ClampingOff();
+        glyph->SetColorModeToColorByScalar();
+        glyph->SetScaleModeToScaleByVector();
+        glyph->SetScaleFactor(0.2);
+        glyph->SetVectorModeToUseVector();
+        m_glyphList.push_back(glyph);
+
+        //Mapper & Actor
+        vtkSmartPointer<vtkPolyDataMapper> glyphMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        glyphMapper->SetInputConnection(glyph->GetOutputPort());
+        vtkSmartPointer<vtkActor> glyphActor = vtkSmartPointer<vtkActor>::New();
+        glyphActor->SetMapper(glyphMapper);
+
+    /* END VECTORS */
+
     //RENDERER
     vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
     renderer->AddActor(actor);
+    renderer->AddActor(glyphActor);
     renderer->SetActiveCamera(m_headcam); //set the active camera for this renderer to main camera
     renderer->ResetCamera();
 
@@ -125,7 +150,6 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     scalarBar->SetLabelTextProperty(LabelProperty);
 
     renderer->AddActor2D(scalarBar);
-
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -197,7 +221,7 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
     if(m_selectedIndex.size() > 1)
     {
         // Update colormap to the first selected window position
-        const char * cmap = m_windowsList[m_selectedIndex[0]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetName();
+        const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
         this->UpdateAttribute(cmap, m_selectedIndex);
         this->UpdateColorMap(m_selectedIndex);
     }
@@ -385,7 +409,7 @@ double * ShapePopulationBase::computeCommonRange(const char * a_cmap, std::vecto
     double * commonRange = NULL; //to avoid warning for not being initialized
     for (unsigned int i = 0; i < a_windowIndex.size(); i++)
     {
-        double * newRange = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars(a_cmap)->GetRange();
+        double * newRange = m_meshList[a_windowIndex[i]]->GetPolyData()->GetPointData()->GetScalars(a_cmap)->GetRange();
 
         if(i==0) commonRange = newRange;
         else
@@ -401,9 +425,23 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
 {
     for (unsigned int i = 0; i < a_windowIndex.size(); i++)
     {
-        vtkSmartPointer<vtkMapper> mapper = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper();
-        mapper->GetInput()->GetPointData()->SetActiveScalars(a_cmap);
+        // Set Active Attribute
+        ShapePopulationData * mesh = m_meshList[a_windowIndex[i]];
+        mesh->GetPolyData()->GetPointData()->SetActiveScalars(a_cmap);
+        int testVector = mesh->GetPolyData()->GetPointData()->SetActiveVectors(a_cmap);
+
+        //Upate Glyph
+        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+        vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[a_windowIndex[i]];
+        glyph->SetSourceConnection(arrow->GetOutputPort());
+
+        //Actor visibility
+        vtkRenderWindow * window = m_windowsList[a_windowIndex[i]];
+        vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        if(testVector == -1) glyphActor->SetVisibility(0);
+        else glyphActor->SetVisibility(1);
     }
+
     // Compute the largest range
     double * commonRange = computeCommonRange(a_cmap, a_windowIndex);
     m_commonRange[0] = commonRange[0];
@@ -413,11 +451,9 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
 
 void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowIndex)
 {
-
-    // Set Attribute, Calculate & Apply the Look Up Table
     for (unsigned int i = 0; i < a_windowIndex.size(); i++)
     {
-        vtkSmartPointer<vtkMapper> mapper = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper();
+        //Look Up table
         vtkSmartPointer<vtkColorTransferFunction> DistanceMapTFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
         double range = fabs(m_usedColorBar->range[1] - m_usedColorBar->range[0]);
 
@@ -435,23 +471,24 @@ void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowInd
         DistanceMapTFunc->AdjustRange(m_usedColorBar->range);
         DistanceMapTFunc->SetColorSpaceToRGB();
 
-        //Mapper Update
+        //Mesh Mapper Update
+        vtkActorCollection * actors = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
+        actors->InitTraversal();
+        vtkSmartPointer<vtkMapper> mapper = actors->GetNextActor()->GetMapper();
         mapper->SetLookupTable( DistanceMapTFunc );
         mapper->ScalarVisibilityOn();
-        mapper->Update();
 
-        //ScalarBar Update
+        //Vector Mapper Update
+        vtkSmartPointer<vtkMapper> glyphMapper = actors->GetLastActor()->GetMapper();
+        glyphMapper->SetLookupTable( DistanceMapTFunc );
+
+        //ScalarBar Mapper Update
         vtkActor2D * oldScalarBar = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
         scalarBar = (vtkScalarBarActor*)oldScalarBar;
-        scalarBar->SetLookupTable(DistanceMapTFunc);
+        scalarBar->SetLookupTable( DistanceMapTFunc );
     }
 }
-
-
-
-
-
 
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -519,7 +556,9 @@ void ShapePopulationBase::PositionToOriginal()
     for (unsigned int i = 0; i < m_windowsList.size();i++)
     {
         //Get the position
-        vtkSmartPointer<vtkActor> testActor = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
+        actors->InitTraversal();
+        vtkSmartPointer<vtkActor> testActor = actors->GetNextActor();
 
         //Update the position
         double newposition[3] = {0,0,0};
@@ -544,7 +583,9 @@ void ShapePopulationBase::PositionToCentered()
     for (unsigned int i = 0; i < m_windowsList.size();i++)
     {
         //Get the position
-        vtkSmartPointer<vtkActor> testActor = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
+        actors->InitTraversal();
+        vtkSmartPointer<vtkActor> testActor = actors->GetNextActor();
         double * position = testActor->GetPosition();
         double * center = testActor->GetCenter();
 

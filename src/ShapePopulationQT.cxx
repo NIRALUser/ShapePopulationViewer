@@ -1077,8 +1077,7 @@ void ShapePopulationQT::UpdateColorbar_QT()
     std::vector<unsigned int > windowsIndex;
     for(unsigned int i = 0 ; i < m_windowsList.size() ; i++)
     {
-        const char * thisCmap =
-                m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetName();
+        const char * thisCmap = m_meshList[i]->GetPolyData()->GetPointData()->GetScalars()->GetName();
         if(std::string(thisCmap) == std::string(cmap))
         {
             windowsIndex.push_back(i);
@@ -1317,8 +1316,7 @@ void ShapePopulationQT::displayAttribute()
 {
     if(m_selectedIndex.size() == 1)  // if new selection
     {
-        const char * cmap =
-                m_windowsList[m_selectedIndex[0]]->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor()->GetMapper()->GetInput()->GetPointData()->GetScalars()->GetName();
+        const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
         int index = comboBox_VISU_attribute->findText(cmap);
         if (index !=comboBox_VISU_attribute->currentIndex() && index != -1)
         {
