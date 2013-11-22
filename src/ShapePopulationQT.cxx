@@ -23,6 +23,10 @@ ShapePopulationQT::ShapePopulationQT()
     actionDelete->setDisabled(true);
     actionDelete_All->setDisabled(true);
 
+    //Pushbuttons color
+    pushButton_VISU_add->setStyleSheet("color: rgb(0, 200, 0)");
+    pushButton_VISU_delete->setStyleSheet("color: rgb(200, 0, 0)");
+
     //Menu signals
     connect(actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
     connect(actionOpen_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
@@ -1155,6 +1159,8 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_clicked()
 void ShapePopulationQT::on_pushButton_VISU_delete_clicked()
 {
     gradientWidget_VISU->deleteFocusArrow();
+
+    if(gradientWidget_VISU->getNumberOfArrows() <= 2) pushButton_VISU_delete->setDisabled(true);
     this->UpdateColorbar_QT();
 }
 
@@ -1210,7 +1216,9 @@ void ShapePopulationQT::slot_gradArrow_selected(qreal newPos)
 {
     if(m_numberOfMeshes == 0) return;
 
-    widget_VISU_arrowOptions->setEnabled(true);
+    if(gradientWidget_VISU->getNumberOfArrows() > 2) pushButton_VISU_delete->setEnabled(true);
+    spinBox_VISU_position->setEnabled(true);
+
     this->slot_gradArrow_moved(newPos);
 }
 
@@ -1228,7 +1236,8 @@ void ShapePopulationQT::slot_gradArrow_doubleClicked()
 
 void ShapePopulationQT::slot_no_gradArrow_selected()
 {
-    widget_VISU_arrowOptions->setDisabled(true);
+    pushButton_VISU_delete->setDisabled(true);
+    spinBox_VISU_position->setDisabled(true);
 }
 
 
@@ -1328,5 +1337,17 @@ void ShapePopulationQT::displayAttribute()
             m_commonRange[0] = commonRange[0];
             m_commonRange[1] = commonRange[1];
         }
+    }
+}
+
+void ShapePopulationQT::on_horizontalSlider_valueChanged(int value)
+{
+    for(unsigned int i = 0; i < m_glyphList.size() ; i++)
+    {
+        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+        vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[i];
+        glyph->SetSourceConnection(arrow->GetOutputPort());
+        glyph->SetScaleFactor((double)value/100);
+        m_windowsList[i]->Render();
     }
 }

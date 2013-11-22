@@ -46,6 +46,7 @@ public:
    ~gradientWidgetQT();
     bool getAllColors(std::vector<colorPointStruct> * colorPointList);
     bool setAllColors(std::vector<colorPointStruct> * colorPointList);
+    int getNumberOfArrows(){return m_arrows.size();}
 
     void setFocusColor(const QColor &col);
     void setFocusPosition(const qreal newPos);
