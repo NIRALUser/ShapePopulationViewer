@@ -8,6 +8,7 @@
 #include <vtkCamera.h>                  //Camera
 #include <vtkPolyDataMapper.h>          //Mapper
 #include <vtkActor.h>                   //Actor
+#include <vtkProperty.h>                //Actor Opacity
 #include <vtkRenderer.h>                //Renderer
 #include <vtkRenderWindow.h>            //RenderWindow
 #include <vtkRenderWindowInteractor.h>  //Interactor
@@ -21,8 +22,6 @@
 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
-#include "vtkAssignAttribute.h"
-#include "vtkGradientFilter.h"
 
 #include <set>
 

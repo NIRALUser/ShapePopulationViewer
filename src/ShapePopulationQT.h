@@ -166,7 +166,8 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
 
 private slots:
-    void on_horizontalSlider_valueChanged(int value);
+    void on_slider_arrowScale_valueChanged(int value);
+    void on_slider_meshOpacity_valueChanged(int value);
 };
 
 #endif

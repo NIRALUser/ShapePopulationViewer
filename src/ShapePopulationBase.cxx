@@ -103,7 +103,6 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
         glyph->ClampingOff();
         glyph->SetColorModeToColorByScalar();
         glyph->SetScaleModeToScaleByVector();
-        glyph->SetScaleFactor(0.2);
         glyph->SetVectorModeToUseVector();
         m_glyphList.push_back(glyph);
 

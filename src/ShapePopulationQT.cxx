@@ -413,7 +413,6 @@ void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
 
         m_windowsList[i]->Render();
     }
-    //m_renderAllSelection = true;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -1056,6 +1055,11 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
         spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
 
+        //Update vectors scale
+        double range = m_commonRange[1] - m_commonRange[0];
+        double max = 500/range;
+        slider_arrowScale->setMaximum((int)max);
+
         // Display colormap
         this->UpdateColorMap(m_selectedIndex);
         this->UpdateArrowPosition();
@@ -1340,7 +1344,7 @@ void ShapePopulationQT::displayAttribute()
     }
 }
 
-void ShapePopulationQT::on_horizontalSlider_valueChanged(int value)
+void ShapePopulationQT::on_slider_arrowScale_valueChanged(int value)
 {
     for(unsigned int i = 0; i < m_glyphList.size() ; i++)
     {
@@ -1348,6 +1352,17 @@ void ShapePopulationQT::on_horizontalSlider_valueChanged(int value)
         vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[i];
         glyph->SetSourceConnection(arrow->GetOutputPort());
         glyph->SetScaleFactor((double)value/100);
+        m_windowsList[i]->Render();
+    }
+}
+
+void ShapePopulationQT::on_slider_meshOpacity_valueChanged(int value)
+{
+    for(unsigned int i = 0; i < m_meshList.size() ; i++)
+    {
+        vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
+        actors->InitTraversal();
+        actors->GetNextActor()->GetProperty()->SetOpacity((double)value/100);
         m_windowsList[i]->Render();
     }
 }
