@@ -846,14 +846,13 @@ void ShapePopulationQT::on_tabWidget_currentChanged(int index)
 {
     if(index == 1)
     {
-        if(m_commonAttributes.size()<6)
-        {
-            tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-5);
-        }
-        else
-        {
-            tableView->setColumnWidth(1,tableView->width()-tableView->columnWidth(0)-20);
-        }
+        int tableWidth = tableView->width();
+        int column0Width = tableView->columnWidth(0);
+        int column1Width = tableView->columnWidth(1);
+        int column2width = tableWidth - column0Width - column1Width;
+
+        if(m_commonAttributes.size()<6) tableView->setColumnWidth(2,column2width -5);
+        else tableView->setColumnWidth(2,column2width-20);
     }
 }
 
@@ -1254,7 +1253,8 @@ void ShapePopulationQT::displayInfo()
     QStandardItemModel * model = (QStandardItemModel*)tableView->model();
     model->clear();
     model->setHorizontalHeaderItem(0, new QStandardItem(QString("Name")));
-    model->setHorizontalHeaderItem(1, new QStandardItem(QString("Range")));
+    model->setHorizontalHeaderItem(1, new QStandardItem(QString("Dim")));
+    model->setHorizontalHeaderItem(2, new QStandardItem(QString("Range")));
 
 	std::ostringstream strs;
 
@@ -1277,12 +1277,20 @@ void ShapePopulationQT::displayInfo()
             QStandardItem * dataName = new QStandardItem(QString(m_commonAttributes[i].c_str()));
             model->setItem(i,0,dataName);
 
+            //Dimension
+            ShapePopulationData * mesh = m_meshList[0];
+            int dim = mesh->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[i].c_str())->GetNumberOfComponents();
+            strs.str(""); strs.clear();
+            strs <<dim<<std::endl;
+            QStandardItem * dimension = new QStandardItem(QString(strs.str().c_str()));
+            model->setItem(i,1,dimension);
+
             //Range
             double * range = computeCommonRange(m_commonAttributes[i].c_str(), m_selectedIndex);
 			strs.str(""); strs.clear();
 			strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
             QStandardItem * dataRange = new QStandardItem(QString(strs.str().c_str()));
-            model->setItem(i,1,dataRange);
+            model->setItem(i,2,dataRange);
         }
     }
     else
@@ -1311,17 +1319,26 @@ void ShapePopulationQT::displayInfo()
             QStandardItem * dataName = new QStandardItem(QString(AttributesList[i].c_str()));
             model->setItem(i,0,dataName);
 
+            //Dimension
+            ShapePopulationData * mesh = m_meshList[0];
+            int dim = mesh->GetPolyData()->GetPointData()->GetScalars(AttributesList[i].c_str())->GetNumberOfComponents();
+            strs.str(""); strs.clear();
+            strs <<dim<<std::endl;
+            QStandardItem * dimension = new QStandardItem(QString(strs.str().c_str()));
+            model->setItem(i,1,dimension);
+
             //Range
             double * range = selectedData->GetPointData()->GetScalars(AttributesList[i].c_str())->GetRange();
 			strs.str(""); strs.clear();
 			strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
             QStandardItem * dataRange = new QStandardItem(QString(strs.str().c_str()));
-            model->setItem(i,1,dataRange);
+            model->setItem(i,2,dataRange);
         }
     }
 
     /* Adapt Columns size */
     tableView->resizeColumnToContents(0);
+    tableView->resizeColumnToContents(1);
     on_tabWidget_currentChanged(1);
 }
 
