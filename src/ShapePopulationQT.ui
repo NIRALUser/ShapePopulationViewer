@@ -312,216 +312,327 @@
            </rect>
           </property>
          </widget>
-         <widget class="gradientWidgetQT" name="gradientWidget_VISU" native="true">
+         <widget class="QTabWidget" name="tabWidget_2">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>100</y>
-            <width>301</width>
-            <height>60</height>
-           </rect>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>70</height>
-           </size>
-          </property>
-         </widget>
-         <widget class="QWidget" name="widget_VISU_arrowOptions" native="true">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>160</y>
-            <width>301</width>
-            <height>61</height>
-           </rect>
-          </property>
-          <widget class="QPushButton" name="pushButton_VISU_delete">
-           <property name="geometry">
-            <rect>
-             <x>180</x>
-             <y>0</y>
-             <width>31</width>
-             <height>27</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>✗</string>
-           </property>
-          </widget>
-          <widget class="QDoubleSpinBox" name="spinBox_VISU_position">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>0</y>
-             <width>101</width>
-             <height>27</height>
-            </rect>
-           </property>
-           <property name="decimals">
-            <number>5</number>
-           </property>
-           <property name="minimum">
-            <double>-999999999.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>999999999.000000000000000</double>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="pushButton_VISU_add">
-           <property name="geometry">
-            <rect>
-             <x>220</x>
-             <y>0</y>
-             <width>31</width>
-             <height>27</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>+</string>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="pushButton_VISU_reset">
-           <property name="geometry">
-            <rect>
-             <x>260</x>
-             <y>0</y>
-             <width>31</width>
-             <height>27</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>⟳</string>
-           </property>
-          </widget>
-          <widget class="QDoubleSpinBox" name="spinBox_VISU_min">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>30</y>
-             <width>86</width>
-             <height>27</height>
-            </rect>
-           </property>
-           <property name="decimals">
-            <number>5</number>
-           </property>
-           <property name="minimum">
-            <double>-999999999.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>999999999.000000000000000</double>
-           </property>
-          </widget>
-          <widget class="QDoubleSpinBox" name="spinBox_VISU_max">
-           <property name="geometry">
-            <rect>
-             <x>165</x>
-             <y>30</y>
-             <width>86</width>
-             <height>27</height>
-            </rect>
-           </property>
-           <property name="decimals">
-            <number>5</number>
-           </property>
-           <property name="minimum">
-            <double>-999999999.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>999999999.000000000000000</double>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="pushButton_VISU_resetRange">
-           <property name="geometry">
-            <rect>
-             <x>260</x>
-             <y>30</y>
-             <width>31</width>
-             <height>27</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>⟳</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_VISU_attribute_2">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>61</width>
-             <height>27</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Arrow :</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_VISU_attribute_3">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>30</y>
-             <width>61</width>
-             <height>27</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Range :</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </widget>
-         <widget class="QSlider" name="slider_arrowScale">
-          <property name="geometry">
-           <rect>
-            <x>180</x>
+            <x>0</x>
             <y>70</y>
-            <width>121</width>
-            <height>20</height>
+            <width>321</width>
+            <height>160</height>
            </rect>
           </property>
-          <property name="maximum">
-           <number>300</number>
+          <property name="currentIndex">
+           <number>0</number>
           </property>
-          <property name="singleStep">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-         <widget class="QSlider" name="slider_meshOpacity">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>70</y>
-            <width>121</width>
-            <height>20</height>
-           </rect>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="singleStep">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
+          <widget class="QWidget" name="tab_scalars">
+           <attribute name="title">
+            <string>Colorbar</string>
+           </attribute>
+           <widget class="gradientWidgetQT" name="gradientWidget_VISU" native="true">
+            <property name="geometry">
+             <rect>
+              <x>9</x>
+              <y>9</y>
+              <width>299</width>
+              <height>61</height>
+             </rect>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>70</height>
+             </size>
+            </property>
+           </widget>
+           <widget class="QWidget" name="widget_VISU_arrowOptions" native="true">
+            <property name="geometry">
+             <rect>
+              <x>9</x>
+              <y>70</y>
+              <width>299</width>
+              <height>56</height>
+             </rect>
+            </property>
+            <widget class="QPushButton" name="pushButton_VISU_delete">
+             <property name="geometry">
+              <rect>
+               <x>177</x>
+               <y>0</y>
+               <width>31</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>✗</string>
+             </property>
+            </widget>
+            <widget class="QDoubleSpinBox" name="spinBox_VISU_position">
+             <property name="geometry">
+              <rect>
+               <x>67</x>
+               <y>0</y>
+               <width>101</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="decimals">
+              <number>5</number>
+             </property>
+             <property name="minimum">
+              <double>-999999999.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>999999999.000000000000000</double>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="pushButton_VISU_add">
+             <property name="geometry">
+              <rect>
+               <x>217</x>
+               <y>0</y>
+               <width>31</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>+</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="pushButton_VISU_reset">
+             <property name="geometry">
+              <rect>
+               <x>257</x>
+               <y>0</y>
+               <width>31</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>⟳</string>
+             </property>
+            </widget>
+            <widget class="QDoubleSpinBox" name="spinBox_VISU_min">
+             <property name="geometry">
+              <rect>
+               <x>67</x>
+               <y>30</y>
+               <width>86</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="decimals">
+              <number>5</number>
+             </property>
+             <property name="minimum">
+              <double>-999999999.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>999999999.000000000000000</double>
+             </property>
+            </widget>
+            <widget class="QDoubleSpinBox" name="spinBox_VISU_max">
+             <property name="geometry">
+              <rect>
+               <x>162</x>
+               <y>30</y>
+               <width>86</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="decimals">
+              <number>5</number>
+             </property>
+             <property name="minimum">
+              <double>-999999999.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>999999999.000000000000000</double>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="pushButton_VISU_resetRange">
+             <property name="geometry">
+              <rect>
+               <x>257</x>
+               <y>30</y>
+               <width>31</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>⟳</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="label_VISU_attribute_2">
+             <property name="geometry">
+              <rect>
+               <x>-3</x>
+               <y>0</y>
+               <width>61</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Arrow :</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+            <widget class="QLabel" name="label_VISU_attribute_3">
+             <property name="geometry">
+              <rect>
+               <x>-3</x>
+               <y>30</y>
+               <width>61</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Range :</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </widget>
+          </widget>
+          <widget class="QWidget" name="tab_vectors">
+           <attribute name="title">
+            <string>Vectors</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBox_displayVectors">
+              <property name="text">
+               <string>Display vectors</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_meshOpacity">
+              <property name="text">
+               <string>Mesh Opacity : </string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSlider" name="slider_meshOpacity">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QSpinBox" name="spinbox_meshOpacity">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QLabel" name="label_purcentage1">
+              <property name="text">
+               <string>%</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_vectorScale">
+              <property name="text">
+               <string>Vectors Scale :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSlider" name="slider_vectorScale">
+              <property name="maximum">
+               <number>999</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QSpinBox" name="spinbox_vectorScale">
+              <property name="maximum">
+               <number>999</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QLabel" name="label_purcentage2">
+              <property name="text">
+               <string>%</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_vectorDens">
+              <property name="text">
+               <string>Vectors Dens :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QSlider" name="slider_arrowDens">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QSpinBox" name="spinbox_arrowDens">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3">
+             <widget class="QLabel" name="label_purcentage3">
+              <property name="text">
+               <string>%</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </widget>
        </item>
@@ -955,12 +1066,12 @@
            <rect>
             <x>10</x>
             <y>140</y>
-            <width>81</width>
+            <width>101</width>
             <height>31</height>
            </rect>
           </property>
           <property name="text">
-           <string>Position :</string>
+           <string>Alignement :</string>
           </property>
          </widget>
         </widget>
@@ -1067,5 +1178,102 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>slider_meshOpacity</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinbox_meshOpacity</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>631</x>
+     <y>718</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>679</x>
+     <y>714</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinbox_meshOpacity</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>slider_meshOpacity</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>663</x>
+     <y>729</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>614</x>
+     <y>715</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>slider_vectorScale</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinbox_vectorScale</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>615</x>
+     <y>748</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>667</x>
+     <y>753</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinbox_vectorScale</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>slider_vectorScale</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>663</x>
+     <y>740</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>622</x>
+     <y>739</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>slider_arrowDens</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinbox_arrowDens</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>615</x>
+     <y>773</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>673</x>
+     <y>782</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinbox_arrowDens</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>slider_arrowDens</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>666</x>
+     <y>769</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>621</x>
+     <y>771</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

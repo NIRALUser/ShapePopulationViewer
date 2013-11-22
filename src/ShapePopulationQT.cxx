@@ -277,6 +277,7 @@ void ShapePopulationQT::deleteAll()
     //Empty the meshes FileInfo List
     m_fileList.clear();
     m_meshList.clear();
+    m_glyphList.clear();
     m_selectedIndex.clear();
     m_windowsList.clear();
     m_widgetList.clear();
@@ -303,6 +304,7 @@ void ShapePopulationQT::deleteSelection()
 
                 delete m_meshList.at(j);
                 m_meshList.erase(m_meshList.begin()+j);
+                m_glyphList.erase(m_glyphList.begin()+j);
 
                 m_selectedIndex.erase(m_selectedIndex.begin()+i);           // CAREFUL : erase i value not j value, different vector here
                 for(unsigned int k = 0; k < m_selectedIndex.size() ; k++)
@@ -395,14 +397,14 @@ void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
         vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
 
         //CornerAnnotation Update
-        vtkObject * viewPropObject = propCollection->GetItemAsObject(1);
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
         vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
         cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
         vtkSmartPointer<vtkTextProperty> cornerProperty = cornerAnnotation->GetTextProperty();
         cornerProperty->SetColor(textColor);
 
         //ScalarBar Update
-        viewPropObject = propCollection->GetItemAsObject(2);
+        viewPropObject = propCollection->GetItemAsObject(3);
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
         scalarBar = (vtkScalarBarActor*)viewPropObject;
         vtkSmartPointer<vtkTextProperty> labelProperty = scalarBar->GetLabelTextProperty();
@@ -559,15 +561,6 @@ void ShapePopulationQT::saveColorMap()
 void ShapePopulationQT::CreateWidgets()
 {
     this->scrollArea->setVisible(false);
-
-    if(m_numberOfMeshes==0) //clear all vectors so they might be refilled
-    {
-        m_meshList.clear();
-        m_windowsList.clear();
-        m_widgetList.clear();
-    }
-    m_selectedIndex.clear();
-
 
     /* VTK WINDOWS */
     for (int i = m_numberOfMeshes; i < m_fileList.size(); i++)
@@ -1046,11 +1039,6 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
         spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
 
-        //Update vectors scale
-        double range = m_commonRange[1] - m_commonRange[0];
-        double max = 500/range;
-        slider_arrowScale->setMaximum((int)max);
-
         // Display colormap
         this->UpdateColorMap(m_selectedIndex);
         this->UpdateArrowPosition();
@@ -1351,7 +1339,7 @@ void ShapePopulationQT::displayAttribute()
     }
 }
 
-void ShapePopulationQT::on_slider_arrowScale_valueChanged(int value)
+void ShapePopulationQT::on_slider_vectorScale_valueChanged(int value)
 {
     for(unsigned int i = 0; i < m_glyphList.size() ; i++)
     {
