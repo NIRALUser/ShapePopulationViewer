@@ -43,13 +43,11 @@ void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
     m_selectedColor[1] = a_selectedColor[1];
     m_selectedColor[2] = a_selectedColor[2];
 
-    //m_renderAllSelection = false;
     for(unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_selectedColor);
         m_windowsList[m_selectedIndex[i]]->Render();
     }
-    //m_renderAllSelection = true;
 }
 
 void ShapePopulationBase::setBackgroundUnselectedColor(double a_unselectedColor[])
@@ -68,12 +66,10 @@ void ShapePopulationBase::setBackgroundUnselectedColor(double a_unselectedColor[
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_selectedColor);
     }
 
-    //m_renderAllSelection = false;
     for(unsigned int i = 0; i < m_windowsList.size(); i++)
     {
         m_windowsList[i]->Render();
     }
-    //m_renderAllSelection = true;
 }
 
 void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
@@ -183,9 +179,7 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
             camera->DeepCopy(m_headcam);
             selectedWindow->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
-            //m_renderAllSelection = false;
             selectedWindow->Render();
-            //m_renderAllSelection = true;
             m_selectedIndex.erase((std::find(m_selectedIndex.begin(), m_selectedIndex.end(), index)));
         }
         return;
@@ -194,7 +188,6 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
     // NEW SELECTION (Ctrl not pushed)
     if(selectedInteractor->GetControlKey()==0)
     {
-        //m_renderAllSelection = false;
         for (unsigned int i = 0; i < m_selectedIndex.size();i++)                              //reset backgrounds and cameras
         {
             m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_unselectedColor);
@@ -203,7 +196,6 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
             m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
             m_windowsList[m_selectedIndex[i]]->Render();
         }
-        //m_renderAllSelection = true;
         m_selectedIndex.clear();                                                             // empty the selectedWindows list
     }
 
@@ -257,7 +249,6 @@ void ShapePopulationBase::UnselectAll()
      ** uncheck Select All if needed
      */
 
-    //m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
         //Create an independant camera, copy of headcam
@@ -268,7 +259,6 @@ void ShapePopulationBase::UnselectAll()
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_unselectedColor);
         m_windowsList[m_selectedIndex[i]]->Render();
     }
-    //m_renderAllSelection = true;
     m_selectedIndex.clear();
 }
 
@@ -557,12 +547,13 @@ void ShapePopulationBase::PositionToOriginal()
         //Get the position
         vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
         actors->InitTraversal();
-        vtkSmartPointer<vtkActor> testActor = actors->GetNextActor();
+        vtkSmartPointer<vtkActor> meshActor = actors->GetNextActor();
+        vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
 
         //Update the position
         double newposition[3] = {0,0,0};
-        testActor->SetPosition(newposition);
-        testActor->SetOrigin(newposition);
+        meshActor->SetPosition(newposition);
+        glyphActor->SetPosition(newposition);
     }
     this->ResetHeadcam();
     for (unsigned int i = 0; i < m_windowsList.size();i++)
@@ -581,20 +572,23 @@ void ShapePopulationBase::PositionToCentered()
 {
     for (unsigned int i = 0; i < m_windowsList.size();i++)
     {
-        //Get the position
+        //Get the actual position
         vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
         actors->InitTraversal();
-        vtkSmartPointer<vtkActor> testActor = actors->GetNextActor();
-        double * position = testActor->GetPosition();
-        double * center = testActor->GetCenter();
+        vtkSmartPointer<vtkActor> meshActor = actors->GetNextActor();
+        vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
+        double * position = meshActor->GetPosition();
+        double * center = meshActor->GetCenter();
 
-        //Update the position
+        //Calculate the new position
         double a = position[0]-center[0];
         double b = position[1]-center[1];
         double c = position[2]-center[2];
         double newposition[3] = {a,b,c};
-        testActor->SetPosition(newposition);
-        testActor->SetOrigin(newposition);
+
+        //Update the position
+        meshActor->SetPosition(newposition);
+        glyphActor->SetPosition(newposition);
     }
     this->ResetHeadcam();
     for (unsigned int i = 0; i < m_windowsList.size();i++)

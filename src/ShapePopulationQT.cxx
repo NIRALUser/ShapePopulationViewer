@@ -93,7 +93,6 @@ void ShapePopulationQT::slotExit()
 
 void ShapePopulationQT::on_pushButton_displayTools_clicked()
 {
-    //m_renderAllSelection = false;
     if(m_toolsDisplayed)
     {
         this->toolBox->hide();
@@ -106,7 +105,6 @@ void ShapePopulationQT::on_pushButton_displayTools_clicked()
         this->pushButton_displayTools->setText(QString::fromUtf8("\u25BC"));
         m_toolsDisplayed = true;
     }
-    //m_renderAllSelection = true;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -392,7 +390,6 @@ void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
     textColor[1] = (double)color.green()/255.0;
     textColor[2] = (double)color.blue()/255.0;
 
-    //m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_windowsList.size(); i++)
     {
         vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
@@ -946,9 +943,7 @@ void ShapePopulationQT::on_spinBox_DISPLAY_columns_editingFinished()
     placeWidgetInArea(spinBox_DISPLAY_columns->value());
     if (radioButton_DISPLAY_square->isChecked()) resizeWidgetInArea();
 
-    //m_renderAllSelection = false;
     this->scrollArea->setVisible(true);
-    //m_renderAllSelection = true;
 }
 
 
@@ -994,13 +989,10 @@ void ShapePopulationQT::on_comboBox_SYNC_position_currentIndexChanged()
     {
         this->PositionToOriginal();
     }
-
-    //m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_windowsList.size();i++)
     {
         m_windowsList[i]->Render();
     }
-    //m_renderAllSelection = true;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -1095,12 +1087,10 @@ void ShapePopulationQT::UpdateColorbar_QT()
     this->UpdateColorMap(windowsIndex);
 
     //Rendering those windows...
-    //m_renderAllSelection = false;
     for(unsigned int i = 0 ; i < windowsIndex.size() ; i++)
     {
         m_windowsList[windowsIndex[i]]->Render();
     }
-    //m_renderAllSelection = true;
 }
 
 void ShapePopulationQT::UpdateArrowPosition()
