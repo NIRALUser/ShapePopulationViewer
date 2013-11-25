@@ -28,12 +28,17 @@ ShapePopulationBase::ShapePopulationBase()
 {
     m_headcam = vtkSmartPointer<vtkCamera>::New();
     m_headcam->ParallelProjectionOn();
+
     m_unselectedColor[0] = 0.0;
     m_unselectedColor[1] = 0.0;
     m_unselectedColor[2] = 0.0;
     m_selectedColor[0] = 0.1;
     m_selectedColor[1] = 0.0;
     m_selectedColor[2] = 0.3;
+    m_labelColor[0] = 1.0;
+    m_labelColor[1] = 1.0;
+    m_labelColor[2] = 1.0;
+
     m_renderAllSelection = false; //changed
 }
 
@@ -68,6 +73,35 @@ void ShapePopulationBase::setBackgroundUnselectedColor(double a_unselectedColor[
 
     for(unsigned int i = 0; i < m_windowsList.size(); i++)
     {
+        m_windowsList[i]->Render();
+    }
+}
+
+
+void ShapePopulationBase::setLabelColor(double a_labelColor[])
+{
+    m_labelColor[0] = a_labelColor[0];
+    m_labelColor[1] = a_labelColor[1];
+    m_labelColor[2] = a_labelColor[2];
+
+    for (unsigned int i = 0; i < m_windowsList.size(); i++)
+    {
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+
+        //CornerAnnotation Update
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
+        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
+        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkSmartPointer<vtkTextProperty> cornerProperty = cornerAnnotation->GetTextProperty();
+        cornerProperty->SetColor(m_labelColor);
+
+        //ScalarBar Update
+        viewPropObject = propCollection->GetItemAsObject(3);
+        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkSmartPointer<vtkTextProperty> labelProperty = scalarBar->GetLabelTextProperty();
+        labelProperty->SetColor(m_labelColor);
+
         m_windowsList[i]->Render();
     }
 }
@@ -132,6 +166,7 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     cornerAnnotation->SetNonlinearFontScaleFactor( 1 );
     cornerAnnotation->SetMaximumFontSize( 15 );
     cornerAnnotation->SetText( 2,Mesh->GetFileName().c_str());
+    cornerAnnotation->GetTextProperty()->SetColor(m_labelColor);
     renderer->AddViewProp(cornerAnnotation);
 
     // SCALAR BAR
@@ -142,6 +177,7 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 
     vtkSmartPointer<vtkTextProperty> LabelProperty = vtkSmartPointer<vtkTextProperty>::New();
     LabelProperty->SetFontSize(12);
+    LabelProperty->SetColor(m_labelColor);
     scalarBar->SetLabelTextProperty(LabelProperty);
 
     renderer->AddActor2D(scalarBar);
@@ -479,6 +515,38 @@ void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowInd
     }
 }
 
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                            VECTORS                                            * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
+void ShapePopulationBase::setMeshOpacity(double value)
+{
+    for(unsigned int i = 0; i < m_meshList.size() ; i++)
+    {
+        vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
+        actors->InitTraversal();
+        actors->GetNextActor()->GetProperty()->SetOpacity(value);
+        m_windowsList[i]->Render();
+    }
+}
+
+void ShapePopulationBase::setVectorScale(double value)
+{
+    for(unsigned int i = 0; i < m_glyphList.size() ; i++)
+    {
+        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+        vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[i];
+        glyph->SetSourceConnection(arrow->GetOutputPort());
+        glyph->SetScaleFactor(value);
+        m_windowsList[i]->Render();
+    }
+}
+
+void ShapePopulationBase::setVectorDensity(double value)
+{
+
+}
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                            CAMERA                                             * //

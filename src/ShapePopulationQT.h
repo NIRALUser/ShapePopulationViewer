@@ -168,6 +168,8 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
   signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
 
+private slots:
+    void on_slider_arrowDens_valueChanged(int value);
 };
 
 #endif

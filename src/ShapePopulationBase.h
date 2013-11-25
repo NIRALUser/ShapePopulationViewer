@@ -70,6 +70,11 @@ class ShapePopulationBase
     void UpdateColorMap(std::vector<unsigned int> a_windowIndex);
     double m_commonRange[2];
 
+    //VECTORS
+    void setMeshOpacity(double value);
+    void setVectorScale(double value);
+    void setVectorDensity(double value);
+
     //CAMERA
     void ChangeView(int x, int y, int z);
     void ResetHeadcam();
@@ -82,8 +87,10 @@ class ShapePopulationBase
     //BACKGROUND
     double m_selectedColor[3];
     double m_unselectedColor[3];
+    double m_labelColor[3];
     void setBackgroundSelectedColor(double a_selectedColor[]);
     void setBackgroundUnselectedColor(double a_unselectedColor[]);
+    void setLabelColor(double a_labelColor[]);
 
 };
 

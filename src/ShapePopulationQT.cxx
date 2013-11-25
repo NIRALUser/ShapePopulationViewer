@@ -392,26 +392,8 @@ void ShapePopulationQT::slot_textColor_valueChanged(QColor color)
     textColor[1] = (double)color.green()/255.0;
     textColor[2] = (double)color.blue()/255.0;
 
-    for (unsigned int i = 0; i < m_windowsList.size(); i++)
-    {
-        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+    this->setLabelColor(textColor);
 
-        //CornerAnnotation Update
-        vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
-        vtkSmartPointer<vtkTextProperty> cornerProperty = cornerAnnotation->GetTextProperty();
-        cornerProperty->SetColor(textColor);
-
-        //ScalarBar Update
-        viewPropObject = propCollection->GetItemAsObject(3);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
-        vtkSmartPointer<vtkTextProperty> labelProperty = scalarBar->GetLabelTextProperty();
-        labelProperty->SetColor(textColor);
-
-        m_windowsList[i]->Render();
-    }
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -1341,23 +1323,18 @@ void ShapePopulationQT::displayAttribute()
 
 void ShapePopulationQT::on_slider_vectorScale_valueChanged(int value)
 {
-    for(unsigned int i = 0; i < m_glyphList.size() ; i++)
-    {
-        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
-        vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[i];
-        glyph->SetSourceConnection(arrow->GetOutputPort());
-        glyph->SetScaleFactor((double)value/100);
-        m_windowsList[i]->Render();
-    }
+    double val = (double)value/100;
+    this->setVectorScale(val);
 }
 
 void ShapePopulationQT::on_slider_meshOpacity_valueChanged(int value)
 {
-    for(unsigned int i = 0; i < m_meshList.size() ; i++)
-    {
-        vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
-        actors->InitTraversal();
-        actors->GetNextActor()->GetProperty()->SetOpacity((double)value/100);
-        m_windowsList[i]->Render();
-    }
+    double val = (double)value/100;
+    this->setMeshOpacity(val);
+}
+
+void ShapePopulationQT::on_slider_arrowDens_valueChanged(int value)
+{
+    double val = (double)value/100;
+    this->setVectorDensity(val);
 }
