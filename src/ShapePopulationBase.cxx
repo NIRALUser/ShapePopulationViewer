@@ -40,6 +40,7 @@ ShapePopulationBase::ShapePopulationBase()
     m_labelColor[2] = 1.0;
 
     m_renderAllSelection = false; //changed
+    m_displayVectors = true;
 }
 
 void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
@@ -131,7 +132,7 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
         glyph->ScalingOn();
         glyph->OrientOn();
         glyph->ClampingOff();
-        glyph->SetColorModeToColorByScalar();
+        glyph->SetColorModeToColorByVector();
         glyph->SetScaleModeToScaleByVector();
         glyph->SetVectorModeToUseVector();
         m_glyphList.push_back(glyph);
@@ -150,10 +151,13 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     renderer->AddActor(glyphActor);
     renderer->SetActiveCamera(m_headcam); //set the active camera for this renderer to main camera
     renderer->ResetCamera();
+    renderer->SetUseDepthPeeling(true);/*test opacity*/
 
     //WINDOW
     vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
     renderWindow->AddRenderer(renderer);
+    renderWindow->SetAlphaBitPlanes(true);/*test opacity*/
+    renderWindow->SetMultiSamples(0);/*test opacity*/
     m_windowsList.push_back(renderWindow);
 
     //INTERACTOR
@@ -448,29 +452,71 @@ double * ShapePopulationBase::computeCommonRange(const char * a_cmap, std::vecto
 }
 void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsigned int > a_windowIndex)
 {
-    for (unsigned int i = 0; i < a_windowIndex.size(); i++)
+    int dim = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(a_cmap)->GetNumberOfComponents();
+
+    //test _mag
+    std::string cmap = std::string(a_cmap);
+    size_t found = cmap.rfind("_mag");
+    std::string new_cmap = cmap.substr(0,found);
+    if( (new_cmap != cmap) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()))
     {
-        // Set Active Attribute
-        ShapePopulationData * mesh = m_meshList[a_windowIndex[i]];
-        mesh->GetPolyData()->GetPointData()->SetActiveScalars(a_cmap);
-        int testVector = mesh->GetPolyData()->GetPointData()->SetActiveVectors(a_cmap);
-
-        //Upate Glyph
-        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
-        vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[a_windowIndex[i]];
-        glyph->SetSourceConnection(arrow->GetOutputPort());
-
-        //Actor visibility
-        vtkRenderWindow * window = m_windowsList[a_windowIndex[i]];
-        vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
-        if(testVector == -1) glyphActor->SetVisibility(0);
-        else glyphActor->SetVisibility(1);
+        dim = 3;
+        a_cmap = new_cmap.c_str();
     }
 
-    // Compute the largest range
-    double * commonRange = computeCommonRange(a_cmap, a_windowIndex);
-    m_commonRange[0] = commonRange[0];
-    m_commonRange[1] = commonRange[1];
+    if(dim == 1)
+    {
+        for (unsigned int i = 0; i < a_windowIndex.size(); i++)
+        {
+            ShapePopulationData * mesh = m_meshList[a_windowIndex[i]];
+            vtkRenderWindow * window = m_windowsList[a_windowIndex[i]];
+            vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+
+            // Set Active Scalars
+            mesh->GetPolyData()->GetPointData()->SetActiveScalars(a_cmap);
+
+            // Glyph visibility
+            glyphActor->SetVisibility(0);
+        }
+
+        // Compute the largest range
+        double * commonRange = computeCommonRange(a_cmap, a_windowIndex);
+        m_commonRange[0] = commonRange[0];
+        m_commonRange[1] = commonRange[1];
+    }
+
+    else if(dim == 3)
+    {
+        std::ostringstream strs;
+        strs.str(""); strs.clear();
+        strs << a_cmap << "_mag" << std::endl;
+
+        for (unsigned int i = 0; i < a_windowIndex.size(); i++)
+        {
+            ShapePopulationData * mesh = m_meshList[a_windowIndex[i]];
+            vtkRenderWindow * window = m_windowsList[a_windowIndex[i]];
+            vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+
+            // Set Active Vectors
+            mesh->GetPolyData()->GetPointData()->SetActiveVectors(a_cmap);
+
+            // Set Active Scalars to Vectors magnitude
+            mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs.str().c_str());
+
+            // Update Glyph
+            vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+            vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[a_windowIndex[i]];
+            glyph->SetSourceConnection(arrow->GetOutputPort());
+
+            // Glyph visibility
+            if (m_displayVectors == true) glyphActor->SetVisibility(1);
+        }
+
+        // Compute the largest range
+        double * commonRange = computeCommonRange(strs.str().c_str(), a_windowIndex);
+        m_commonRange[0] = commonRange[0];
+        m_commonRange[1] = commonRange[1];
+    }
 
 }
 
@@ -495,6 +541,7 @@ void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowInd
         m_usedColorBar->range[1] = spv_math::round_nplaces(m_usedColorBar->range[1],2);
         DistanceMapTFunc->AdjustRange(m_usedColorBar->range);
         DistanceMapTFunc->SetColorSpaceToRGB();
+        DistanceMapTFunc->SetVectorModeToMagnitude(); /*test magnitude to scalars*/
 
         //Mesh Mapper Update
         vtkActorCollection * actors = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
@@ -527,7 +574,6 @@ void ShapePopulationBase::setMeshOpacity(double value)
         vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
         actors->InitTraversal();
         actors->GetNextActor()->GetProperty()->SetOpacity(value);
-        m_windowsList[i]->Render();
     }
 }
 
@@ -539,13 +585,52 @@ void ShapePopulationBase::setVectorScale(double value)
         vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[i];
         glyph->SetSourceConnection(arrow->GetOutputPort());
         glyph->SetScaleFactor(value);
-        m_windowsList[i]->Render();
     }
 }
 
 void ShapePopulationBase::setVectorDensity(double value)
 {
+    for(unsigned int i = 0; i < m_meshList.size() ; i++)
+    {
+        ShapePopulationData * mesh = m_meshList[i];
+        vtkSmartPointer<vtkMaskPoints> filter = vtkSmartPointer<vtkMaskPoints>::New();
+        filter->SetInputConnection(mesh->GetPolyData()->GetProducerPort());
+        filter->SetOnRatio(101-value);
 
+        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+        vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[i];
+        glyph->SetSourceConnection(arrow->GetOutputPort());
+        glyph->SetInputConnection(filter->GetOutputPort());
+    }
+}
+
+void ShapePopulationBase::displayVectors(bool display)
+{
+    for(unsigned int i = 0; i < m_windowsList.size() ; i++)
+    {
+
+        const char * a_cmap = m_meshList[i]->GetPolyData()->GetPointData()->GetScalars()->GetName();
+        std::string cmap = std::string(a_cmap);
+        size_t found = cmap.rfind("_mag");
+        std::string new_cmap = cmap.substr(0,found);
+
+        if( (new_cmap != cmap) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()))
+        {
+            vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
+            vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
+
+            if(display)
+            {
+                m_displayVectors = true;
+                glyphActor->SetVisibility(1);
+            }
+            else
+            {
+                m_displayVectors = false;
+                glyphActor->SetVisibility(0);
+            }
+        }
+    }
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //

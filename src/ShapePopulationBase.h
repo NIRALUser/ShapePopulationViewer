@@ -22,6 +22,11 @@
 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
+#include "vtkExtractGrid.h"
+#include "vtkMaskPoints.h"
+#include "vtkImageShrink3D.h"
+#include "vtkImageGradient.h"
+
 
 #include <set>
 
@@ -50,6 +55,7 @@ class ShapePopulationBase
     colorBarStruct * m_usedColorBar;
     std::vector< colorBarStruct *> m_colorBarList;
     bool m_renderAllSelection;
+    bool m_displayVectors;
 
     void CreateNewWindow(std::string a_filePath);
 
@@ -74,6 +80,7 @@ class ShapePopulationBase
     void setMeshOpacity(double value);
     void setVectorScale(double value);
     void setVectorDensity(double value);
+    void displayVectors(bool display);
 
     //CAMERA
     void ChangeView(int x, int y, int z);

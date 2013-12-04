@@ -333,15 +333,36 @@ void ShapePopulationQT::deleteSelection()
     }
     else
     {
-        placeWidgetInArea(spinBox_DISPLAY_columns->value());
 
-        computeCommonAttributes();                                  // get the common attributes
-        comboBox_VISU_attribute->clear();
-        for(unsigned int i = 0; i < m_commonAttributes.size() ; i++)
-        {
-            QString Q_Attribute(m_commonAttributes.at(i).c_str());
-            comboBox_VISU_attribute->addItem(Q_Attribute);           // and then add them to the GUI.
-        }
+    ShapePopulationBase::SelectAll();
+
+    computeCommonAttributes();                                                  // get the common attributes in m_commonAttributes
+    comboBox_VISU_attribute->clear();                                           // clear the Attributes in the comboBox
+    m_colorBarList.clear();                                                     // clear the existing colorbars
+
+    m_updateOnAttributeChanged = false;
+    for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
+    {
+        colorBarStruct * colorBar = new colorBarStruct;                         //new colorbar for this attribute
+        gradientWidget_VISU->reset();                                           //create points
+        gradientWidget_VISU->getAllColors(&colorBar->colorPointList);           //get the points into the colorbar
+        this->UpdateAttribute(m_commonAttributes[i].c_str(), m_selectedIndex);  //create the range
+        colorBar->range[0] = m_commonRange[0];                                  //get the range into the colorbar
+        colorBar->range[1] = m_commonRange[1];
+        m_colorBarList.push_back(colorBar);                                     //add the colorbar to the list
+
+        comboBox_VISU_attribute->addItem(QString(m_commonAttributes[i].c_str()));   // Then add the attribute to the comboBox
+    }
+    m_updateOnAttributeChanged = true;
+
+
+    this->UpdateAttribute(m_commonAttributes[0].c_str(), m_selectedIndex);
+    m_usedColorBar = m_colorBarList[0];
+    this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
+    spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
+    spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
+    this->UpdateColorbar_QT();
+    this->UpdateArrowPosition();
     }
 }
 
@@ -608,6 +629,12 @@ void ShapePopulationQT::CreateWidgets()
     this->UpdateColorbar_QT();
     this->UpdateArrowPosition();
 
+    /* VECTORS UPDATE */
+    //this->displayVectors(this->checkBox_displayVectors->isChecked());
+    this->setMeshOpacity(this->spinbox_meshOpacity->value()/100);
+    this->setVectorScale(this->spinbox_vectorScale->value()/100);
+    this->setVectorDensity(this->spinbox_arrowDens->value());
+
     m_numberOfMeshes = m_fileList.size();
     spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
 
@@ -684,6 +711,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         /* DISPLAY INFOS */
         this->displayInfo();
         this->displayAttribute();
+        this->setVectorDensity(this->spinbox_arrowDens->value());
     }
 }
 
@@ -711,6 +739,7 @@ void ShapePopulationQT::SelectAll()
 
     // Update color with this attribute
     this->UpdateAttribute(cmap, m_selectedIndex);
+    this->setVectorDensity(this->spinbox_arrowDens->value());
     this->UpdateColorMap(m_selectedIndex);
 
     // Render
@@ -1015,6 +1044,15 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         const char *cmap  = arr.data();
         this->UpdateAttribute(cmap, m_selectedIndex);
 
+        // Hide/Show Vector Tab
+        int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+        if (dimension == 3)
+        {
+            tab_vectors->setEnabled(true);
+            this->setVectorDensity(this->spinbox_arrowDens->value());
+        }
+        else tab_vectors->setEnabled(false);
+
         // Change the colorbar selected
         m_usedColorBar = m_colorBarList[index]; //the colorbar depends of the attribute
         this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
@@ -1041,13 +1079,18 @@ void ShapePopulationQT::UpdateColorbar_QT()
     QString text = this->comboBox_VISU_attribute->currentText();
     QByteArray arr = text.toLatin1();
     const char *cmap  = arr.data();
+    std::ostringstream strs;
+    strs.str(""); strs.clear();
+    strs << cmap << "_mag"<<std::endl;
+    std::string cmap_mag = strs.str();
 
     //Get the windows with this attribute
     std::vector<unsigned int > windowsIndex;
     for(unsigned int i = 0 ; i < m_windowsList.size() ; i++)
     {
         const char * thisCmap = m_meshList[i]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        if(std::string(thisCmap) == std::string(cmap))
+
+        if(std::string(thisCmap) == std::string(cmap) || std::string(thisCmap) == cmap_mag)
         {
             windowsIndex.push_back(i);
         }
@@ -1241,14 +1284,24 @@ void ShapePopulationQT::displayInfo()
             ShapePopulationData * mesh = m_meshList[0];
             int dim = mesh->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[i].c_str())->GetNumberOfComponents();
             strs.str(""); strs.clear();
-            strs <<dim<<std::endl;
+            strs <<dim;
             QStandardItem * dimension = new QStandardItem(QString(strs.str().c_str()));
             model->setItem(i,1,dimension);
 
             //Range
-            double * range = computeCommonRange(m_commonAttributes[i].c_str(), m_selectedIndex);
+            double * range;
+            if(dim == 1)
+            {
+                range = computeCommonRange(m_commonAttributes[i].c_str(), m_selectedIndex);
+            }
+            else if(dim == 3)
+            {
+                strs.str(""); strs.clear();
+                strs <<m_commonAttributes[i]<<"_mag"<<std::endl;
+                range = computeCommonRange(strs.str().c_str(), m_selectedIndex);
+            }
 			strs.str(""); strs.clear();
-			strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
+            strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]";
             QStandardItem * dataRange = new QStandardItem(QString(strs.str().c_str()));
             model->setItem(i,2,dataRange);
         }
@@ -1263,10 +1316,10 @@ void ShapePopulationQT::displayInfo()
         this->lineEdit_filename->setText(QString(m_meshList[index]->GetFileName().c_str()));
         this->lineEdit_dir->setText(QString(m_meshList[index]->GetFileDir().c_str()));
 		strs.str(""); strs.clear();
-		strs << (int)selectedData->GetNumberOfPoints()<< std::endl;
+        strs << (int)selectedData->GetNumberOfPoints();
 		this->lineEdit_points->setText(QString(strs.str().c_str()));
 		strs.str(""); strs.clear();
-		strs << (int)selectedData->GetNumberOfCells()<< std::endl;
+        strs << (int)selectedData->GetNumberOfCells();
         this->lineEdit_cells->setText(QString(strs.str().c_str()));
 
 
@@ -1280,17 +1333,27 @@ void ShapePopulationQT::displayInfo()
             model->setItem(i,0,dataName);
 
             //Dimension
-            ShapePopulationData * mesh = m_meshList[0];
+            ShapePopulationData * mesh = m_meshList[index];
             int dim = mesh->GetPolyData()->GetPointData()->GetScalars(AttributesList[i].c_str())->GetNumberOfComponents();
             strs.str(""); strs.clear();
-            strs <<dim<<std::endl;
+            strs <<dim;
             QStandardItem * dimension = new QStandardItem(QString(strs.str().c_str()));
             model->setItem(i,1,dimension);
 
             //Range
-            double * range = selectedData->GetPointData()->GetScalars(AttributesList[i].c_str())->GetRange();
+            double * range;
+            if(dim == 1)
+            {
+                range = computeCommonRange(AttributesList[i].c_str(), m_selectedIndex);
+            }
+            else if(dim == 3)
+            {
+                strs.str(""); strs.clear();
+                strs <<AttributesList[i]<<"_mag"<<std::endl;
+                range = computeCommonRange(strs.str().c_str(), m_selectedIndex);
+            }
 			strs.str(""); strs.clear();
-			strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]"<<std::endl;
+            strs <<"[ "<<range[0]<<" ; "<<range[1]<<" ]";
             QStandardItem * dataRange = new QStandardItem(QString(strs.str().c_str()));
             model->setItem(i,2,dataRange);
         }
@@ -1307,12 +1370,26 @@ void ShapePopulationQT::displayAttribute()
     if(m_selectedIndex.size() == 1)  // if new selection
     {
         const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
+        const char * cmap_vector = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetVectors()->GetName();
+
         int index = comboBox_VISU_attribute->findText(cmap);
+        int index_vector = comboBox_VISU_attribute->findText(cmap_vector);
+
         if (index !=comboBox_VISU_attribute->currentIndex() && index != -1)
         {
             comboBox_VISU_attribute->setCurrentIndex(index);
         }
         else if (index == comboBox_VISU_attribute->currentIndex())
+        {
+            double * commonRange = computeCommonRange(cmap, m_selectedIndex);
+            m_commonRange[0] = commonRange[0];
+            m_commonRange[1] = commonRange[1];
+        }
+        else if (index_vector !=comboBox_VISU_attribute->currentIndex() && index_vector != -1)
+        {
+            comboBox_VISU_attribute->setCurrentIndex(index_vector);
+        }
+        else if (index_vector == comboBox_VISU_attribute->currentIndex())
         {
             double * commonRange = computeCommonRange(cmap, m_selectedIndex);
             m_commonRange[0] = commonRange[0];
@@ -1325,16 +1402,37 @@ void ShapePopulationQT::on_slider_vectorScale_valueChanged(int value)
 {
     double val = (double)value/100;
     this->setVectorScale(val);
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+        m_windowsList[i]->Render();
+    }
 }
 
 void ShapePopulationQT::on_slider_meshOpacity_valueChanged(int value)
 {
     double val = (double)value/100;
     this->setMeshOpacity(val);
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+        m_windowsList[i]->Render();
+    }
 }
 
 void ShapePopulationQT::on_slider_arrowDens_valueChanged(int value)
 {
-    double val = (double)value/100;
-    this->setVectorDensity(val);
+    //double val = (double)value/100;
+    this->setVectorDensity(value);
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+        m_windowsList[i]->Render();
+    }
+}
+
+void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
+{
+    this->displayVectors(checked);
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+        m_windowsList[i]->Render();
+    }
 }

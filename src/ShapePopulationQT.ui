@@ -322,7 +322,7 @@
            </rect>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_scalars">
            <attribute name="title">
@@ -607,7 +607,7 @@
                <number>1</number>
               </property>
               <property name="value">
-               <number>100</number>
+               <number>99</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -620,7 +620,7 @@
                <number>100</number>
               </property>
               <property name="value">
-               <number>100</number>
+               <number>99</number>
               </property>
              </widget>
             </item>

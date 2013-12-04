@@ -161,15 +161,15 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void slot_no_gradArrow_selected();
 
     //VECTORS
-    void on_slider_vectorScale_valueChanged(int value);
+    void on_checkBox_displayVectors_toggled(bool checked);
     void on_slider_meshOpacity_valueChanged(int value);
+    void on_slider_vectorScale_valueChanged(int value);
+    void on_slider_arrowDens_valueChanged(int value);
 
     void UpdateCameraConfig();
   signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
 
-private slots:
-    void on_slider_arrowDens_valueChanged(int value);
 };
 
 #endif
