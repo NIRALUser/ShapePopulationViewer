@@ -43,7 +43,6 @@ void ShapePopulationData::ReadMesh(std::string a_filePath)
             strs.str(""); strs.clear();
             strs << AttributeName << "_mag" << std::endl;
             test->DoAnyNeededConversions(m_PolyData,strs.str().c_str(),vtkDataObject::FIELD_ASSOCIATION_POINTS, AttributeName, "Magnitude");
-            //m_AttributeList.push_back("magnitudeScalars");
         }
     }
     std::sort(m_AttributeList.begin(),m_AttributeList.end());

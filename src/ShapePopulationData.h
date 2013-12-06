@@ -28,7 +28,6 @@ class ShapePopulationData
     std::string GetFileName() {return m_FileName;}
     std::string GetFileDir() {return m_FileDir;}
     std::vector<std::string> GetAttributeList() {return m_AttributeList;}
-    std::vector<std::string> GetVectorList() {return m_vectorList;}
 
   protected :
 
@@ -37,7 +36,6 @@ class ShapePopulationData
     std::string m_FileName;
     std::string m_FileDir;
     std::vector<std::string> m_AttributeList;
-    std::vector<std::string> m_vectorList;
 };
 
 

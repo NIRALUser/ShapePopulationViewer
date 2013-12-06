@@ -90,19 +90,26 @@ void ShapePopulationQT::slotExit()
     qApp->exit();
 }
 
-
 void ShapePopulationQT::on_pushButton_displayTools_clicked()
 {
     if(m_toolsDisplayed)
     {
         this->toolBox->hide();
+#ifdef WIN32
+          this->pushButton_displayTools->setText(QString("^"));
+#else
         this->pushButton_displayTools->setText(QString::fromUtf8("\u25B2"));
+#endif
         m_toolsDisplayed = false;
     }
     else
     {
         this->toolBox->show();
+#ifdef WIN32
+        this->pushButton_displayTools->setText(QString("v"));
+#else
         this->pushButton_displayTools->setText(QString::fromUtf8("\u25BC"));
+#endif
         m_toolsDisplayed = true;
     }
 }

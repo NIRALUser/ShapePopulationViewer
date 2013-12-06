@@ -14,7 +14,13 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkPVPostFilter.h"
 
-#include "vtkArrayIteratorIncludes.h"
+// Iterators.
+#include "vtkArrayIteratorTemplate.h"
+#include "vtkBitArrayIterator.h"
+
+// DataTypes for Iterators.
+#include "vtkStdString.h"
+
 #include "vtkCellData.h"
 #include "vtkCellDataToPointData.h"
 #include "vtkCommand.h"
