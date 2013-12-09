@@ -1443,3 +1443,14 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
         m_windowsList[i]->Render();
     }
 }
+
+void ShapePopulationQT::on_checkBox_displayColorbar_toggled(bool checked)
+{
+    this->displayColorbar(checked);
+
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+        m_windowsList[i]->Render();
+    }
+
+}

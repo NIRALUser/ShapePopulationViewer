@@ -41,6 +41,7 @@ ShapePopulationBase::ShapePopulationBase()
 
     m_renderAllSelection = false; //changed
     m_displayVectors = true;
+    m_displayColorbar = true;
 }
 
 void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
@@ -185,6 +186,7 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     scalarBar->SetLabelTextProperty(LabelProperty);
 
     renderer->AddActor2D(scalarBar);
+    if (m_displayColorbar == false) scalarBar->SetVisibility(0);
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -633,6 +635,28 @@ void ShapePopulationBase::displayVectors(bool display)
     }
 }
 
+
+void ShapePopulationBase::displayColorbar(bool display)
+{
+    for(unsigned int i = 0; i < m_windowsList.size() ; i++)
+    {
+
+        vtkActor2D * oldScalarBar = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
+        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+        scalarBar = (vtkScalarBarActor*)oldScalarBar;
+
+        if(display)
+        {
+            m_displayColorbar = true;
+            scalarBar->SetVisibility(1);
+        }
+        else
+        {
+            m_displayColorbar = false;
+            scalarBar->SetVisibility(0);
+        }
+    }
+}
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                            CAMERA                                             * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //

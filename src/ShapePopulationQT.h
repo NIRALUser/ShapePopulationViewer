@@ -170,6 +170,8 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
   signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
 
+private slots:
+    void on_checkBox_displayColorbar_toggled(bool checked);
 };
 
 #endif
