@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkBitArrayIterator.h"
 
 // DataTypes for Iterators.
-#include "vtkStdString.h"
+//#include "vtkStdString.h"
 
 #include "vtkCellData.h"
 #include "vtkCellDataToPointData.h"
@@ -37,17 +37,17 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVPostFilterExecutive.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/string>
+//#include <vtkstd/string>
 #include <assert.h>
 #include <sstream>
 
 namespace
 {
   // Demangles a mangled string containing an array name and a component name.
-  void DeMangleArrayName(const vtkstd::string &mangledName,
+  void DeMangleArrayName(const std::string &mangledName,
                          vtkDataSet *dataSet,
-                         vtkstd::string &demangledName,
-                         vtkstd::string &demangledComponentName)
+                         std::string &demangledName,
+                         std::string &demangledComponentName)
     {
     std::vector<vtkDataSetAttributes *> attributesArray;
     attributesArray.push_back(dataSet->GetCellData());
@@ -72,7 +72,7 @@ namespace
             {
             // the mangled name is just the array name
             demangledName = mangledName;
-            demangledComponentName = vtkstd::string();
+            demangledComponentName = std::string();
             return;
             }
           else if(mangledName.size() > arrayNameLength + 1)
@@ -83,7 +83,7 @@ namespace
             // check the for a matching component name
             for(size_t componentIndex = 0; componentIndex < componentCount; componentIndex++)
               {
-              vtkStdString componentNameString;
+              std::string componentNameString;
               const char *componentName = array->GetComponentName(componentIndex);
               if(componentName)
                 {
@@ -117,7 +117,7 @@ namespace
 
     // return original name
     demangledName = mangledName;
-    demangledComponentName = vtkstd::string();
+    demangledComponentName = std::string();
     }
 }
 
@@ -146,7 +146,7 @@ vtkExecutive* vtkPVPostFilter::CreateDefaultExecutive()
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkPVPostFilter::DefaultComponentName(int componentNumber, int componentCount)
+std::string vtkPVPostFilter::DefaultComponentName(int componentNumber, int componentCount)
 {
   if (componentCount <= 1)
     {
@@ -169,7 +169,7 @@ vtkStdString vtkPVPostFilter::DefaultComponentName(int componentNumber, int comp
     }
   else
     {
-    vtkstd::ostringstream buffer;
+    std::ostringstream buffer;
     buffer << componentNumber;
     return buffer.str();
     }
@@ -284,7 +284,7 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
       vtkDataSet* dataset = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (dataset)
         {
-        vtkstd::string demangled_name, demagled_component_name;
+        std::string demangled_name, demagled_component_name;
         DeMangleArrayName(name, dataset, demangled_name, demagled_component_name);
 
         this->DoAnyNeededConversions(dataset, name, fieldAssociation,
@@ -299,7 +299,7 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
     vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
     if (dataset)
       {
-      vtkstd::string demangled_name, demagled_component_name;
+      std::string demangled_name, demagled_component_name;
       DeMangleArrayName(name, dataset, demangled_name, demagled_component_name);
 
       return this->DoAnyNeededConversions(dataset,
