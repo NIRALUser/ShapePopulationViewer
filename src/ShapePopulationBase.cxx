@@ -152,13 +152,13 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     renderer->AddActor(glyphActor);
     renderer->SetActiveCamera(m_headcam); //set the active camera for this renderer to main camera
     renderer->ResetCamera();
-    renderer->SetUseDepthPeeling(true);/*test opacity*/
+    //renderer->SetUseDepthPeeling(true);/*test opacity*/
 
     //WINDOW
     vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
     renderWindow->AddRenderer(renderer);
-    renderWindow->SetAlphaBitPlanes(true);/*test opacity*/
-    renderWindow->SetMultiSamples(0);/*test opacity*/
+    //renderWindow->SetAlphaBitPlanes(true);/*test opacity*/
+    //renderWindow->SetMultiSamples(0);/*test opacity*/
     m_windowsList.push_back(renderWindow);
 
     //INTERACTOR

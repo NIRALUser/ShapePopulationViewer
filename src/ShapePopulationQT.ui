@@ -517,23 +517,6 @@
             <string>Vectors</string>
            </attribute>
            <layout class="QGridLayout" name="gridLayout_2">
-            <item row="0" column="0" colspan="2">
-             <widget class="QCheckBox" name="checkBox_displayVectors">
-              <property name="text">
-               <string>Display vectors</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_meshOpacity">
-              <property name="text">
-               <string>Mesh Opacity : </string>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="1">
              <widget class="QSlider" name="slider_meshOpacity">
               <property name="maximum">
@@ -550,6 +533,13 @@
               </property>
              </widget>
             </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_meshOpacity">
+              <property name="text">
+               <string>Mesh Opacity : </string>
+              </property>
+             </widget>
+            </item>
             <item row="1" column="2">
              <widget class="QSpinBox" name="spinbox_meshOpacity">
               <property name="maximum">
@@ -560,17 +550,30 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="3">
-             <widget class="QLabel" name="label_purcentage1">
+            <item row="2" column="3">
+             <widget class="QLabel" name="label_purcentage2">
               <property name="text">
                <string>%</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_vectorScale">
+            <item row="2" column="2">
+             <widget class="QSpinBox" name="spinbox_vectorScale">
+              <property name="maximum">
+               <number>999</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" colspan="2">
+             <widget class="QCheckBox" name="checkBox_displayVectors">
               <property name="text">
-               <string>Vectors Scale :</string>
+               <string>Display vectors</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -587,30 +590,6 @@
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QSpinBox" name="spinbox_vectorScale">
-              <property name="maximum">
-               <number>999</number>
-              </property>
-              <property name="value">
-               <number>100</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="3">
-             <widget class="QLabel" name="label_purcentage2">
-              <property name="text">
-               <string>%</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_vectorDens">
-              <property name="text">
-               <string>Vectors Dens :</string>
               </property>
              </widget>
             </item>
@@ -644,6 +623,27 @@
              <widget class="QLabel" name="label_purcentage3">
               <property name="text">
                <string>%</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QLabel" name="label_purcentage1">
+              <property name="text">
+               <string>%</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_vectorScale">
+              <property name="text">
+               <string>Vectors Scale :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_vectorDens">
+              <property name="text">
+               <string>Vectors Dens :</string>
               </property>
              </widget>
             </item>

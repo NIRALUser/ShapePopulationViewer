@@ -22,10 +22,7 @@
 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
-#include "vtkExtractGrid.h"
 #include "vtkMaskPoints.h"
-#include "vtkImageShrink3D.h"
-#include "vtkImageGradient.h"
 
 
 #include <set>
