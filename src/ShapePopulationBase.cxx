@@ -97,8 +97,15 @@ void ShapePopulationBase::setLabelColor(double a_labelColor[])
         vtkSmartPointer<vtkTextProperty> cornerProperty = cornerAnnotation->GetTextProperty();
         cornerProperty->SetColor(m_labelColor);
 
-        //ScalarBar Update
+        //CornerAnnotation Update
         viewPropObject = propCollection->GetItemAsObject(3);
+        cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
+        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        cornerProperty = cornerAnnotation->GetTextProperty();
+        cornerProperty->SetColor(m_labelColor);
+
+        //ScalarBar Update
+        viewPropObject = propCollection->GetItemAsObject(4);
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
         scalarBar = (vtkScalarBarActor*)viewPropObject;
         vtkSmartPointer<vtkTextProperty> labelProperty = scalarBar->GetLabelTextProperty();
@@ -165,12 +172,21 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     interactor->SetRenderWindow(renderWindow);
 
-    //ANNOTATIONS
+    //ANNOTATIONS (file name)
     vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
     cornerAnnotation->SetLinearFontScaleFactor( 2 );
     cornerAnnotation->SetNonlinearFontScaleFactor( 1 );
     cornerAnnotation->SetMaximumFontSize( 15 );
     cornerAnnotation->SetText( 2,Mesh->GetFileName().c_str());
+    cornerAnnotation->GetTextProperty()->SetColor(m_labelColor);
+    renderer->AddViewProp(cornerAnnotation);
+
+    //ANNOTATIONS (attribute name)
+    cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
+    cornerAnnotation->SetLinearFontScaleFactor( 2 );
+    cornerAnnotation->SetNonlinearFontScaleFactor( 1 );
+    cornerAnnotation->SetMaximumFontSize( 15 );
+    cornerAnnotation->SetText(0,"test");
     cornerAnnotation->GetTextProperty()->SetColor(m_labelColor);
     renderer->AddViewProp(cornerAnnotation);
 
@@ -454,9 +470,11 @@ double * ShapePopulationBase::computeCommonRange(const char * a_cmap, std::vecto
 }
 void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsigned int > a_windowIndex)
 {
+
+    /* FIND DIMENSION OF ATTRIBUTE */
     int dim = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(a_cmap)->GetNumberOfComponents();
 
-    //test _mag
+    //test if _mag => in that case, we will take the cmap without _mag for the vectors
     std::string cmap = std::string(a_cmap);
     size_t found = cmap.rfind("_mag");
     std::string new_cmap = cmap.substr(0,found);
@@ -466,6 +484,20 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
         a_cmap = new_cmap.c_str();
     }
 
+    /* UPDATE ATTRIBUTE NAME (cornerAnnotation) */
+    for (unsigned int i = 0; i < a_windowIndex.size(); i++)
+    {
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+
+        //CornerAnnotation Update
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(3);
+        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
+        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        cornerAnnotation->ClearAllTexts();
+        cornerAnnotation->SetText(0,a_cmap);
+    }
+
+    /* ATTRIBUTE : SCALARS */
     if(dim == 1)
     {
         for (unsigned int i = 0; i < a_windowIndex.size(); i++)
@@ -487,6 +519,7 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
         m_commonRange[1] = commonRange[1];
     }
 
+    /* ATTRIBUTE : VECTORS */
     else if(dim == 3)
     {
         std::ostringstream strs;
