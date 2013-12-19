@@ -54,6 +54,7 @@ class ShapePopulationBase
     bool m_renderAllSelection;
     bool m_displayVectors;
     bool m_displayColorbar;
+    bool m_displayAttribute;
 
     void CreateNewWindow(std::string a_filePath);
 
@@ -68,11 +69,12 @@ class ShapePopulationBase
     void RealTimeRenderSynchro(bool realtime);
 
     //COLORMAP
+    double m_commonRange[2];
     void computeCommonAttributes();
     double* computeCommonRange(const char * a_cmap, std::vector<unsigned int> a_windowIndex);
     void UpdateAttribute(const char *a_cmap, std::vector<unsigned int> a_windowIndex);
     void UpdateColorMap(std::vector<unsigned int> a_windowIndex);
-    double m_commonRange[2];
+    void displayAttribute(bool display);
 
     //VECTORS
     void setMeshOpacity(double value);

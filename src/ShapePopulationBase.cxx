@@ -42,6 +42,7 @@ ShapePopulationBase::ShapePopulationBase()
     m_renderAllSelection = false; //changed
     m_displayVectors = true;
     m_displayColorbar = true;
+    m_displayAttribute = true;
 }
 
 void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
@@ -203,6 +204,7 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 
     renderer->AddActor2D(scalarBar);
     if (m_displayColorbar == false) scalarBar->SetVisibility(0);
+    if (m_displayAttribute == false) cornerAnnotation->SetVisibility(0);
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -687,6 +689,30 @@ void ShapePopulationBase::displayColorbar(bool display)
         {
             m_displayColorbar = false;
             scalarBar->SetVisibility(0);
+        }
+    }
+}
+
+void ShapePopulationBase::displayAttribute(bool display)
+{
+    for(unsigned int i = 0; i < m_windowsList.size() ; i++)
+    {
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+
+        // cornerAnnotation
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(3);
+        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
+        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+
+        if(display)
+        {
+            m_displayAttribute = true;
+            cornerAnnotation->SetVisibility(1);
+        }
+        else
+        {
+            m_displayAttribute = false;
+            cornerAnnotation->SetVisibility(0);
         }
     }
 }

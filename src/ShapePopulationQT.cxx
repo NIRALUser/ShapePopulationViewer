@@ -164,7 +164,7 @@ void ShapePopulationQT::loadColorMapCLP(std::string a_filePath)
     QString QFilePath(a_filePath.c_str());
     gradientWidget_VISU->loadColorPointList(QFilePath, &m_usedColorBar->colorPointList);
 
-    this->UpdateColorbar_QT();
+    this->updateColorbar_QT();
 }
 
 void ShapePopulationQT::loadCameraCLP(std::string a_filePath)
@@ -368,8 +368,8 @@ void ShapePopulationQT::deleteSelection()
     this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
     spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
     spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
-    this->UpdateColorbar_QT();
-    this->UpdateArrowPosition();
+    this->updateColorbar_QT();
+    this->updateArrowPosition();
     }
 }
 
@@ -548,7 +548,7 @@ void ShapePopulationQT::loadColorMap()
     m_colormapDirectory= file.path();
     gradientWidget_VISU->loadColorPointList(filename, &m_usedColorBar->colorPointList);
 
-    this->UpdateColorbar_QT();
+    this->updateColorbar_QT();
 }
 
 
@@ -633,8 +633,8 @@ void ShapePopulationQT::CreateWidgets()
     this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
     spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
     spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
-    this->UpdateColorbar_QT();
-    this->UpdateArrowPosition();
+    this->updateColorbar_QT();
+    this->updateArrowPosition();
 
     /* VECTORS UPDATE */
     //this->displayVectors(this->checkBox_displayVectors->isChecked());
@@ -659,7 +659,7 @@ void ShapePopulationQT::CreateWidgets()
     this->actionLoad_CSV->setText("Add CSV file");\
 
     /* DISPLAY INFOS */
-    this->displayInfo();
+    this->updateInfo_QT();
 
     /* GUI WIDGETS DISPLAY */
     unsigned int sum = 0;
@@ -716,8 +716,8 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         this->tabWidget->setEnabled(true);
 
         /* DISPLAY INFOS */
-        this->displayInfo();
-        this->displayAttribute();
+        this->updateInfo_QT();
+        this->updateAttribute_QT();
         this->setVectorDensity(this->spinbox_arrowDens->value());
     }
 }
@@ -755,7 +755,7 @@ void ShapePopulationQT::SelectAll()
     m_renderAllSelection = false;
 
     /* DISPLAY INFOS */
-    this->displayInfo();
+    this->updateInfo_QT();
 }
 
 
@@ -1068,7 +1068,7 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
 
         // Display colormap
         this->UpdateColorMap(m_selectedIndex);
-        this->UpdateArrowPosition();
+        this->updateArrowPosition();
 
         // Render
         m_renderAllSelection = true;
@@ -1077,7 +1077,7 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
     }
 }
 
-void ShapePopulationQT::UpdateColorbar_QT()
+void ShapePopulationQT::updateColorbar_QT()
 {
     // Update m_colorPointList from colorbar
     gradientWidget_VISU->getAllColors(&m_usedColorBar->colorPointList);
@@ -1113,7 +1113,7 @@ void ShapePopulationQT::UpdateColorbar_QT()
     }
 }
 
-void ShapePopulationQT::UpdateArrowPosition()
+void ShapePopulationQT::updateArrowPosition()
 {
     m_updateOnPositionChanged = false;
 
@@ -1140,8 +1140,8 @@ void ShapePopulationQT::on_spinBox_VISU_min_editingFinished()
     }
 
     m_usedColorBar->range[0] = spinBox_VISU_min->value();
-    this->UpdateColorbar_QT();
-    this->UpdateArrowPosition();
+    this->updateColorbar_QT();
+    this->updateArrowPosition();
 }
 
 void ShapePopulationQT::on_spinBox_VISU_max_editingFinished()
@@ -1152,8 +1152,8 @@ void ShapePopulationQT::on_spinBox_VISU_max_editingFinished()
         return;
     }
     m_usedColorBar->range[1] = spinBox_VISU_max->value();
-    this->UpdateColorbar_QT();
-    this->UpdateArrowPosition();
+    this->updateColorbar_QT();
+    this->updateArrowPosition();
 }
 
 
@@ -1164,8 +1164,8 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_clicked()
     spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
     spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
 
-    this->UpdateColorbar_QT();
-    this->UpdateArrowPosition();
+    this->updateColorbar_QT();
+    this->updateArrowPosition();
 
 }
 
@@ -1174,7 +1174,7 @@ void ShapePopulationQT::on_pushButton_VISU_delete_clicked()
     gradientWidget_VISU->deleteFocusArrow();
 
     if(gradientWidget_VISU->getNumberOfArrows() <= 2) pushButton_VISU_delete->setDisabled(true);
-    this->UpdateColorbar_QT();
+    this->updateColorbar_QT();
 }
 
 void ShapePopulationQT::on_spinBox_VISU_position_valueChanged(double arg1)
@@ -1191,7 +1191,7 @@ void ShapePopulationQT::on_spinBox_VISU_position_valueChanged(double arg1)
     else if(newPos > 1.0) gradientWidget_VISU->setFocusPosition(1.0);
 
     //update
-    this->UpdateColorbar_QT();
+    this->updateColorbar_QT();
 }
 
 void ShapePopulationQT::on_pushButton_VISU_add_clicked()
@@ -1201,14 +1201,14 @@ void ShapePopulationQT::on_pushButton_VISU_add_clicked()
     if (color.isValid())
     {
         gradientWidget_VISU->addArrow(color, 0.7, true);
-        this->UpdateColorbar_QT();
+        this->updateColorbar_QT();
     }
 }
 
 void ShapePopulationQT::on_pushButton_VISU_reset_clicked()
 {
     gradientWidget_VISU->reset();
-    this->UpdateColorbar_QT();
+    this->updateColorbar_QT();
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -1244,7 +1244,7 @@ void ShapePopulationQT::slot_gradArrow_doubleClicked()
         gradientWidget_VISU->setFocusColor(color);
     }
 
-    this->UpdateColorbar_QT();
+    this->updateColorbar_QT();
 }
 
 void ShapePopulationQT::slot_no_gradArrow_selected()
@@ -1257,7 +1257,7 @@ void ShapePopulationQT::slot_no_gradArrow_selected()
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                             INFO                                              * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-void ShapePopulationQT::displayInfo()
+void ShapePopulationQT::updateInfo_QT()
 {
     // Data Array Headers
     QStandardItemModel * model = (QStandardItemModel*)tableView->model();
@@ -1372,7 +1372,7 @@ void ShapePopulationQT::displayInfo()
     on_tabWidget_currentChanged(1);
 }
 
-void ShapePopulationQT::displayAttribute()
+void ShapePopulationQT::updateAttribute_QT()
 {
     if(m_selectedIndex.size() == 1)  // if new selection
     {
@@ -1452,5 +1452,14 @@ void ShapePopulationQT::on_checkBox_displayColorbar_toggled(bool checked)
     {
         m_windowsList[i]->Render();
     }
+}
 
+void ShapePopulationQT::on_checkBox_displayAttribute_toggled(bool checked)
+{
+    this->displayAttribute(checked);
+
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+        m_windowsList[i]->Render();
+    }
 }

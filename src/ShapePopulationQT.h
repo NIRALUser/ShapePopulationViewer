@@ -76,10 +76,10 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void dropEvent(QDropEvent* Qevent);
 
     // UPDATES & DISPLAY INFO
-    void UpdateColorbar_QT();
-    void UpdateArrowPosition();
-    void displayInfo();
-    void displayAttribute();
+    void updateColorbar_QT();
+    void updateAttribute_QT();
+    void updateArrowPosition();
+    void updateInfo_QT();
 
 
   protected slots:
@@ -172,6 +172,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
 
 private slots:
     void on_checkBox_displayColorbar_toggled(bool checked);
+    void on_checkBox_displayAttribute_toggled(bool checked);
 };
 
 #endif
