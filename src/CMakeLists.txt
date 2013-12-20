@@ -1,5 +1,3 @@
-
-
 # --- cmake -------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 2.8.3)
 if(COMMAND CMAKE_POLICY)
@@ -19,8 +17,10 @@ include(${VTK_USE_FILE})
 file(GLOB CXX_FILES *.cxx)
 file(GLOB UI_FILES *.ui)
 file(GLOB QT_WRAP *QT.h)
+file(GLOB QT_QRC_FILES *.qrc)
 QT4_WRAP_UI(UISrcs ${UI_FILES})
 QT4_WRAP_CPP(MOCSrcs ${QT_WRAP})
+QT4_ADD_RESOURCES(QRCrcs ${QT_QRC_FILES})
 
 # --- LIBRARIES ---------------------------------------------------------------------------
 if(VTK_LIBRARIES)
@@ -39,7 +39,7 @@ if( NOT ShapePopulationViewer_BUILD_SLICER_EXTENSION )
     SEMMacroBuildCLI(
         NAME ${LOCAL_PROJECT_NAME}
         EXECUTABLE_ONLY
-        ADDITIONAL_SRCS ${CXX_FILES} ${UISrcs} ${MOCSrcs}
+        ADDITIONAL_SRCS ${CXX_FILES} ${UISrcs} ${MOCSrcs} ${QRCrcs}
         TARGET_LIBRARIES ${ShapePopulationLIBS}
         INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
@@ -53,7 +53,7 @@ else()
     SEMMacroBuildCLI(
         NAME ${LOCAL_PROJECT_NAME}
         EXECUTABLE_ONLY
-        ADDITIONAL_SRCS ${CXX_FILES} ${UISrcs} ${MOCSrcs}
+        ADDITIONAL_SRCS ${CXX_FILES} ${UISrcs} ${MOCSrcs} ${QRCrcs}
         TARGET_LIBRARIES ${ShapePopulationLIBS}
         INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
