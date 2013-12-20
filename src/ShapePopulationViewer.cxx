@@ -51,6 +51,7 @@ int main( int argc, char** argv )
 
     // QT SOFTWARE
     QApplication app( argc, argv );
+    Q_INIT_RESOURCE(ShapePopulationViewer);
     ShapePopulationQT window;
     window.show();
 

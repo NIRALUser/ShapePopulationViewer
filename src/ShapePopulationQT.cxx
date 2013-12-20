@@ -27,6 +27,20 @@ ShapePopulationQT::ShapePopulationQT()
     pushButton_VISU_add->setStyleSheet("color: rgb(0, 200, 0)");
     pushButton_VISU_delete->setStyleSheet("color: rgb(200, 0, 0)");
 
+    //Checkbox icons
+    std::string eyeStyleSheet;
+    eyeStyleSheet += "QCheckBox::indicator:checked{ image: url(:/resources/eyeOpen.png);} ";
+    eyeStyleSheet += "QCheckBox::indicator:unchecked{ image: url(:/resources/eyeClosed.png);}";
+    eyeStyleSheet += "QCheckBox::indicator:checked:hover{ image: url(:/resources/eyeRed.png);} ";
+    eyeStyleSheet += "QCheckBox::indicator:checked:pressed{ image: url(:/resources/eyeHalf.png);} ";
+    eyeStyleSheet += "QCheckBox::indicator:unchecked:pressed{ image: url(:/resources/eyeHalf.png);}";
+    eyeStyleSheet += "QCheckBox::indicator:checked:disabled{ image: url(:/resources/eyeOpenDisabled.png);} ";
+    eyeStyleSheet += "QCheckBox::indicator:unchecked:disabled{ image: url(:/resources/eyeClosedDisabled.png);}";
+
+    this->checkBox_displayAttribute->setStyleSheet(QString::fromStdString(eyeStyleSheet));
+    this->checkBox_displayColorbar->setStyleSheet(QString::fromStdString(eyeStyleSheet));
+
+
     //Menu signals
     connect(actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
     connect(actionOpen_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
