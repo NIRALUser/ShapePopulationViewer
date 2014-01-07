@@ -10,6 +10,10 @@ find_package(SlicerExecutionModel REQUIRED)
 include(${SlicerExecutionModel_USE_FILE})
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
+if( ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION )
+    find_package(GenerateCLP REQUIRED)
+    include(${GenerateCLP_USE_FILE})
+endif()
 #find_package(Qt4 REQUIRED)
 #include(${QT_USE_FILE})        #-- In Common.cmake
 
@@ -35,33 +39,29 @@ endif()
 
 # --- SEMMacro ----------------------------------------------------------------------------
 
-if( NOT ShapePopulationViewer_BUILD_SLICER_EXTENSION )
-    SEMMacroBuildCLI(
-        NAME ${LOCAL_PROJECT_NAME}
-        EXECUTABLE_ONLY
-        ADDITIONAL_SRCS ${CXX_FILES} ${UISrcs} ${MOCSrcs} ${QRCrcs}
-        TARGET_LIBRARIES ${ShapePopulationLIBS}
-        INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-        INSTALL_RUNTIME_DESTINATION bin
-        INSTALL_LIBRARY_DESTINATION lib
-        INSTALL_ARCHIVE_DESTINATION lib
-    )
+if( NOT ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION )
+    set(INSTALL_RUNTIME_DEST bin)
 else()
-    SEMMacroBuildCLI(
-        NAME ${LOCAL_PROJECT_NAME}
-        EXECUTABLE_ONLY
-        ADDITIONAL_SRCS ${CXX_FILES} ${UISrcs} ${MOCSrcs} ${QRCrcs}
-        TARGET_LIBRARIES ${ShapePopulationLIBS}
-        INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-        INSTALL_ARCHIVE_DESTINATION lib
-    )
+    set(INSTALL_RUNTIME_DEST ${SlicerExecutionModel_DEFAULT_CLI_INSTALL_RUNTIME_DESTINATION}/../hidden-cli-modules)
+
+    generateCLP(SPV_SRCS_CLP ShapePopulationViewer.xml )
+    add_executable( Launcher Launcher/Launcher.cxx ${SPV_SRCS_CLP} )
+    install(TARGETS Launcher DESTINATION ${SlicerExecutionModel_DEFAULT_CLI_INSTALL_RUNTIME_DESTINATION} )
 endif()
+
+SEMMacroBuildCLI(
+    NAME ${LOCAL_PROJECT_NAME}
+    EXECUTABLE_ONLY
+    ADDITIONAL_SRCS ${CXX_FILES} ${UISrcs} ${MOCSrcs} ${QRCrcs}
+    TARGET_LIBRARIES ${ShapePopulationLIBS}
+    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+    INSTALL_RUNTIME_DESTINATION ${INSTALL_RUNTIME_DEST}
+    INSTALL_LIBRARY_DESTINATION lib
+    INSTALL_ARCHIVE_DESTINATION lib
+)
 
 
 # --- CTest -------------------------------------------------------------------------------

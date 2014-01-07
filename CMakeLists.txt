@@ -45,14 +45,14 @@ if(${LOCAL_PROJECT_NAME}_SUPERBUILD)
 else()
   project(${LOCAL_PROJECT_NAME})
 
-  if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
+  if( ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION )
     find_package(Slicer REQUIRED)
     include(${Slicer_USE_FILE})
   endif()
 
   include("${CMAKE_CURRENT_SOURCE_DIR}/${LOCAL_PROJECT_NAME}.cmake")
 
-  if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
+  if( ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION )
     include(${Slicer_EXTENSION_CPACK})
   endif()
 
