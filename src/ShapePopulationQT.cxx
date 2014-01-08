@@ -37,9 +37,13 @@ ShapePopulationQT::ShapePopulationQT()
     eyeStyleSheet += "QCheckBox::indicator:checked:disabled{ image: url(:/resources/eyeOpenDisabled.png);} ";
     eyeStyleSheet += "QCheckBox::indicator:unchecked:disabled{ image: url(:/resources/eyeClosedDisabled.png);}";
 
+    this->checkBox_displayMeshName->setStyleSheet(QString::fromStdString(eyeStyleSheet));
     this->checkBox_displayAttribute->setStyleSheet(QString::fromStdString(eyeStyleSheet));
     this->checkBox_displayColorbar->setStyleSheet(QString::fromStdString(eyeStyleSheet));
 
+    QPalette backgroundColor = frame_DISPLAY->palette();
+    backgroundColor.setColor( backgroundRole(), QColor( 255, 255, 255 ) );
+    frame_DISPLAY->setPalette( backgroundColor );
 
     //Menu signals
     connect(actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
@@ -88,6 +92,7 @@ ShapePopulationQT::ShapePopulationQT()
 
     //Display
     radioButton_DISPLAY_all->toggle();                          //Display All surfaces,
+    radioButton_SYNC_realtime->toggle();
 }
 
 
@@ -310,6 +315,8 @@ void ShapePopulationQT::deleteSelection()
 {
     if(m_selectedIndex.size() == 0) return;
 
+    this->scrollArea->setVisible(false);
+
     this->actionDelete->setDisabled(true);
 
     // Deleting the selection, the widget, and the data
@@ -354,36 +361,37 @@ void ShapePopulationQT::deleteSelection()
     }
     else
     {
+        ShapePopulationBase::SelectAll();
 
-    ShapePopulationBase::SelectAll();
+        computeCommonAttributes();                                                  // get the common attributes in m_commonAttributes
+        comboBox_VISU_attribute->clear();                                           // clear the Attributes in the comboBox
+        m_colorBarList.clear();                                                     // clear the existing colorbars
 
-    computeCommonAttributes();                                                  // get the common attributes in m_commonAttributes
-    comboBox_VISU_attribute->clear();                                           // clear the Attributes in the comboBox
-    m_colorBarList.clear();                                                     // clear the existing colorbars
+        m_updateOnAttributeChanged = false;
+        for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
+        {
+            colorBarStruct * colorBar = new colorBarStruct;                         //new colorbar for this attribute
+            gradientWidget_VISU->reset();                                           //create points
+            gradientWidget_VISU->getAllColors(&colorBar->colorPointList);           //get the points into the colorbar
+            this->UpdateAttribute(m_commonAttributes[i].c_str(), m_selectedIndex);  //create the range
+            colorBar->range[0] = m_commonRange[0];                                  //get the range into the colorbar
+            colorBar->range[1] = m_commonRange[1];
+            m_colorBarList.push_back(colorBar);                                     //add the colorbar to the list
 
-    m_updateOnAttributeChanged = false;
-    for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
-    {
-        colorBarStruct * colorBar = new colorBarStruct;                         //new colorbar for this attribute
-        gradientWidget_VISU->reset();                                           //create points
-        gradientWidget_VISU->getAllColors(&colorBar->colorPointList);           //get the points into the colorbar
-        this->UpdateAttribute(m_commonAttributes[i].c_str(), m_selectedIndex);  //create the range
-        colorBar->range[0] = m_commonRange[0];                                  //get the range into the colorbar
-        colorBar->range[1] = m_commonRange[1];
-        m_colorBarList.push_back(colorBar);                                     //add the colorbar to the list
+            comboBox_VISU_attribute->addItem(QString(m_commonAttributes[i].c_str()));   // Then add the attribute to the comboBox
+        }
+        m_updateOnAttributeChanged = true;
 
-        comboBox_VISU_attribute->addItem(QString(m_commonAttributes[i].c_str()));   // Then add the attribute to the comboBox
-    }
-    m_updateOnAttributeChanged = true;
+        this->UpdateAttribute(m_commonAttributes[0].c_str(), m_selectedIndex);
+        m_usedColorBar = m_colorBarList[0];
+        this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
+        spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
+        spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
+        this->updateColorbar_QT();
+        this->updateArrowPosition();
 
-
-    this->UpdateAttribute(m_commonAttributes[0].c_str(), m_selectedIndex);
-    m_usedColorBar = m_colorBarList[0];
-    this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
-    spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
-    spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
-    this->updateColorbar_QT();
-    this->updateArrowPosition();
+        this->updateInfo_QT();
+        on_spinBox_DISPLAY_columns_editingFinished();
     }
 }
 
@@ -616,8 +624,7 @@ void ShapePopulationQT::CreateWidgets()
     {
         m_windowsList.push_back(m_widgetList.at(i)->GetRenderWindow());
     }
-    radioButton_SYNC_delayed->toggle();
-    RealTimeRenderSynchro(false);                         //Start with a delayed synchro
+    RealTimeRenderSynchro(radioButton_SYNC_realtime->isChecked());              //Start with a realtime synchro
 
     /* ATTRIBUTES & COLORBARS */
     ShapePopulationBase::SelectAll();
@@ -651,16 +658,15 @@ void ShapePopulationQT::CreateWidgets()
     this->updateArrowPosition();
 
     /* VECTORS UPDATE */
-    //this->displayVectors(this->checkBox_displayVectors->isChecked());
-    this->setMeshOpacity(this->spinbox_meshOpacity->value()/100);
-    this->setVectorScale(this->spinbox_vectorScale->value()/100);
+    this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
+    this->setVectorScale((double)this->spinbox_vectorScale->value()/100.0);
     this->setVectorDensity(this->spinbox_arrowDens->value());
 
     m_numberOfMeshes = m_fileList.size();
     spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
 
-    /* CHECK POSITION */
-    on_comboBox_SYNC_position_currentIndexChanged();
+    /* CHECK ALIGNMENT */
+    on_comboBox_alignment_currentIndexChanged();
 
     /* GUI BUTTONS & ACTIONS */
     this->toolBox->setEnabled(true);
@@ -944,7 +950,7 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-// *                                         VIEW OPTIONS                                          * //
+// *                                       DISPLAY OPTIONS                                         * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 
@@ -971,6 +977,23 @@ void ShapePopulationQT::on_spinBox_DISPLAY_columns_editingFinished()
     this->scrollArea->setVisible(true);
 }
 
+void ShapePopulationQT::on_checkBox_displayColorbar_toggled(bool checked)
+{
+    this->displayColorbar(checked);
+    this->RenderAll();
+}
+
+void ShapePopulationQT::on_checkBox_displayAttribute_toggled(bool checked)
+{
+    this->displayAttribute(checked);
+    this->RenderAll();
+}
+
+void ShapePopulationQT::on_checkBox_displayMeshName_toggled(bool checked)
+{
+    this->displayMeshName(checked);
+    this->RenderAll();
+}
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                        SYNCHRONISATION                                        * //
@@ -981,7 +1004,6 @@ void ShapePopulationQT::on_radioButton_SYNC_realtime_toggled()
 {
     RealTimeRenderSynchro(true);
 }
-
 
 void ShapePopulationQT::on_radioButton_SYNC_delayed_toggled()
 {
@@ -998,30 +1020,7 @@ void ShapePopulationQT::on_pushButton_SYNC_unselect_clicked()
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-// *                                            CENTER                                             * //
-// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-
-void ShapePopulationQT::on_comboBox_SYNC_position_currentIndexChanged()
-{
-    // Get Attribute in ComboBox
-    QString position = this->comboBox_SYNC_position->currentText();
-
-    if(position == QString("Centered"))
-    {
-        this->PositionToCentered();
-    }
-    else if(position == QString("Original"))
-    {
-        this->PositionToOriginal();
-    }
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
-    {
-        m_windowsList[i]->Render();
-    }
-}
-
-// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-// *                                         AXIS FUNCTIONS                                        * //
+// *                                         VIEW FUNCTIONS                                        * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 void ShapePopulationQT::on_pushButton_VIEW_reset_clicked()
@@ -1047,6 +1046,16 @@ void ShapePopulationQT::on_toolButton_VIEW_S_clicked() {ChangeView(0,1,0);}
 
 void ShapePopulationQT::on_toolButton_VIEW_I_clicked() {ChangeView(0,-1,0);}
 
+void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged()
+{
+    // Get Attribute in ComboBox
+    int alignment = this->comboBox_alignment->currentIndex();
+
+    if(alignment == 0) this->AlignMesh(false);
+    else if(alignment == 1) this->AlignMesh(true);
+
+    this->RenderAll();
+}
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                     ATTRIBUTES COLORMAP                                       * //
@@ -1065,14 +1074,12 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         const char *cmap  = arr.data();
         this->UpdateAttribute(cmap, m_selectedIndex);
 
-        // Hide/Show Vector Tab
+        // Update Vectors
         int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
         if (dimension == 3)
         {
-            tab_vectors->setEnabled(true);
             this->setVectorDensity(this->spinbox_arrowDens->value());
         }
-        else tab_vectors->setEnabled(false);
 
         // Change the colorbar selected
         m_usedColorBar = m_colorBarList[index]; //the colorbar depends of the attribute
@@ -1423,57 +1430,24 @@ void ShapePopulationQT::on_slider_vectorScale_valueChanged(int value)
 {
     double val = (double)value/100;
     this->setVectorScale(val);
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
-    {
-        m_windowsList[i]->Render();
-    }
+    this->RenderAll();
 }
 
 void ShapePopulationQT::on_slider_meshOpacity_valueChanged(int value)
 {
     double val = (double)value/100;
     this->setMeshOpacity(val);
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
-    {
-        m_windowsList[i]->Render();
-    }
+    this->RenderAll();
 }
 
 void ShapePopulationQT::on_slider_arrowDens_valueChanged(int value)
 {
-    //double val = (double)value/100;
     this->setVectorDensity(value);
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
-    {
-        m_windowsList[i]->Render();
-    }
+    this->RenderAll();
 }
 
 void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
 {
     this->displayVectors(checked);
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
-    {
-        m_windowsList[i]->Render();
-    }
-}
-
-void ShapePopulationQT::on_checkBox_displayColorbar_toggled(bool checked)
-{
-    this->displayColorbar(checked);
-
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
-    {
-        m_windowsList[i]->Render();
-    }
-}
-
-void ShapePopulationQT::on_checkBox_displayAttribute_toggled(bool checked)
-{
-    this->displayAttribute(checked);
-
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
-    {
-        m_windowsList[i]->Render();
-    }
+    this->RenderAll();
 }

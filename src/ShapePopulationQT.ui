@@ -26,11 +26,11 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>ShapePopulationViewer 1.3.1</string>
+   <string>ShapePopulationViewer 1.3.2</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ShapePopulationViewer.qrc">
-    <normaloff>:/resources/eyeRed.png</normaloff>:/resources/eyeRed.png</iconset>
+    <normaloff>:/resources/logo.png</normaloff>:/resources/logo.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="acceptDrops">
@@ -287,7 +287,7 @@
          <widget class="QLabel" name="label_VISU_attribute">
           <property name="geometry">
            <rect>
-            <x>30</x>
+            <x>10</x>
             <y>30</y>
             <width>71</width>
             <height>31</height>
@@ -303,9 +303,9 @@
          <widget class="QComboBox" name="comboBox_VISU_attribute">
           <property name="geometry">
            <rect>
-            <x>110</x>
+            <x>90</x>
             <y>30</y>
-            <width>181</width>
+            <width>221</width>
             <height>31</height>
            </rect>
           </property>
@@ -493,22 +493,6 @@
              </property>
             </widget>
            </widget>
-           <widget class="QCheckBox" name="checkBox_displayColorbar">
-            <property name="geometry">
-             <rect>
-              <x>293</x>
-              <y>17</y>
-              <width>21</width>
-              <height>22</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
           </widget>
           <widget class="QWidget" name="tab_vectors">
            <attribute name="title">
@@ -571,7 +555,7 @@
                <string>Display vectors</string>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -600,7 +584,7 @@
                <number>1</number>
               </property>
               <property name="value">
-               <number>99</number>
+               <number>50</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -613,7 +597,7 @@
                <number>100</number>
               </property>
               <property name="value">
-               <number>99</number>
+               <number>50</number>
               </property>
              </widget>
             </item>
@@ -648,19 +632,6 @@
            </layout>
           </widget>
          </widget>
-         <widget class="QCheckBox" name="checkBox_displayAttribute">
-          <property name="geometry">
-           <rect>
-            <x>295</x>
-            <y>34</y>
-            <width>21</width>
-            <height>22</height>
-           </rect>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
         </widget>
        </item>
        <item>
@@ -687,7 +658,7 @@
           <property name="geometry">
            <rect>
             <x>30</x>
-            <y>170</y>
+            <y>145</y>
             <width>101</width>
             <height>27</height>
            </rect>
@@ -700,7 +671,7 @@
           <property name="geometry">
            <rect>
             <x>20</x>
-            <y>50</y>
+            <y>40</y>
             <width>120</width>
             <height>101</height>
            </rect>
@@ -926,6 +897,39 @@
           <zorder>toolButton_VIEW_P</zorder>
           <zorder>toolButton_VIEW_R</zorder>
          </widget>
+         <widget class="QLabel" name="label_aligned">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>185</y>
+            <width>61</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Aligned</string>
+          </property>
+         </widget>
+         <widget class="QComboBox" name="comboBox_alignment">
+          <property name="geometry">
+           <rect>
+            <x>80</x>
+            <y>185</y>
+            <width>61</width>
+            <height>27</height>
+           </rect>
+          </property>
+          <item>
+           <property name="text">
+            <string>Off</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>On</string>
+           </property>
+          </item>
+         </widget>
         </widget>
        </item>
        <item>
@@ -948,8 +952,8 @@
          <widget class="QRadioButton" name="radioButton_SYNC_realtime">
           <property name="geometry">
            <rect>
-            <x>20</x>
-            <y>40</y>
+            <x>10</x>
+            <y>30</y>
             <width>121</width>
             <height>22</height>
            </rect>
@@ -961,8 +965,8 @@
          <widget class="QRadioButton" name="radioButton_SYNC_delayed">
           <property name="geometry">
            <rect>
-            <x>20</x>
-            <y>70</y>
+            <x>10</x>
+            <y>60</y>
             <width>121</width>
             <height>22</height>
            </rect>
@@ -974,27 +978,63 @@
          <widget class="QPushButton" name="pushButton_SYNC_all">
           <property name="geometry">
            <rect>
-            <x>30</x>
-            <y>110</y>
-            <width>101</width>
+            <x>10</x>
+            <y>90</y>
+            <width>67</width>
             <height>27</height>
            </rect>
           </property>
           <property name="text">
-           <string>Select All</string>
+           <string>ALL</string>
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_SYNC_unselect">
           <property name="geometry">
            <rect>
-            <x>30</x>
-            <y>140</y>
-            <width>101</width>
+            <x>85</x>
+            <y>90</y>
+            <width>67</width>
             <height>27</height>
            </rect>
           </property>
           <property name="text">
-           <string>Unselect</string>
+           <string>NONE</string>
+          </property>
+         </widget>
+         <widget class="QTextBrowser" name="textBrowser">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>130</y>
+            <width>141</width>
+            <height>91</height>
+           </rect>
+          </property>
+          <property name="html">
+           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Ctrl+click&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; : select,&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;unselect windows&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Ctrl+A&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; (or ALL) :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;select all&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Esc&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; (or NONE) :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;unselect all&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;drag&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;rotation % Y , Z&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Ctrl+drag&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;rotation % X&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Shift+drag &lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;translation % Y , Z&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Alt+Shift+drag&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;translation % X&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </widget>
@@ -1023,33 +1063,33 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>40</y>
+            <y>130</y>
             <width>141</width>
             <height>22</height>
            </rect>
           </property>
           <property name="text">
-           <string>All Surfaces</string>
+           <string>All windows</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="radioButton_DISPLAY_square">
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>70</y>
+            <y>160</y>
             <width>141</width>
             <height>22</height>
            </rect>
           </property>
           <property name="text">
-           <string>Square Windows</string>
+           <string>Square windows</string>
           </property>
          </widget>
          <widget class="QSpinBox" name="spinBox_DISPLAY_columns">
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>102</y>
+            <y>190</y>
             <width>41</width>
             <height>27</height>
            </rect>
@@ -1059,48 +1099,153 @@
           <property name="geometry">
            <rect>
             <x>60</x>
-            <y>100</y>
+            <y>188</y>
             <width>63</width>
-            <height>31</height>
+            <height>27</height>
            </rect>
           </property>
           <property name="text">
            <string>columns</string>
           </property>
          </widget>
-         <widget class="QComboBox" name="comboBox_SYNC_position">
+         <widget class="QFrame" name="frame_DISPLAY">
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>170</y>
-            <width>101</width>
-            <height>27</height>
+            <y>30</y>
+            <width>146</width>
+            <height>91</height>
            </rect>
           </property>
-          <item>
-           <property name="text">
-            <string>Original</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Centered</string>
-           </property>
-          </item>
-         </widget>
-         <widget class="QLabel" name="label_DISPLAY_position">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>140</y>
-            <width>101</width>
-            <height>31</height>
-           </rect>
+          <property name="autoFillBackground">
+           <bool>true</bool>
           </property>
-          <property name="text">
-           <string>Alignement :</string>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
           </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <widget class="QCheckBox" name="checkBox_displayAttribute">
+           <property name="geometry">
+            <rect>
+             <x>7</x>
+             <y>65</y>
+             <width>21</width>
+             <height>22</height>
+            </rect>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_DISPLAY_attributeName">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>65</y>
+             <width>111</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Attribute Name</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox_displayMeshName">
+           <property name="geometry">
+            <rect>
+             <x>7</x>
+             <y>35</y>
+             <width>21</width>
+             <height>22</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox_displayColorbar">
+           <property name="geometry">
+            <rect>
+             <x>7</x>
+             <y>5</y>
+             <width>20</width>
+             <height>22</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_DISPLAY_attributeName_2">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>5</y>
+             <width>111</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Colorbar</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_DISPLAY_meshName">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>35</y>
+             <width>111</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Mesh Name</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+          <zorder>checkBox_displayAttribute</zorder>
+          <zorder>label_DISPLAY_attributeName</zorder>
+          <zorder>checkBox_displayMeshName</zorder>
+          <zorder>checkBox_displayColorbar</zorder>
+          <zorder>label_DISPLAY_attributeName_2</zorder>
+          <zorder>label_DISPLAY_meshName</zorder>
+          <zorder>checkBox_displayAttribute</zorder>
+          <zorder>label_DISPLAY_attributeName</zorder>
+          <zorder>checkBox_displayMeshName</zorder>
+          <zorder>checkBox_displayColorbar</zorder>
+          <zorder>label_DISPLAY_attributeName_2</zorder>
+          <zorder>label_DISPLAY_meshName</zorder>
          </widget>
+         <zorder>frame_DISPLAY</zorder>
+         <zorder>radioButton_DISPLAY_all</zorder>
+         <zorder>radioButton_DISPLAY_square</zorder>
+         <zorder>spinBox_DISPLAY_columns</zorder>
+         <zorder>label_DISPLAY_columns</zorder>
+         <zorder>label_DISPLAY_attributeName</zorder>
+         <zorder>checkBox_displayAttribute</zorder>
+         <zorder>checkBox_displayMeshName</zorder>
+         <zorder>checkBox_displayColorbar</zorder>
+         <zorder>label_DISPLAY_attributeName_2</zorder>
+         <zorder>label_DISPLAY_meshName</zorder>
+         <zorder>label_DISPLAY_attributeName</zorder>
+         <zorder>label_DISPLAY_attributeName_2</zorder>
+         <zorder>label_DISPLAY_meshName</zorder>
         </widget>
        </item>
       </layout>
@@ -1204,6 +1349,9 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <resources>
+  <include location="ShapePopulationViewer.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>slider_meshOpacity</sender>

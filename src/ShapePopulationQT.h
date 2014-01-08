@@ -109,12 +109,14 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void on_radioButton_DISPLAY_all_toggled();
     void on_radioButton_DISPLAY_square_toggled();
     void on_spinBox_DISPLAY_columns_editingFinished();
+    void on_checkBox_displayColorbar_toggled(bool checked);
+    void on_checkBox_displayAttribute_toggled(bool checked);
+    void on_checkBox_displayMeshName_toggled(bool checked);
 
     //SYNCHRO
     void on_radioButton_SYNC_realtime_toggled();
     void on_radioButton_SYNC_delayed_toggled();
     void on_pushButton_SYNC_all_clicked();
-    void on_comboBox_SYNC_position_currentIndexChanged();
     void on_pushButton_SYNC_unselect_clicked();
 
     //VIEW (Axis + Camera)
@@ -125,6 +127,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void on_toolButton_VIEW_S_clicked();
     void on_toolButton_VIEW_I_clicked();
     void on_pushButton_VIEW_reset_clicked();
+    void on_comboBox_alignment_currentIndexChanged();
 
     //BACKGROUND CONFIG
     void slot_selectedColor_valueChanged(QColor color);
@@ -143,7 +146,6 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void slot_viewup_vz_valueChanged(double arg1);
     void slot_scale_valueChanged(double arg1);
     void slot_newCameraConfig(cameraConfigStruct cam);
-
 
     //COLORMAP
     void on_comboBox_VISU_attribute_currentIndexChanged();
@@ -170,9 +172,6 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
   signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
 
-private slots:
-    void on_checkBox_displayColorbar_toggled(bool checked);
-    void on_checkBox_displayAttribute_toggled(bool checked);
 };
 
 #endif

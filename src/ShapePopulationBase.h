@@ -55,16 +55,18 @@ class ShapePopulationBase
     bool m_displayVectors;
     bool m_displayColorbar;
     bool m_displayAttribute;
+    bool m_displayMeshName;
 
     void CreateNewWindow(std::string a_filePath);
 
     //SELECTION
+    unsigned int getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow);
     virtual void ClickEvent(vtkObject* a_selectedObject, unsigned long, void*);
     virtual void SelectAll();
     virtual void UnselectAll();
-    unsigned int getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow);
     
     //RENDERING
+    void RenderAll();
     void RenderSelection();
     void RealTimeRenderSynchro(bool realtime);
 
@@ -74,23 +76,23 @@ class ShapePopulationBase
     double* computeCommonRange(const char * a_cmap, std::vector<unsigned int> a_windowIndex);
     void UpdateAttribute(const char *a_cmap, std::vector<unsigned int> a_windowIndex);
     void UpdateColorMap(std::vector<unsigned int> a_windowIndex);
-    void displayAttribute(bool display);
 
     //VECTORS
     void setMeshOpacity(double value);
     void setVectorScale(double value);
     void setVectorDensity(double value);
     void displayVectors(bool display);
-    void displayColorbar(bool display);
 
-    //CAMERA
+    //DISPLAY
+    void displayColorbar(bool display);
+    void displayAttribute(bool display);
+    void displayMeshName(bool display);
+
+    //CAMERA/VIEW
+    void AlignMesh(bool alignment);
     void ChangeView(int x, int y, int z);
     void ResetHeadcam();
     virtual void UpdateCameraConfig();
-
-    //CENTER
-    void PositionToCentered();
-    void PositionToOriginal();
 
     //BACKGROUND
     double m_selectedColor[3];

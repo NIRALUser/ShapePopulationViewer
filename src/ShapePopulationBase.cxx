@@ -40,9 +40,10 @@ ShapePopulationBase::ShapePopulationBase()
     m_labelColor[2] = 1.0;
 
     m_renderAllSelection = false; //changed
-    m_displayVectors = true;
+    m_displayVectors = false;
     m_displayColorbar = true;
     m_displayAttribute = true;
+    m_displayMeshName = true;
 }
 
 void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
@@ -74,10 +75,7 @@ void ShapePopulationBase::setBackgroundUnselectedColor(double a_unselectedColor[
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetBackground(m_selectedColor);
     }
 
-    for(unsigned int i = 0; i < m_windowsList.size(); i++)
-    {
-        m_windowsList[i]->Render();
-    }
+    this->RenderAll();
 }
 
 
@@ -174,22 +172,23 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     interactor->SetRenderWindow(renderWindow);
 
     //ANNOTATIONS (file name)
-    vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-    cornerAnnotation->SetLinearFontScaleFactor( 2 );
-    cornerAnnotation->SetNonlinearFontScaleFactor( 1 );
-    cornerAnnotation->SetMaximumFontSize( 15 );
-    cornerAnnotation->SetText( 2,Mesh->GetFileName().c_str());
-    cornerAnnotation->GetTextProperty()->SetColor(m_labelColor);
-    renderer->AddViewProp(cornerAnnotation);
+    vtkSmartPointer<vtkCornerAnnotation> fileName = vtkSmartPointer<vtkCornerAnnotation>::New();
+    fileName->SetLinearFontScaleFactor( 2 );
+    fileName->SetNonlinearFontScaleFactor( 1 );
+    fileName->SetMaximumFontSize( 15 );
+    fileName->SetText( 2,Mesh->GetFileName().c_str());
+    fileName->GetTextProperty()->SetColor(m_labelColor);
+    renderer->AddViewProp(fileName);
 
     //ANNOTATIONS (attribute name)
-    cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-    cornerAnnotation->SetLinearFontScaleFactor( 2 );
-    cornerAnnotation->SetNonlinearFontScaleFactor( 1 );
-    cornerAnnotation->SetMaximumFontSize( 15 );
-    cornerAnnotation->SetText(0,"test");
-    cornerAnnotation->GetTextProperty()->SetColor(m_labelColor);
-    renderer->AddViewProp(cornerAnnotation);
+    vtkSmartPointer<vtkCornerAnnotation> attributeName = vtkSmartPointer<vtkCornerAnnotation>::New();
+    attributeName = vtkSmartPointer<vtkCornerAnnotation>::New();
+    attributeName->SetLinearFontScaleFactor( 2 );
+    attributeName->SetNonlinearFontScaleFactor( 1 );
+    attributeName->SetMaximumFontSize( 15 );
+    attributeName->SetText(0,"test");
+    attributeName->GetTextProperty()->SetColor(m_labelColor);
+    renderer->AddViewProp(attributeName);
 
     // SCALAR BAR
     vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
@@ -203,13 +202,26 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     scalarBar->SetLabelTextProperty(LabelProperty);
 
     renderer->AddActor2D(scalarBar);
+
+    //DISPLAY
+    if (m_displayMeshName == false) fileName->SetVisibility(0);
+    if (m_displayAttribute == false) attributeName->SetVisibility(0);
     if (m_displayColorbar == false) scalarBar->SetVisibility(0);
-    if (m_displayAttribute == false) cornerAnnotation->SetVisibility(0);
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                          SELECTION                                            * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
+unsigned int ShapePopulationBase::getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow)
+{
+    unsigned int j=0;
+    for( j=0 ; j < m_windowsList.size() ; j++)
+    {
+        if (a_selectedWindow == m_windowsList[j]) break;
+    }
+    return j;
+}
 
 void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long, void*)
 {
@@ -359,6 +371,13 @@ void ShapePopulationBase::EndEventVTK(vtkObject*, unsigned long, void*)
 // *                                           RENDERING                                           * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
+void ShapePopulationBase::RenderAll()
+{
+    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    {
+        m_windowsList[i]->Render();
+    }
+}
 void ShapePopulationBase::RenderSelection()
 {
     if(m_selectedIndex.size()==0 || m_renderAllSelection == false) return;
@@ -547,6 +566,7 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
 
             // Glyph visibility
             if (m_displayVectors == true) glyphActor->SetVisibility(1);
+            else glyphActor->SetVisibility(0);
         }
 
         // Compute the largest range
@@ -568,7 +588,7 @@ void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowInd
         for (unsigned int j = 0; j < m_usedColorBar->colorPointList.size(); j++)
         {
             double position = m_usedColorBar->colorPointList[j].pos;
-            double x = spv_math::round_nplaces(m_usedColorBar->range[0] + range * position,2);
+            double x = m_usedColorBar->range[0] + range * position;
             double r = m_usedColorBar->colorPointList[j].r;
             double g = m_usedColorBar->colorPointList[j].g;
             double b = m_usedColorBar->colorPointList[j].b;
@@ -643,9 +663,11 @@ void ShapePopulationBase::setVectorDensity(double value)
 
 void ShapePopulationBase::displayVectors(bool display)
 {
+    if(display) m_displayVectors = true;
+    else m_displayVectors = false;
+
     for(unsigned int i = 0; i < m_windowsList.size() ; i++)
     {
-
         const char * a_cmap = m_meshList[i]->GetPolyData()->GetPointData()->GetScalars()->GetName();
         std::string cmap = std::string(a_cmap);
         size_t found = cmap.rfind("_mag");
@@ -656,29 +678,27 @@ void ShapePopulationBase::displayVectors(bool display)
             vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
             vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
 
-            if(display)
-            {
-                m_displayVectors = true;
-                glyphActor->SetVisibility(1);
-            }
-            else
-            {
-                m_displayVectors = false;
-                glyphActor->SetVisibility(0);
-            }
+            if(display) glyphActor->SetVisibility(1);
+            else glyphActor->SetVisibility(0);
         }
     }
 }
 
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                            DISPLAY                                            * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 void ShapePopulationBase::displayColorbar(bool display)
 {
     for(unsigned int i = 0; i < m_windowsList.size() ; i++)
     {
 
-        vtkActor2D * oldScalarBar = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+
+        // cornerAnnotation
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
+        scalarBar = (vtkScalarBarActor*)viewPropObject;
 
         if(display)
         {
@@ -712,6 +732,30 @@ void ShapePopulationBase::displayAttribute(bool display)
         else
         {
             m_displayAttribute = false;
+            cornerAnnotation->SetVisibility(0);
+        }
+    }
+}
+
+void ShapePopulationBase::displayMeshName(bool display)
+{
+    for(unsigned int i = 0; i < m_windowsList.size() ; i++)
+    {
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+
+        // cornerAnnotation
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
+        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
+        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+
+        if(display)
+        {
+            m_displayMeshName = true;
+            cornerAnnotation->SetVisibility(1);
+        }
+        else
+        {
+            m_displayMeshName = false;
             cornerAnnotation->SetVisibility(0);
         }
     }
@@ -772,26 +816,50 @@ void ShapePopulationBase::UpdateCameraConfig()
     m_headcamConfig.scale = m_headcam->GetParallelScale();
 }
 
-// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-// *                                            CENTER                                             * //
-// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-
-void ShapePopulationBase::PositionToOriginal()
+void ShapePopulationBase::AlignMesh(bool alignment)
 {
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
+    if(alignment == true)
     {
-        //Get the position
-        vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
-        actors->InitTraversal();
-        vtkSmartPointer<vtkActor> meshActor = actors->GetNextActor();
-        vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
+        for (unsigned int i = 0; i < m_windowsList.size();i++)
+        {
+            //Get the actual position
+            vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
+            actors->InitTraversal();
+            vtkSmartPointer<vtkActor> meshActor = actors->GetNextActor();
+            vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
+            double * position = meshActor->GetPosition();
+            double * center = meshActor->GetCenter();
 
-        //Update the position
-        double newposition[3] = {0,0,0};
-        meshActor->SetPosition(newposition);
-        glyphActor->SetPosition(newposition);
+            //Calculate the new position
+            double a = position[0]-center[0];
+            double b = position[1]-center[1];
+            double c = position[2]-center[2];
+            double newposition[3] = {a,b,c};
+
+            //Update the position
+            meshActor->SetPosition(newposition);
+            glyphActor->SetPosition(newposition);
+        }
     }
+    else
+    {
+        for (unsigned int i = 0; i < m_windowsList.size();i++)
+        {
+            //Get the position
+            vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
+            actors->InitTraversal();
+            vtkSmartPointer<vtkActor> meshActor = actors->GetNextActor();
+            vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
+
+            //Update the position
+            double newposition[3] = {0,0,0};
+            meshActor->SetPosition(newposition);
+            glyphActor->SetPosition(newposition);
+        }
+    }
+
     this->ResetHeadcam();
+
     for (unsigned int i = 0; i < m_windowsList.size();i++)
     {
         vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
@@ -802,49 +870,4 @@ void ShapePopulationBase::PositionToOriginal()
     {
         m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(m_headcam);
     }
-}
-
-void ShapePopulationBase::PositionToCentered()
-{
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
-    {
-        //Get the actual position
-        vtkActorCollection * actors = m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetActors();
-        actors->InitTraversal();
-        vtkSmartPointer<vtkActor> meshActor = actors->GetNextActor();
-        vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
-        double * position = meshActor->GetPosition();
-        double * center = meshActor->GetCenter();
-
-        //Calculate the new position
-        double a = position[0]-center[0];
-        double b = position[1]-center[1];
-        double c = position[2]-center[2];
-        double newposition[3] = {a,b,c};
-
-        //Update the position
-        meshActor->SetPosition(newposition);
-        glyphActor->SetPosition(newposition);
-    }
-    this->ResetHeadcam();
-    for (unsigned int i = 0; i < m_windowsList.size();i++)
-    {
-            vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
-            camera->DeepCopy(m_headcam);
-            m_windowsList[i]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(camera);
-    }
-    for (unsigned int i = 0; i < m_selectedIndex.size();i++)
-    {
-        m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(m_headcam);
-    }
-}
-
-unsigned int ShapePopulationBase::getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow)
-{
-    unsigned int j=0;
-    for( j=0 ; j < m_windowsList.size() ; j++)
-    {
-        if (a_selectedWindow == m_windowsList[j]) break;
-    }
-    return j;
 }

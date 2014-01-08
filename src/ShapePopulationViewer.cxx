@@ -54,6 +54,7 @@ int main( int argc, char** argv )
     Q_INIT_RESOURCE(ShapePopulationViewer);
     ShapePopulationQT window;
     window.show();
+    window.raise();
 
     // CLP
     if(!vtkFiles.empty())
