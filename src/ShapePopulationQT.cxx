@@ -10,8 +10,9 @@ ShapePopulationQT::ShapePopulationQT()
     m_updateOnPositionChanged = true;
     m_updateOnAttributeChanged = true;
     m_numberOfMeshes = 0;
-    m_lastDirectory = "~";
-    m_colormapDirectory = "~";
+    m_lastDirectory = "";
+    m_colormapDirectory = "";
+    m_exportDirectory = "";
     m_cameraDialog = new cameraDialogQT(this);
     m_backgroundDialog = new backgroundDialogQT(this);
     m_CSVloaderDialog = new CSVloaderQT(this);
@@ -22,6 +23,7 @@ ShapePopulationQT::ShapePopulationQT()
     menuOptions->setDisabled(true);
     actionDelete->setDisabled(true);
     actionDelete_All->setDisabled(true);
+    menuExport->setDisabled(true);
 
     //Pushbuttons color
     pushButton_VISU_add->setStyleSheet("color: rgb(0, 200, 0)");
@@ -57,6 +59,11 @@ ShapePopulationQT::ShapePopulationQT()
     connect(actionBackgroundConfig,SIGNAL(triggered()),this,SLOT(showBackgroundConfigWindow()));
     connect(actionLoad_Colorbar,SIGNAL(triggered()),this,SLOT(loadColorMap()));
     connect(actionSave_Colorbar,SIGNAL(triggered()),this,SLOT(saveColorMap()));
+    connect(actionTo_PDF,SIGNAL(triggered()),this,SLOT(exportToPDF()));
+    connect(actionTo_PS,SIGNAL(triggered()),this,SLOT(exportToPS()));
+    connect(actionTo_EPS,SIGNAL(triggered()),this,SLOT(exportToEPS()));
+    connect(actionTo_TEX,SIGNAL(triggered()),this,SLOT(exportToTEX()));
+    connect(actionTo_SVG,SIGNAL(triggered()),this,SLOT(exportToSVG()));
 
     //gradView Signals
     connect(gradientWidget_VISU,SIGNAL(arrowMovedSignal(qreal)), this, SLOT(slot_gradArrow_moved(qreal)));
@@ -293,6 +300,7 @@ void ShapePopulationQT::deleteAll()
     gradientWidget_VISU->disable();
     actionDelete_All->setDisabled(true);
     actionDelete->setDisabled(true);
+    menuExport->setDisabled(true);
     menuOptions->setDisabled(true);
 
     //Initialize Menu actions
@@ -318,6 +326,7 @@ void ShapePopulationQT::deleteSelection()
     this->scrollArea->setVisible(false);
 
     this->actionDelete->setDisabled(true);
+    this->menuExport->setDisabled(true);
 
     // Deleting the selection, the widget, and the data
     QGridLayout *Qlayout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
@@ -674,6 +683,7 @@ void ShapePopulationQT::CreateWidgets()
     this->menuOptions->setEnabled(true);
     this->actionDelete->setEnabled(true);
     this->actionDelete_All->setEnabled(true);
+    this->menuExport->setEnabled(true);
     this->actionOpen_Directory->setText("Add Directory");
     this->actionOpen_VTK_Files->setText("Add VTK files");
     this->actionLoad_CSV->setText("Add CSV file");\
@@ -721,6 +731,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
     {
         /* DISABLE GUI ACTIONS */
         this->actionDelete->setDisabled(true);
+        this->menuExport->setDisabled(true);
         this->groupBox_VIEW->setDisabled(true);
         this->groupBox_VISU->setDisabled(true);
         this->gradientWidget_VISU->disable();
@@ -730,6 +741,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
     {
         /* ENABLE GUI ACTIONS */
         this->actionDelete->setEnabled(true);
+        this->menuExport->setEnabled(true);
         this->groupBox_VIEW->setEnabled(true);
         this->groupBox_VISU->setEnabled(true);
         this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
@@ -752,6 +764,7 @@ void ShapePopulationQT::SelectAll()
 
     /* ENABLE GUI ACTIONS */
     this->actionDelete->setEnabled(true);
+    this->menuExport->setEnabled(true);
     this->groupBox_VIEW->setEnabled(true);
     this->groupBox_VISU->setEnabled(true);
     this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
@@ -788,6 +801,7 @@ void ShapePopulationQT::UnselectAll()
 
     /* DISABLE GUI ACTIONS */
     this->actionDelete->setDisabled(true);
+    this->menuExport->setDisabled(true);
     this->groupBox_VIEW->setDisabled(true);
     this->groupBox_VISU->setDisabled(true);
     this->gradientWidget_VISU->disable();
@@ -1426,6 +1440,11 @@ void ShapePopulationQT::updateAttribute_QT()
     }
 }
 
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                           VECTORS                                             * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
 void ShapePopulationQT::on_slider_vectorScale_valueChanged(int value)
 {
     double val = (double)value/100;
@@ -1450,4 +1469,105 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
 {
     this->displayVectors(checked);
     this->RenderAll();
+}
+
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                            EXPORT                                             * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
+void ShapePopulationQT::exportToPDF()
+{
+    QString showedFileName ;
+    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
+    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
+
+    QString basename = QFileDialog::getSaveFileName(this,tr("Save PDF files"),showedFileName,"PDF file (*.pdf)");
+    if(basename == "") return;
+    QFileInfo file(basename);
+    m_exportDirectory= file.path();
+    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
+
+    this->exportTo(2);
+}
+void ShapePopulationQT::exportToPS()
+{
+    QString showedFileName ;
+    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
+    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
+
+    QString basename = QFileDialog::getSaveFileName(this,tr("Save PS files"),showedFileName,"PS file (*.ps)");
+    if(basename == "") return;
+    QFileInfo file(basename);
+    m_exportDirectory= file.path();
+    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
+
+    this->exportTo(0);
+}
+void ShapePopulationQT::exportToEPS()
+{
+    QString showedFileName ;
+    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
+    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
+
+    QString basename = QFileDialog::getSaveFileName(this,tr("Save EPS files"),showedFileName,"EPS file (*.EPS)");
+    if(basename == "") return;
+    QFileInfo file(basename);
+    m_exportDirectory= file.path();
+    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
+
+    this->exportTo(1);
+}
+void ShapePopulationQT::exportToTEX()
+{
+    QString showedFileName ;
+    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
+    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
+
+    QString basename = QFileDialog::getSaveFileName(this,tr("Save TEX files"),showedFileName,"TEX file (*.TEX)");
+    if(basename == "") return;
+    QFileInfo file(basename);
+    m_exportDirectory= file.path();
+    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
+
+    this->exportTo(3);
+}
+void ShapePopulationQT::exportToSVG()
+{
+    QString showedFileName ;
+    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
+    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
+
+    QString basename = QFileDialog::getSaveFileName(this,tr("Save SVG files"),showedFileName,"SVG file (*.SVG)");
+    if(basename == "") return;
+    QFileInfo file(basename);
+    m_exportDirectory= file.path();
+    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
+
+    this->exportTo(4);
+}
+
+void ShapePopulationQT::exportTo(int fileFormat)
+{
+    vtkGL2PSExporter * exporter = vtkGL2PSExporter::New();
+    exporter->SetFileFormat(fileFormat);
+
+    for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
+    {
+        ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
+        QFileInfo meshfile(mesh->GetFileName().c_str());
+        QString meshName = meshfile.baseName();
+        QString meshAttribute(mesh->GetPolyData()->GetPointData()->GetScalars()->GetName());
+
+        #ifdef WIN32
+            QString filePrefix = m_exportDirectory + "\" + meshName + "_" + meshAttribute;
+        #else
+            QString filePrefix = m_exportDirectory + "/" + meshName + "_" + meshAttribute;
+        #endif
+        exporter->SetInput(m_windowsList[m_selectedIndex[i]]);
+        exporter->SetFilePrefix(filePrefix.toStdString().c_str());
+        exporter->Write();
+    }
+
+    exporter->Delete();
 }

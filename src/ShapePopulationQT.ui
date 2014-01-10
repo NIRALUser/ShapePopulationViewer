@@ -1219,33 +1219,12 @@ p, li { white-space: pre-wrap; }
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
           </widget>
-          <zorder>checkBox_displayAttribute</zorder>
-          <zorder>label_DISPLAY_attributeName</zorder>
-          <zorder>checkBox_displayMeshName</zorder>
-          <zorder>checkBox_displayColorbar</zorder>
-          <zorder>label_DISPLAY_attributeName_2</zorder>
-          <zorder>label_DISPLAY_meshName</zorder>
-          <zorder>checkBox_displayAttribute</zorder>
-          <zorder>label_DISPLAY_attributeName</zorder>
-          <zorder>checkBox_displayMeshName</zorder>
-          <zorder>checkBox_displayColorbar</zorder>
-          <zorder>label_DISPLAY_attributeName_2</zorder>
-          <zorder>label_DISPLAY_meshName</zorder>
          </widget>
          <zorder>frame_DISPLAY</zorder>
          <zorder>radioButton_DISPLAY_all</zorder>
          <zorder>radioButton_DISPLAY_square</zorder>
          <zorder>spinBox_DISPLAY_columns</zorder>
          <zorder>label_DISPLAY_columns</zorder>
-         <zorder>label_DISPLAY_attributeName</zorder>
-         <zorder>checkBox_displayAttribute</zorder>
-         <zorder>checkBox_displayMeshName</zorder>
-         <zorder>checkBox_displayColorbar</zorder>
-         <zorder>label_DISPLAY_attributeName_2</zorder>
-         <zorder>label_DISPLAY_meshName</zorder>
-         <zorder>label_DISPLAY_attributeName</zorder>
-         <zorder>label_DISPLAY_attributeName_2</zorder>
-         <zorder>label_DISPLAY_meshName</zorder>
         </widget>
        </item>
       </layout>
@@ -1266,10 +1245,22 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export Selection</string>
+     </property>
+     <addaction name="actionTo_PDF"/>
+     <addaction name="actionTo_PS"/>
+     <addaction name="actionTo_EPS"/>
+     <addaction name="actionTo_TEX"/>
+     <addaction name="actionTo_SVG"/>
+    </widget>
     <addaction name="separator"/>
     <addaction name="actionOpen_Directory"/>
     <addaction name="actionOpen_VTK_Files"/>
     <addaction name="actionLoad_CSV"/>
+    <addaction name="separator"/>
+    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionDelete"/>
     <addaction name="actionDelete_All"/>
@@ -1338,6 +1329,31 @@ p, li { white-space: pre-wrap; }
   <action name="actionBackgroundConfig">
    <property name="text">
     <string>Window colors</string>
+   </property>
+  </action>
+  <action name="actionTo_PDF">
+   <property name="text">
+    <string>PDF</string>
+   </property>
+  </action>
+  <action name="actionTo_PS">
+   <property name="text">
+    <string>PS</string>
+   </property>
+  </action>
+  <action name="actionTo_EPS">
+   <property name="text">
+    <string>EPS</string>
+   </property>
+  </action>
+  <action name="actionTo_TEX">
+   <property name="text">
+    <string>TEX</string>
+   </property>
+  </action>
+  <action name="actionTo_SVG">
+   <property name="text">
+    <string>SVG</string>
    </property>
   </action>
  </widget>

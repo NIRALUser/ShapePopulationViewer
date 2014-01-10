@@ -23,7 +23,7 @@
 
 
 #include <QDebug>
-
+#include <vtkGL2PSExporter.h>
 
 
 class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, public ShapePopulationBase
@@ -50,6 +50,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     unsigned int m_numberOfMeshes;
     QString m_lastDirectory;
     QString m_colormapDirectory;
+    QString m_exportDirectory;
     QFileInfoList m_fileList;
     std::vector<QVTKWidget *> m_widgetList;
     cameraDialogQT * m_cameraDialog;
@@ -167,6 +168,15 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void on_slider_meshOpacity_valueChanged(int value);
     void on_slider_vectorScale_valueChanged(int value);
     void on_slider_arrowDens_valueChanged(int value);
+
+    //EXPORT
+    void exportToPDF();
+    void exportToPS();
+    void exportToEPS();
+    void exportToTEX();
+    void exportToSVG();
+    void exportTo(int fileFormat);
+
 
     void UpdateCameraConfig();
   signals:
