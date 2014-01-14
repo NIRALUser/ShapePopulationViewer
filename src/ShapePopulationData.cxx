@@ -38,11 +38,12 @@ void ShapePopulationData::ReadMesh(std::string a_filePath)
 
         if(m_PolyData->GetPointData()->GetArray(j)->GetNumberOfComponents() == 3)
         {
-            vtkPVPostFilter *  test = vtkPVPostFilter::New();
+            vtkPVPostFilter *  getVectors = vtkPVPostFilter::New();
             std::ostringstream strs;
             strs.str(""); strs.clear();
             strs << AttributeName << "_mag" << std::endl;
-            test->DoAnyNeededConversions(m_PolyData,strs.str().c_str(),vtkDataObject::FIELD_ASSOCIATION_POINTS, AttributeName, "Magnitude");
+            getVectors->DoAnyNeededConversions(m_PolyData,strs.str().c_str(),vtkDataObject::FIELD_ASSOCIATION_POINTS, AttributeName, "Magnitude");
+            getVectors->Delete();
         }
     }
     std::sort(m_AttributeList.begin(),m_AttributeList.end());
