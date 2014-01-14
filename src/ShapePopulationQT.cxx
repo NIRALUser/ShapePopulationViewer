@@ -325,9 +325,6 @@ void ShapePopulationQT::deleteSelection()
 
     this->scrollArea->setVisible(false);
 
-    this->actionDelete->setDisabled(true);
-    this->menuExport->setDisabled(true);
-
     // Deleting the selection, the widget, and the data
     QGridLayout *Qlayout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
 
@@ -1268,6 +1265,8 @@ void ShapePopulationQT::slot_gradArrow_selected(qreal newPos)
     spinBox_VISU_position->setEnabled(true);
 
     this->slot_gradArrow_moved(newPos);
+    this->spinBox_VISU_position->setFocus();
+    this->spinBox_VISU_position->selectAll();
 }
 
 void ShapePopulationQT::slot_gradArrow_doubleClicked()
@@ -1331,7 +1330,7 @@ void ShapePopulationQT::updateInfo_QT()
             model->setItem(i,1,dimension);
 
             //Range
-            double * range;
+            double * range = m_commonRange;
             if(dim == 1)
             {
                 range = computeCommonRange(m_commonAttributes[i].c_str(), m_selectedIndex);
@@ -1383,7 +1382,7 @@ void ShapePopulationQT::updateInfo_QT()
             model->setItem(i,1,dimension);
 
             //Range
-            double * range;
+            double * range = m_commonRange;
             if(dim == 1)
             {
                 range = computeCommonRange(AttributesList[i].c_str(), m_selectedIndex);
@@ -1476,81 +1475,46 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
 // *                                            EXPORT                                             * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
-void ShapePopulationQT::exportToPDF()
-{
-    QString showedFileName ;
-    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
-    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
-
-    QString basename = QFileDialog::getSaveFileName(this,tr("Save PDF files"),showedFileName,"PDF file (*.pdf)");
-    if(basename == "") return;
-    QFileInfo file(basename);
-    m_exportDirectory= file.path();
-    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
-
-    this->exportTo(2);
-}
 void ShapePopulationQT::exportToPS()
 {
-    QString showedFileName ;
-    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
-    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
-
-    QString basename = QFileDialog::getSaveFileName(this,tr("Save PS files"),showedFileName,"PS file (*.ps)");
-    if(basename == "") return;
-    QFileInfo file(basename);
-    m_exportDirectory= file.path();
-    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
-
+    if (this->getExportDirectory() == 0) return;
     this->exportTo(0);
 }
 void ShapePopulationQT::exportToEPS()
 {
-    QString showedFileName ;
-    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
-    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
-
-    QString basename = QFileDialog::getSaveFileName(this,tr("Save EPS files"),showedFileName,"EPS file (*.EPS)");
-    if(basename == "") return;
-    QFileInfo file(basename);
-    m_exportDirectory= file.path();
-    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
-
+    if (this->getExportDirectory() == 0) return;
     this->exportTo(1);
+}
+void ShapePopulationQT::exportToPDF()
+{
+    if (this->getExportDirectory() == 0) return;
+    this->exportTo(2);
 }
 void ShapePopulationQT::exportToTEX()
 {
-    QString showedFileName ;
-    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
-    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
-
-    QString basename = QFileDialog::getSaveFileName(this,tr("Save TEX files"),showedFileName,"TEX file (*.TEX)");
-    if(basename == "") return;
-    QFileInfo file(basename);
-    m_exportDirectory= file.path();
-    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
-
+    if (this->getExportDirectory() == 0) return;
     this->exportTo(3);
 }
 void ShapePopulationQT::exportToSVG()
 {
-    QString showedFileName ;
-    if(m_exportDirectory.isEmpty()) showedFileName = "this file name will be replaced by the vtk files name";
-    else showedFileName = m_exportDirectory + "/this file name will be replaced by the vtk files name";
-
-    QString basename = QFileDialog::getSaveFileName(this,tr("Save SVG files"),showedFileName,"SVG file (*.SVG)");
-    if(basename == "") return;
-    QFileInfo file(basename);
-    m_exportDirectory= file.path();
-    std::cout<<basename.toStdString()<<std::endl<<m_exportDirectory.toStdString()<<std::endl;
-
+    if (this->getExportDirectory() == 0) return;
     this->exportTo(4);
+}
+
+int ShapePopulationQT::getExportDirectory()
+{
+    QFileDialog dirWindow;
+    QString dir = dirWindow.getExistingDirectory(this,tr("Save to Directory"),m_exportDirectory);
+    if(dir.isEmpty()) return 0;
+
+    m_exportDirectory= dir;
+    return 1;
 }
 
 void ShapePopulationQT::exportTo(int fileFormat)
 {
     vtkGL2PSExporter * exporter = vtkGL2PSExporter::New();
-    exporter->SetFileFormat(fileFormat);
+    exporter->SetFileFormat(fileFormat); //see vtkGL2PSExporter::OutputFormat
 
     for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
@@ -1558,12 +1522,8 @@ void ShapePopulationQT::exportTo(int fileFormat)
         QFileInfo meshfile(mesh->GetFileName().c_str());
         QString meshName = meshfile.baseName();
         QString meshAttribute(mesh->GetPolyData()->GetPointData()->GetScalars()->GetName());
+        QString filePrefix = m_exportDirectory + "/" + meshName + "_" + meshAttribute;
 
-        #ifdef WIN32
-            QString filePrefix = m_exportDirectory + "\" + meshName + "_" + meshAttribute;
-        #else
-            QString filePrefix = m_exportDirectory + "/" + meshName + "_" + meshAttribute;
-        #endif
         exporter->SetInput(m_windowsList[m_selectedIndex[i]]);
         exporter->SetFilePrefix(filePrefix.toStdString().c_str());
         exporter->Write();

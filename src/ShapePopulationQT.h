@@ -175,6 +175,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void exportToEPS();
     void exportToTEX();
     void exportToSVG();
+    int getExportDirectory();
     void exportTo(int fileFormat);
 
 
