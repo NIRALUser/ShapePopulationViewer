@@ -1408,34 +1408,38 @@ void ShapePopulationQT::updateInfo_QT()
 
 void ShapePopulationQT::updateAttribute_QT()
 {
-    if(m_selectedIndex.size() == 1)  // if new selection
+    if(m_selectedIndex.size() == 1)  // if new selection (TODO : wrong if unselect one and one left)
     {
         const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        const char * cmap_vector = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetVectors()->GetName();
-
         int index = comboBox_VISU_attribute->findText(cmap);
-        int index_vector = comboBox_VISU_attribute->findText(cmap_vector);
 
-        if (index !=comboBox_VISU_attribute->currentIndex() && index != -1)
+        if (index !=comboBox_VISU_attribute->currentIndex() && index != -1) // 1. different attribute (scalar)
         {
             comboBox_VISU_attribute->setCurrentIndex(index);
         }
-        else if (index == comboBox_VISU_attribute->currentIndex())
+        else if (index == comboBox_VISU_attribute->currentIndex())  // 2. same attribute but needs to update range
         {
             double * commonRange = computeCommonRange(cmap, m_selectedIndex);
             m_commonRange[0] = commonRange[0];
             m_commonRange[1] = commonRange[1];
         }
-        else if (index_vector !=comboBox_VISU_attribute->currentIndex() && index_vector != -1)
+        else // (if the scalar attribute cmap is a _mag one, it's vectors)
         {
-            comboBox_VISU_attribute->setCurrentIndex(index_vector);
+            const char * cmap_vector = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetVectors()->GetName();
+            int index_vector = comboBox_VISU_attribute->findText(cmap_vector);
+
+            if (index_vector !=comboBox_VISU_attribute->currentIndex() && index_vector != -1) // 3. different attribute (vector)
+            {
+                comboBox_VISU_attribute->setCurrentIndex(index_vector);
+            }
+            else if (index_vector == comboBox_VISU_attribute->currentIndex()) // 4. same attribute but need to update range (magnitude)
+            {
+                double * commonRange = computeCommonRange(cmap, m_selectedIndex);
+                m_commonRange[0] = commonRange[0];
+                m_commonRange[1] = commonRange[1];
+            }
         }
-        else if (index_vector == comboBox_VISU_attribute->currentIndex())
-        {
-            double * commonRange = computeCommonRange(cmap, m_selectedIndex);
-            m_commonRange[0] = commonRange[0];
-            m_commonRange[1] = commonRange[1];
-        }
+
     }
 }
 
