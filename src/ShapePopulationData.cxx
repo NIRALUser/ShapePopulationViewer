@@ -32,11 +32,15 @@ void ShapePopulationData::ReadMesh(std::string a_filePath)
     int numAttributes = m_PolyData->GetPointData()->GetNumberOfArrays();
     for (int j = 0; j < numAttributes; j++)
     {
+        int dim = m_PolyData->GetPointData()->GetArray(j)->GetNumberOfComponents();
         const char * AttributeName = m_PolyData->GetPointData()->GetArrayName(j);
-        std::string AttributeString = AttributeName;
-        m_AttributeList.push_back(AttributeString);
 
-        if(m_PolyData->GetPointData()->GetArray(j)->GetNumberOfComponents() == 3)
+        if (dim == 1 || dim == 3 )
+        {
+            std::string AttributeString = AttributeName;
+            m_AttributeList.push_back(AttributeString);
+        }
+        if( dim == 3)
         {
             vtkPVPostFilter *  getVectors = vtkPVPostFilter::New();
             std::ostringstream strs;
