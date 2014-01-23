@@ -594,8 +594,15 @@ void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowInd
             double b = m_usedColorBar->colorPointList[j].b;
             DistanceMapTFunc->AddRGBPoint(x,r,g,b);
         }
-        m_usedColorBar->range[0] = spv_math::round_nplaces(m_usedColorBar->range[0],2);
-        m_usedColorBar->range[1] = spv_math::round_nplaces(m_usedColorBar->range[1],2);
+
+        /* The two following lines where there to round the values on the scalarbar
+         * but it was also rounding the actual range and therefore the arrow position
+         * was restricted to sometime nothing.
+         * TODO : either copy the lookuptable and edit it for the scalarbar, either
+         * use vtk functions on the scalarbaractor (but bugs during last attempt.
+         */
+        //m_usedColorBar->range[0] = spv_math::round_nplaces(m_usedColorBar->range[0],2);
+        //m_usedColorBar->range[1] = spv_math::round_nplaces(m_usedColorBar->range[1],2);
         DistanceMapTFunc->AdjustRange(m_usedColorBar->range);
         DistanceMapTFunc->SetColorSpaceToRGB();
         DistanceMapTFunc->SetVectorModeToMagnitude(); /*test magnitude to scalars*/
