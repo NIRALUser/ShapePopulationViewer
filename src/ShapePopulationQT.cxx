@@ -174,7 +174,7 @@ void ShapePopulationQT::loadVTKDirCLP(QDir vtkDir)
     for (int i = 0; i < m_fileList.size(); i++)
     {
         QString QFilePath = m_fileList.at(i).canonicalFilePath();
-        if (!QFilePath.endsWith(".vtk"))
+        if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp"))
         {
             m_fileList.removeAt(i);
             i--;
@@ -206,7 +206,7 @@ void ShapePopulationQT::openDirectory()
 {
 
     // get directory
-    QString dir = QFileDialog::getExistingDirectory(this,tr("Open .vtk Directory"),m_lastDirectory,QFileDialog::ShowDirsOnly);
+    QString dir = QFileDialog::getExistingDirectory(this,tr("Open Directory"),m_lastDirectory,QFileDialog::ShowDirsOnly);
     if(dir.isEmpty() || !QDir(dir).exists()) return;
 
     // Add files in the fileList
@@ -218,7 +218,7 @@ void ShapePopulationQT::openDirectory()
     for (int i = 0; i < m_fileList.size(); i++)
     {
         QString QFilePath = m_fileList.at(i).canonicalFilePath();
-        if (!QFilePath.endsWith(".vtk"))
+        if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp"))
         {
             m_fileList.removeAt(i);
             i--;
@@ -232,7 +232,7 @@ void ShapePopulationQT::openDirectory()
 
 void ShapePopulationQT::openFiles()
 {
-    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open .vtk Files"),m_lastDirectory,"VTK Files (*.vtk)");
+    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open Files"),m_lastDirectory,"VTK Files (*.vtk *.vtp)");
     if(stringList.isEmpty()) return;
 
     m_lastDirectory=QFileInfo(stringList.at(0)).path();
@@ -930,11 +930,10 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
         for (int i = 0; i < urlList.size(); ++i)
         {
             QString filePath = urlList.at(i).toLocalFile();
-            if(filePath.endsWith(".vtk") && QFileInfo(filePath).exists())
+            if((filePath.endsWith(".vtk") || filePath.endsWith(".vtp")) && QFileInfo(filePath).exists())
             {
                 fileList.append(QFileInfo(filePath));
                 load = true;
-                //this->loadVTKFileCLP(QFileInfo(filePath));
             }
             else if(filePath.endsWith(".csv") && QFileInfo(filePath).exists())
             {

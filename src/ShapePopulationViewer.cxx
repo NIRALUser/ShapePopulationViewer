@@ -65,11 +65,10 @@ int main( int argc, char** argv )
         {
             QString QFilePath(vtkFiles[i].c_str());
             QFileInfo vtkFileInfo(QFilePath);
-            if (!QFilePath.endsWith(".vtk")) wrongFileFormat(vtkFiles[i],"vtk", &window);         // Control the files format
+            if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp")) wrongFileFormat(vtkFiles[i],"vtk/vtp", &window);         // Control the files format
             else if(!vtkFileInfo.exists()) fileDoesNotExist(vtkFiles[i], &window);                  // Control that the file exists
             else
             {
-                //window.loadVTKFileCLP(vtkFileInfo);
                 fileList.append(vtkFileInfo);
                 load = true;
             }

@@ -1275,7 +1275,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionOpen_VTK_Files">
    <property name="text">
-    <string>Open VTK Files</string>
+    <string>Open Files</string>
    </property>
   </action>
   <action name="actionLoad_CSV">

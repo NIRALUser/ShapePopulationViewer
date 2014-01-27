@@ -4,6 +4,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataReader.h>
+#include <vtkXMLPolyDataReader.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPointData.h>
 
@@ -22,6 +23,8 @@ class ShapePopulationData
     ~ShapePopulationData(){}
 
     void ReadMesh(std::string a_filePath);
+    vtkSmartPointer<vtkPolyData> ReadPolyData(std::string a_filePath);
+
 
     vtkSmartPointer<vtkPolyData> GetPolyData() {return m_PolyData;}
     std::string GetFilePath() {return m_FilePath;}

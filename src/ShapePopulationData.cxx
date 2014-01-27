@@ -1,22 +1,49 @@
 #include "ShapePopulationData.h"
 
+static bool endswith(std::string file, std::string ext)
+{
+    int epos = file.length() - ext.length();
+    if (epos < 0)
+    {
+        return false;
+    }
+    return file.rfind(ext) == (unsigned int)epos;
+}
 
 ShapePopulationData::ShapePopulationData()
 {
     m_PolyData = vtkSmartPointer<vtkPolyData>::New();
 }
 
+vtkSmartPointer<vtkPolyData> ShapePopulationData::ReadPolyData(std::string a_filePath)
+{
+    if (endswith(a_filePath, ".vtp"))
+    {
+        vtkSmartPointer<vtkXMLPolyDataReader> meshReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+        meshReader->SetFileName(a_filePath.c_str());
+        meshReader->Update();
+        return meshReader->GetOutput();
+    }
+    else if (endswith(a_filePath, ".vtk"))
+    {
+        vtkSmartPointer<vtkPolyDataReader> meshReader = vtkSmartPointer<vtkPolyDataReader>::New();
+        meshReader->SetFileName(a_filePath.c_str());
+        meshReader->Update();
+        return meshReader->GetOutput();
+    }
+    else
+    {
+        return NULL;
+    }
+}
 
 void ShapePopulationData::ReadMesh(std::string a_filePath)
 {
-    //initialize a vtkPolyDataReader to read the .vtk file
-    vtkSmartPointer<vtkPolyDataReader> meshReader = vtkSmartPointer<vtkPolyDataReader>::New();
-    meshReader->SetFileName ( a_filePath.c_str() );
-    meshReader->ReadAllScalarsOn();
-    meshReader->Update();
+    vtkSmartPointer<vtkPolyData> polyData = ReadPolyData(a_filePath);
+    if(polyData == NULL) return;
 
     vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
-    normalGenerator->SetInput(meshReader->GetOutput());
+    normalGenerator->SetInput(polyData);
     normalGenerator->SplittingOff();
     normalGenerator->ComputePointNormalsOn();
     normalGenerator->ComputeCellNormalsOff();
@@ -52,3 +79,5 @@ void ShapePopulationData::ReadMesh(std::string a_filePath)
     }
     std::sort(m_AttributeList.begin(),m_AttributeList.end());
 }
+
+
