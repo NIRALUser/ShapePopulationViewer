@@ -123,8 +123,11 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 
     //MAPPER
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    #if (VTK_MAJOR_VERSION < 6)
     mapper->SetInputConnection(Mesh->GetPolyData()->GetProducerPort());
-
+    #else
+    mapper->SetInputData(Mesh->GetPolyData());
+    #endif
     //ACTOR
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
@@ -135,7 +138,11 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
         //vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
         vtkSmartPointer<vtkGlyph3D> glyph = vtkSmartPointer<vtkGlyph3D>::New();
         //glyph->SetSourceConnection(arrow->GetOutputPort());
+        #if (VTK_MAJOR_VERSION < 6)
         glyph->SetInputConnection(Mesh->GetPolyData()->GetProducerPort());
+        #else
+        glyph->SetInputData(Mesh->GetPolyData());
+        #endif
         glyph->ScalingOn();
         glyph->OrientOn();
         glyph->ClampingOff();
@@ -146,7 +153,11 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 
         //Mapper & Actor
         vtkSmartPointer<vtkPolyDataMapper> glyphMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        #if (VTK_MAJOR_VERSION < 6)
         glyphMapper->SetInputConnection(glyph->GetOutputPort());
+        #else
+        glyphMapper->SetInputData(glyph->GetOutput());
+        #endif
         vtkSmartPointer<vtkActor> glyphActor = vtkSmartPointer<vtkActor>::New();
         glyphActor->SetMapper(glyphMapper);
 
@@ -658,13 +669,21 @@ void ShapePopulationBase::setVectorDensity(double value)
     {
         ShapePopulationData * mesh = m_meshList[i];
         vtkSmartPointer<vtkMaskPoints> filter = vtkSmartPointer<vtkMaskPoints>::New();
+        #if (VTK_MAJOR_VERSION < 6)
         filter->SetInputConnection(mesh->GetPolyData()->GetProducerPort());
+        #else
+        filter->SetInputData(mesh->GetPolyData());
+        #endif
         filter->SetOnRatio(101-value);
 
         vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
         vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[i];
         glyph->SetSourceConnection(arrow->GetOutputPort());
+        #if (VTK_MAJOR_VERSION < 6)
         glyph->SetInputConnection(filter->GetOutputPort());
+        #else
+        glyph->SetInputData(filter->GetOutput());
+        #endif
     }
 }
 

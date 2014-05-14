@@ -39,6 +39,8 @@ else()
   set(gen "${CMAKE_GENERATOR}")
 endif()
 
+set(EXTERNAL_SOURCE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Select where external packages will be downloaded" )
+set(EXTERNAL_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Select where external packages will be compiled and installed" )
 
 # With CMake 2.8.9 or later, the UPDATE_COMMAND is required for updates to occur.
 # For earlier versions, we nullify the update state to prevent updates and
