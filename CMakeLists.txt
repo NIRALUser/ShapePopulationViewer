@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 cmake_policy(VERSION 2.8.3)
 
+project(ShapePopulationViewer)
+
 set(LOCAL_PROJECT_NAME ShapePopulationViewer)
 
 #-----------------------------------------------------------------------------
@@ -8,11 +10,12 @@ set(LOCAL_PROJECT_NAME ShapePopulationViewer)
 #-----------------------------------------------------------------------------
 if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
     set(EXTENSION_HOMEPAGE "https://www.nitrc.org/projects/shapepopviewer/")
-    set(EXTENSION_CATEGORY "Surface Models")
+    set(EXTENSION_CATEGORY "Shape Analysis")
     set(EXTENSION_CONTRIBUTORS "Alexis Girault (NIRAL, UNC)")
     set(EXTENSION_DESCRIPTION "Visualize and interact with multiple surfaces at the same time to easily compare them")
     set(EXTENSION_ICONURL "https://www.nitrc.org/project/screenshot.php?group_id=759&screenshot_id=704")
     set(EXTENSION_SCREENSHOTURLS "http://wiki.na-mic.org/Wiki/images/8/81/Screenshot1.png http://wiki.na-mic.org/Wiki/images/1/13/SPVscreenshot2.png")
+    set(EXTENSION_DEPENDS "NA") # Specified as a space separated list or 'NA' if any
 
     set(${LOCAL_PROJECT_NAME}_SUPERBUILD OFF CACHE BOOL "Build ${LOCAL_PROJECT_NAME} and the projects it depends on via SuperBuild.cmake.")
 endif()
@@ -39,11 +42,10 @@ option(${LOCAL_PROJECT_NAME}_SUPERBUILD "Build ${LOCAL_PROJECT_NAME} and the pro
 # Superbuild script
 #-----------------------------------------------------------------------------
 if(${LOCAL_PROJECT_NAME}_SUPERBUILD)
-  project(${LOCAL_PROJECT_NAME}_SUPERBUILD)
+
   include("${CMAKE_CURRENT_SOURCE_DIR}/SuperBuild.cmake")
   return()
 else()
-  project(${LOCAL_PROJECT_NAME})
 
   if( ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION )
     find_package(Slicer REQUIRED)
