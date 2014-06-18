@@ -98,7 +98,7 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
   if(${PRIMARY_PROJECT_NAME}_USE_QT)
     if(USE_VTKv6)
       set(VTK_QT_ARGS
-        -DModule_vtkGUISupportQt:BOOL=ON
+        -DVTK_Group_Qt:BOOL=ON
         )
     else()
       set(VTK_QT_ARGS)
@@ -178,6 +178,7 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
       -DBUILD_EXAMPLES:BOOL=OFF
       -DBUILD_TESTING:BOOL=OFF
       -DVTK_USE_PARALLEL:BOOL=ON
+      -DVTK_USE_GL2PS:BOOL=ON
       -DVTK_DEBUG_LEAKS:BOOL=${${PROJECT_NAME}_USE_VTK_DEBUG_LEAKS}
       -DVTK_LEGACY_REMOVE:BOOL=OFF
       -DVTK_WRAP_TCL:BOOL=${VTK_WRAP_TCL}
