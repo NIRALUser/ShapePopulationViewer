@@ -1518,6 +1518,7 @@ void ShapePopulationQT::exportTo(int fileFormat)
 {
     vtkGL2PSExporter * exporter = vtkGL2PSExporter::New();
     exporter->SetFileFormat(fileFormat); //see vtkGL2PSExporter::OutputFormat
+    exporter->CompressOff();
 
     for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
