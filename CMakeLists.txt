@@ -9,6 +9,7 @@ set(LOCAL_PROJECT_NAME ShapePopulationViewer)
 # SLICER EXTENSION
 #-----------------------------------------------------------------------------
 if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
+    ADD_DEFINITIONS(-DSPV_EXTENSION=1)
     #VTK_VERSION_MAJOR is define but not a CACHE variable
     set( VTK_VERSION_MAJOR ${VTK_VERSION_MAJOR} CACHE STRING "Choose the expected VTK major version to build Slicer (5 or 6).")
     set(EXTENSION_HOMEPAGE "https://www.nitrc.org/projects/shapepopviewer/")

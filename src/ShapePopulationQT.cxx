@@ -25,6 +25,12 @@ ShapePopulationQT::ShapePopulationQT()
     actionDelete_All->setDisabled(true);
     menuExport->setDisabled(true);
 
+    #ifdef SPV_EXTENSION
+    menuExport->clear();
+    menuExport->addAction("PDF");
+    connect(menuExport->actions().at(0),SIGNAL(triggered()),this,SLOT(showNoExportWindow()));
+    #endif
+
     //Pushbuttons color
     pushButton_VISU_add->setStyleSheet("color: rgb(0, 200, 0)");
     pushButton_VISU_delete->setStyleSheet("color: rgb(200, 0, 0)");
@@ -1516,6 +1522,7 @@ int ShapePopulationQT::getExportDirectory()
 
 void ShapePopulationQT::exportTo(int fileFormat)
 {
+    #ifndef SPV_EXTENSION
     vtkGL2PSExporter * exporter = vtkGL2PSExporter::New();
     exporter->SetFileFormat(fileFormat); //see vtkGL2PSExporter::OutputFormat
     exporter->CompressOff();
@@ -1534,4 +1541,16 @@ void ShapePopulationQT::exportTo(int fileFormat)
     }
 
     exporter->Delete();
+    #endif
+}
+
+void ShapePopulationQT::showNoExportWindow()
+{
+    std::ostringstream strs;
+    strs << "GL2PS is not available in VTK's version of 3D Slicer." << std::endl << std::endl
+         << "To export your windows in high-resolution files, you can use the full "
+         << "version of ShapePopulationViewer, available on its NITRC webpage"<< std::endl
+         << "http://www.nitrc.org/projects/shapepopviewer"<< std::endl;
+
+    QMessageBox::about(this,"Not available in Slicer",QString(strs.str().c_str()));
 }

@@ -23,8 +23,9 @@
 
 
 #include <QDebug>
-#include <vtkGL2PSExporter.h>
-
+#ifndef SPV_EXTENSION
+  #include <vtkGL2PSExporter.h>
+#endif
 
 class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, public ShapePopulationBase
 {
@@ -177,6 +178,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void exportToSVG();
     int getExportDirectory();
     void exportTo(int fileFormat);
+    void showNoExportWindow();
 
 
     void UpdateCameraConfig();
