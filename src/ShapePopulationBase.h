@@ -1,6 +1,8 @@
 #ifndef SHAPEPOPULATIONBASE_H
 #define SHAPEPOPULATIONBASE_H
 
+#include <vtkVersion.h>
+
 #include "ShapePopulationData.h"
 #include "colorBarStruct.h"
 #include "cameraConfigStruct.h"
