@@ -25,7 +25,7 @@
 #ifndef __vtkPVPostFilter_h
 #define __vtkPVPostFilter_h
 
-#include <vtkVersion.h
+#include <vtkVersion.h>
 #include "vtkDataObjectAlgorithm.h"
 //#include "vtkStdString.h" // needed for: vtkStdString
 

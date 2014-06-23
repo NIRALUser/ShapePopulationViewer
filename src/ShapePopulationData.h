@@ -1,7 +1,7 @@
 #ifndef ShapePopulationData_H
 #define ShapePopulationData_H
 
-#include <vtkVersion.h
+#include <vtkVersion.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
