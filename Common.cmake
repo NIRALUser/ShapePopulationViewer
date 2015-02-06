@@ -28,14 +28,6 @@ endif()
 find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
 
-#-----------------------------------------------------------------------------
-# Update CMake module path
-#------------------------------------------------------------------------------
-set(CMAKE_MODULE_PATH
-  ${CMAKE_SOURCE_DIR}/CMake
-  ${CMAKE_SOURCE_DIR}/SuperBuild
-  ${CMAKE_MODULE_PATH}
-  )
 
 #-----------------------------------------------------------------------------
 # Sanity checks

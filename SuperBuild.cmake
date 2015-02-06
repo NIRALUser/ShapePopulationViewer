@@ -58,10 +58,13 @@ endif()
 # Superbuild option(s)
 #-----------------------------------------------------------------------------
 
+
+
+
 option(USE_SYSTEM_ITK "Build using an externally defined version of ITK" OFF)
 option(USE_SYSTEM_SlicerExecutionModel "Build using an externally defined version of SlicerExecutionModel"  OFF)
 option(USE_SYSTEM_VTK "Build using an externally defined version of VTK" OFF)
-
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
 #------------------------------------------------------------------------------
 # ${LOCAL_PROJECT_NAME} dependency list
 #------------------------------------------------------------------------------
@@ -169,7 +172,9 @@ list(APPEND ${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARS
   ITK_VERSION_MAJOR:STRING
   ITK_DIR:PATH
   VTK_DIR:PATH
+  VTK_VERSION_MAJOR:STRING
   SlicerExecutionModel_DIR:PATH
+  Slicer_DIR:PATH
   )
 
 _expand_external_project_vars()

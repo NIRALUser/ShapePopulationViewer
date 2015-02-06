@@ -8,14 +8,77 @@ endif()
 # --- INCLUDES ----------------------------------------------------------------------------
 find_package(SlicerExecutionModel REQUIRED)
 include(${SlicerExecutionModel_USE_FILE})
-find_package(VTK REQUIRED)
+
+if( VTK_VERSION_MAJOR EQUAL 6 )
+  set(Slicer_VTK_COMPONENTS
+    vtkCommonColor
+    vtkCommonComputationalGeometry
+    vtkCommonCore
+    vtkCommonDataModel
+    vtkCommonExecutionModel
+    vtkCommonMath
+    vtkCommonMisc
+    vtkCommonSystem
+    vtkCommonTransforms
+    vtkFiltersCore
+    vtkFiltersExtraction
+    vtkFiltersGeneral
+    vtkFiltersHybrid
+    vtkFiltersImaging
+    vtkFiltersModeling
+    vtkFiltersSources
+    vtkFiltersStatistics
+    vtkGUISupportQt
+    vtkIOCore
+    vtkIOGeometry
+    vtkIOImage
+    vtkIOInfovis
+#    vtkIOLegacy
+#    vtkIOXML
+#    vtkIOXMLParser
+    vtkImagingColor
+    vtkImagingCore
+    vtkImagingFourier
+    vtkImagingGeneral
+    vtkImagingHybrid
+    vtkImagingSources
+    vtkInfovisCore
+    vtkInfovisLayout
+    vtkInteractionStyle
+    vtkInteractionWidgets
+    vtkRenderingAnnotation
+    vtkRenderingCore
+    vtkRenderingVolumeOpenGL
+    vtkRenderingContextOpenGL
+    vtkRenderingLabel
+    vtkRenderingOpenGL
+    vtkRenderingVolume
+    vtkRenderingFreeTypeOpenGL
+    vtkRenderingFreeTypeFontConfig
+    vtkRenderingFreeType
+    vtkViewsCore
+    vtkViewsInfovis
+    vtkViewsQt
+    vtkalglib
+    vtkfreetype
+    vtkzlib
+    vtkftgl
+    vtkChartsCore 
+#    vtkRenderingGL2PS
+  )
+  if( NOT ShapePopulationViewer_BUILD_SLICER_EXTENSION )
+    message(FATAL_ERROR "plop")
+    list( APPEND Slicer_VTK_COMPONENTS vtkIOExport     vtkRenderingContext2D)
+  endif()
+endif()
+
+
+find_package(VTK REQUIRED COMPONENTS ${Slicer_VTK_COMPONENTS} )
 include(${VTK_USE_FILE})
 if( ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION )
     find_package(GenerateCLP REQUIRED)
     include(${GenerateCLP_USE_FILE})
 endif()
-#find_package(Qt4 REQUIRED)
-#include(${QT_USE_FILE})        #-- In Common.cmake
 
 # --- SRCS --------------------------------------------------------------------------------
 file(GLOB CXX_FILES *.cxx)
@@ -65,11 +128,11 @@ SEMMacroBuildCLI(
 
 
 # --- CTest -------------------------------------------------------------------------------
-#set(BUILD_TESTING ON CACHE BOOL "Build, configure and copy testing files")
+set(BUILD_TESTING ON CACHE BOOL "Build, configure and copy testing files")
 
-#if( BUILD_TESTING )
-#    enable_testing()
+if( BUILD_TESTING )
+  include(CTest)
 #    add_subdirectory( Testing )
-#endif()
+endif()
 
 
