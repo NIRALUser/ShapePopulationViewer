@@ -65,12 +65,13 @@ ShapePopulationQT::ShapePopulationQT()
     connect(actionBackgroundConfig,SIGNAL(triggered()),this,SLOT(showBackgroundConfigWindow()));
     connect(actionLoad_Colorbar,SIGNAL(triggered()),this,SLOT(loadColorMap()));
     connect(actionSave_Colorbar,SIGNAL(triggered()),this,SLOT(saveColorMap()));
+    #ifndef SPV_EXTENSION
     connect(actionTo_PDF,SIGNAL(triggered()),this,SLOT(exportToPDF()));
     connect(actionTo_PS,SIGNAL(triggered()),this,SLOT(exportToPS()));
     connect(actionTo_EPS,SIGNAL(triggered()),this,SLOT(exportToEPS()));
     connect(actionTo_TEX,SIGNAL(triggered()),this,SLOT(exportToTEX()));
     connect(actionTo_SVG,SIGNAL(triggered()),this,SLOT(exportToSVG()));
-
+    #endif
     //gradView Signals
     connect(gradientWidget_VISU,SIGNAL(arrowMovedSignal(qreal)), this, SLOT(slot_gradArrow_moved(qreal)));
     connect(gradientWidget_VISU,SIGNAL(arrowSelectedSignal(qreal)), this, SLOT(slot_gradArrow_selected(qreal)));
