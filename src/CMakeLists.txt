@@ -33,9 +33,8 @@ if( VTK_VERSION_MAJOR EQUAL 6 )
     vtkIOGeometry
     vtkIOImage
     vtkIOInfovis
-#    vtkIOLegacy
-#    vtkIOXML
-#    vtkIOXMLParser
+    vtkIOXML
+    vtkIOXMLParser
     vtkImagingColor
     vtkImagingCore
     vtkImagingFourier
@@ -49,12 +48,10 @@ if( VTK_VERSION_MAJOR EQUAL 6 )
     vtkRenderingAnnotation
     vtkRenderingCore
     vtkRenderingVolumeOpenGL
-    vtkRenderingContextOpenGL
     vtkRenderingLabel
     vtkRenderingOpenGL
     vtkRenderingVolume
     vtkRenderingFreeTypeOpenGL
-    vtkRenderingFreeTypeFontConfig
     vtkRenderingFreeType
     vtkViewsCore
     vtkViewsInfovis
@@ -64,11 +61,9 @@ if( VTK_VERSION_MAJOR EQUAL 6 )
     vtkzlib
     vtkftgl
     vtkChartsCore 
-#    vtkRenderingGL2PS
   )
   if( NOT ShapePopulationViewer_BUILD_SLICER_EXTENSION )
-    message(FATAL_ERROR "plop")
-    list( APPEND Slicer_VTK_COMPONENTS vtkIOExport     vtkRenderingContext2D)
+    list( APPEND Slicer_VTK_COMPONENTS vtkIOExport )
   endif()
 endif()
 
