@@ -1483,7 +1483,7 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                            EXPORT                                             * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-
+#ifndef SPV_EXTENSION
 void ShapePopulationQT::exportToPS()
 {
     if (this->getExportDirectory() == 0) return;
@@ -1522,7 +1522,6 @@ int ShapePopulationQT::getExportDirectory()
 
 void ShapePopulationQT::exportTo(int fileFormat)
 {
-    #ifndef SPV_EXTENSION
     vtkGL2PSExporter * exporter = vtkGL2PSExporter::New();
     exporter->SetFileFormat(fileFormat); //see vtkGL2PSExporter::OutputFormat
     exporter->CompressOff();
@@ -1541,8 +1540,8 @@ void ShapePopulationQT::exportTo(int fileFormat)
     }
 
     exporter->Delete();
-    #endif
 }
+#endif
 
 void ShapePopulationQT::showNoExportWindow()
 {

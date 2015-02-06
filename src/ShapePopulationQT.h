@@ -171,6 +171,7 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void on_slider_arrowDens_valueChanged(int value);
 
     //EXPORT
+    #ifndef SPV_EXTENSION
     void exportToPDF();
     void exportToPS();
     void exportToEPS();
@@ -178,8 +179,8 @@ class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, publ
     void exportToSVG();
     int getExportDirectory();
     void exportTo(int fileFormat);
+    #endif
     void showNoExportWindow();
-
 
     void UpdateCameraConfig();
   signals:
