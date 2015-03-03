@@ -1,4 +1,3 @@
-include(${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake)
 #-----------------------------------------------------------------------------
 set(verbose FALSE)
 
@@ -58,8 +57,8 @@ endif()
 # Superbuild option(s)
 #-----------------------------------------------------------------------------
 
-
-
+find_package(Qt4 REQUIRED)
+include(${QT_USE_FILE})
 
 option(USE_SYSTEM_ITK "Build using an externally defined version of ITK" OFF)
 option(USE_SYSTEM_SlicerExecutionModel "Build using an externally defined version of SlicerExecutionModel"  OFF)

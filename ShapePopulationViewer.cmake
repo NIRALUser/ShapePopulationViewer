@@ -22,7 +22,8 @@ if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
   resetForSlicer( NAMES CMAKE_C_COMPILER CMAKE_CXX_COMPILER CMAKE_CXX_FLAGS CMAKE_C_FLAGS )
 endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake)
+find_package(Qt4 REQUIRED)
+include(${QT_USE_FILE})
 
 add_subdirectory(src)
 

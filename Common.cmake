@@ -25,10 +25,6 @@ if(${ITK_VERSION_MAJOR} STREQUAL "3")
   set(USE_ITKv4 OFF)
 endif()
 
-find_package(Qt4 REQUIRED)
-include(${QT_USE_FILE})
-
-
 #-----------------------------------------------------------------------------
 # Sanity checks
 #------------------------------------------------------------------------------
