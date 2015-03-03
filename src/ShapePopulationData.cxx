@@ -75,7 +75,8 @@ void ShapePopulationData::ReadMesh(std::string a_filePath)
         {
             vtkPVPostFilter *  getVectors = vtkPVPostFilter::New();
             std::ostringstream strs;
-            strs.str(""); strs.clear();
+            strs.str("");
+            strs.clear();
             strs << AttributeName << "_mag" << std::endl;
             getVectors->DoAnyNeededConversions(m_PolyData,strs.str().c_str(),vtkDataObject::FIELD_ASSOCIATION_POINTS, AttributeName, "Magnitude");
             getVectors->Delete();

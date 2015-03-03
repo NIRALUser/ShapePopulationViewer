@@ -240,7 +240,10 @@ void ShapePopulationQT::openDirectory()
 void ShapePopulationQT::openFiles()
 {
     QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open Files"),m_lastDirectory,"VTK Files (*.vtk *.vtp)");
-    if(stringList.isEmpty()) return;
+    if(stringList.isEmpty())
+    {
+        return ;
+    }
 
     m_lastDirectory=QFileInfo(stringList.at(0)).path();
 
@@ -251,7 +254,10 @@ void ShapePopulationQT::openFiles()
     }
 
     // Display widgets
-    if(!m_fileList.isEmpty()) this->CreateWidgets();
+    if(!m_fileList.isEmpty())
+    {
+        this->CreateWidgets();
+    }
 }
 
 

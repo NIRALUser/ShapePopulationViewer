@@ -19,7 +19,6 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/SuperBuild
   ${CMAKE_MODULE_PATH}
   )
-include(${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake)
 
 ## NOTE THERE SHOULD BE NO PROJECT STATEMENT HERE!
 ## This file acts as a simple switch to initiate

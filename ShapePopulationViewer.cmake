@@ -22,6 +22,8 @@ if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
   resetForSlicer( NAMES CMAKE_C_COMPILER CMAKE_CXX_COMPILER CMAKE_CXX_FLAGS CMAKE_C_FLAGS )
 endif()
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake)
+
 add_subdirectory(src)
 
 if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
