@@ -1542,7 +1542,9 @@ void ShapePopulationQT::exportTo(int fileFormat)
         QString filePrefix = m_exportDirectory + "/" + meshName + "_" + meshAttribute;
 
         exporter->SetInput(m_windowsList[m_selectedIndex[i]]);
-        exporter->SetFilePrefix(filePrefix.toStdString().c_str());
+        std::string prefixString = filePrefix.toStdString() ;
+        prefixString = prefixString.erase( prefixString.find_last_not_of( " \n\r\t") + 1 ) ;
+        exporter->SetFilePrefix(prefixString.c_str());
         exporter->Write();
     }
 
