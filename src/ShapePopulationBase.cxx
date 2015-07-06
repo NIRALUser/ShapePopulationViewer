@@ -135,12 +135,13 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     /* VECTORS */
 
         //Arrow
-        //vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+
         vtkSmartPointer<vtkGlyph3D> glyph = vtkSmartPointer<vtkGlyph3D>::New();
-        //glyph->SetSourceConnection(arrow->GetOutputPort());
         #if (VTK_MAJOR_VERSION < 6)
         glyph->SetInputConnection(Mesh->GetPolyData()->GetProducerPort());
         #else
+        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+        glyph->SetSourceConnection(arrow->GetOutputPort());
         glyph->SetInputData(Mesh->GetPolyData());
         #endif
         glyph->ScalingOn();
@@ -149,6 +150,7 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
         glyph->SetColorModeToColorByVector();
         glyph->SetScaleModeToScaleByVector();
         glyph->SetVectorModeToUseVector();
+        glyph->Update();
         m_glyphList.push_back(glyph);
 
         //Mapper & Actor
@@ -656,10 +658,11 @@ void ShapePopulationBase::setVectorScale(double value)
 {
     for(unsigned int i = 0; i < m_glyphList.size() ; i++)
     {
-        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+//        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
         vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[i];
-        glyph->SetSourceConnection(arrow->GetOutputPort());
+//        glyph->SetSourceConnection(arrow->GetOutputPort());
         glyph->SetScaleFactor(value);
+        glyph->Update();
     }
 }
 
@@ -676,14 +679,9 @@ void ShapePopulationBase::setVectorDensity(double value)
         #endif
         filter->SetOnRatio(101-value);
 
-        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
         vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[i];
-        glyph->SetSourceConnection(arrow->GetOutputPort());
-        #if (VTK_MAJOR_VERSION < 6)
         glyph->SetInputConnection(filter->GetOutputPort());
-        #else
-        glyph->SetInputData(filter->GetOutput());
-        #endif
+        glyph->Update();
     }
 }
 
