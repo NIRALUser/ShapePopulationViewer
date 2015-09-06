@@ -107,6 +107,9 @@ ShapePopulationQT::ShapePopulationQT()
     //Display
     radioButton_DISPLAY_all->toggle();                          //Display All surfaces,
     radioButton_SYNC_realtime->toggle();
+    #if __APPLE__
+    Ui_ShapePopulationQT::menuBar->setNativeMenuBar(false);
+    #endif
 }
 
 
