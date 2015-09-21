@@ -6,6 +6,7 @@
 #include "ShapePopulationData.h"
 #include "colorBarStruct.h"
 #include "cameraConfigStruct.h"
+#include "valueDirectionColorMapStruct.h"
 
 #include <vtkCamera.h>                  //Camera
 #include <vtkPolyDataMapper.h>          //Mapper
@@ -22,28 +23,36 @@
 #include <vtkRendererCollection.h>      //GetRenderers
 #include <vtkActor2DCollection.h>       //GetActors2D
 
+
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <string.h>
+
+
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
 #include "vtkMaskPoints.h"
+
+
 
 
 #include <set>
 
 class ShapePopulationBase
 {
-  public :
-
+    public :
+    
     ShapePopulationBase();
     ~ShapePopulationBase(){} //delete the pointers in the lists
-
-
+    
+    
     void KeyPressEventVTK(vtkObject* a_selectedObject, unsigned long, void*);
     void CameraChangedEventVTK(vtkObject*, unsigned long, void*);
     void StartEventVTK(vtkObject*, unsigned long, void*);
     void EndEventVTK(vtkObject*, unsigned long, void*);
-
-  protected :
-
+    
+    protected :
+    
     std::vector<ShapePopulationData *> m_meshList;
     std::vector< vtkSmartPointer<vtkGlyph3D> > m_glyphList;
     std::vector< vtkSmartPointer<vtkRenderWindow> > m_windowsList;
@@ -53,14 +62,25 @@ class ShapePopulationBase
     std::vector<std::string> m_commonAttributes;
     colorBarStruct * m_usedColorBar;
     std::vector< colorBarStruct *> m_colorBarList;
+    valueDirectionColorMapStruct * m_usedValueDirectionColorMap;
+    std::vector< valueDirectionColorMapStruct * > m_valueDirectionColorMapList;
     bool m_renderAllSelection;
     bool m_displayVectors;
+    bool m_displayVectorsByMagnitude;
+    bool m_displayVectorsByDirection;
+    bool m_displayVectorsByAbsoluteDirection;
+    bool m_displayColorMapByMagnitude;
+    bool m_displayColorMapByDirection;
+    bool m_displayAbsoluteColorMapByDirection;
     bool m_displayColorbar;
     bool m_displayAttribute;
     bool m_displayMeshName;
-
+    bool m_createWidget;
+    double m_norm;
+    vtkSmartPointer<vtkActor> actorSphere;
+    
     void CreateNewWindow(std::string a_filePath);
-
+    
     //SELECTION
     unsigned int getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow);
     virtual void ClickEvent(vtkObject* a_selectedObject, unsigned long, void*);
@@ -71,31 +91,44 @@ class ShapePopulationBase
     void RenderAll();
     void RenderSelection();
     void RealTimeRenderSynchro(bool realtime);
-
+    
     //COLORMAP
     double m_commonRange[2];
+    double m_commonRangeDirection[6];
+    double m_commonRangeDirectionAbs[6];
     void computeCommonAttributes();
     double* computeCommonRange(const char * a_cmap, std::vector<unsigned int> a_windowIndex);
+    void computeRangeDirection(const char *a_cmap);
+    void computeNorm(const char *a_cmap);
+    void UpdateColorMapByDirection(const char *cmap, int index);
+    void UpdateColorMapByAbsoluteDirection(const char *cmap, int index);
     void UpdateAttribute(const char *a_cmap, std::vector<unsigned int> a_windowIndex);
+    void displayColorMapByMagnitude(bool display);
+    void displayColorMapByDirection(bool display);
+    void displayAbsoluteColorMapByDirection(bool display);
     void UpdateColorMap(std::vector<unsigned int> a_windowIndex);
-
+    
     //VECTORS
     void setMeshOpacity(double value);
     void setVectorScale(double value);
     void setVectorDensity(double value);
     void displayVectors(bool display);
-
+    void displayVectorsByMagnitude(bool display);
+    void displayVectorsByDirection(bool display);
+    void displayVectorsByAbsoluteDirection(bool display);
+    void UpdateVectorsByDirection();
+    
     //DISPLAY
     void displayColorbar(bool display);
     void displayAttribute(bool display);
     void displayMeshName(bool display);
-
+    
     //CAMERA/VIEW
     void AlignMesh(bool alignment);
     void ChangeView(int x, int y, int z);
     void ResetHeadcam();
     virtual void UpdateCameraConfig();
-
+    
     //BACKGROUND
     double m_selectedColor[3];
     double m_unselectedColor[3];
@@ -103,7 +136,7 @@ class ShapePopulationBase
     void setBackgroundSelectedColor(double a_selectedColor[]);
     void setBackgroundUnselectedColor(double a_unselectedColor[]);
     void setLabelColor(double a_labelColor[]);
-
+    
 };
 
 
