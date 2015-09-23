@@ -9,6 +9,7 @@ ShapePopulationQT::ShapePopulationQT()
     m_toolsDisplayed = true;
     m_updateOnPositionChanged = true;
     m_updateOnAttributeChanged = true;
+    m_linkCoordinate = false;
     m_numberOfMeshes = 0;
     m_lastDirectory = "";
     m_colormapDirectory = "";
@@ -36,6 +37,10 @@ ShapePopulationQT::ShapePopulationQT()
     //Pushbuttons color
     pushButton_VISU_add->setStyleSheet("color: rgb(0, 200, 0)");
     pushButton_VISU_delete->setStyleSheet("color: rgb(200, 0, 0)");
+
+    //Pushbuttons link
+    pushButton_VISU_link_coordinate->setIcon(QIcon(":/resources/LinkOff.png"));
+
     
     //Checkbox icons
     std::string eyeStyleSheet;
@@ -708,7 +713,6 @@ void ShapePopulationQT::CreateWidgets()
             valueDirectionColorMap->maxAbs[2] = 0.0;
             valueDirectionColorMap->norm = 0.0;
         }
-        //        std::cout<<"CreateWidgets m_commonAttributes[i] "<<m_commonAttributes[i].c_str()<<" m_norm "<<m_norm<<" min x "<<m_commonRangeDirection[0]<<" max x "<<m_commonRangeDirection[1]<<std::endl;
         
         m_valueDirectionColorMapList.push_back(valueDirectionColorMap);
         
@@ -875,62 +879,6 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         for(unsigned int k = 0 ; k < m_commonAttributes.size() ; k++)
         {
             int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[k].c_str())->GetNumberOfComponents();
-            valueDirectionColorMapStruct * valueDirectionColorMap = new valueDirectionColorMapStruct;
-            if (dimension == 3 )
-            {
-                this->computeNorm(m_commonAttributes[k].c_str());
-                this->computeRangeDirection(m_commonAttributes[k].c_str());
-                valueDirectionColorMap->min[0] = m_commonRangeDirection[0];
-                valueDirectionColorMap->max[0] = m_commonRangeDirection[1];
-                valueDirectionColorMap->min[1] = m_commonRangeDirection[2];
-                valueDirectionColorMap->max[1] = m_commonRangeDirection[3];
-                valueDirectionColorMap->min[2] = m_commonRangeDirection[4];
-                valueDirectionColorMap->max[2] = m_commonRangeDirection[5];
-                valueDirectionColorMap->minAbs[0] = m_commonRangeDirectionAbs[0];
-                valueDirectionColorMap->maxAbs[0] = m_commonRangeDirectionAbs[1];
-                valueDirectionColorMap->minAbs[1] = m_commonRangeDirectionAbs[2];
-                valueDirectionColorMap->maxAbs[1] = m_commonRangeDirectionAbs[3];
-                valueDirectionColorMap->minAbs[2] = m_commonRangeDirectionAbs[4];
-                valueDirectionColorMap->maxAbs[2] = m_commonRangeDirectionAbs[5];
-                valueDirectionColorMap->norm = m_norm;
-                
-                if(!m_displayAbsoluteColorMapByDirection)
-                {
-                    spinBox_VISU_min_AxisX->setValue(valueDirectionColorMap->min[0]);
-                    spinBox_VISU_max_AxisX->setValue(valueDirectionColorMap->max[0]);
-                    spinBox_VISU_min_AxisY->setValue(valueDirectionColorMap->min[1]);
-                    spinBox_VISU_max_AxisY->setValue(valueDirectionColorMap->max[1]);
-                    spinBox_VISU_min_AxisZ->setValue(valueDirectionColorMap->min[2]);
-                    spinBox_VISU_max_AxisZ->setValue(valueDirectionColorMap->max[2]);
-                }
-                else
-                {
-                    spinBox_VISU_min_AxisX->setValue(valueDirectionColorMap->minAbs[0]);
-                    spinBox_VISU_max_AxisX->setValue(valueDirectionColorMap->maxAbs[0]);
-                    spinBox_VISU_min_AxisY->setValue(valueDirectionColorMap->minAbs[1]);
-                    spinBox_VISU_max_AxisY->setValue(valueDirectionColorMap->maxAbs[1]);
-                    spinBox_VISU_min_AxisZ->setValue(valueDirectionColorMap->minAbs[2]);
-                    spinBox_VISU_max_AxisZ->setValue(valueDirectionColorMap->maxAbs[2]);
-                }
-            }
-            else if (dimension == 1 )
-            {
-                valueDirectionColorMap->min[0] = 0.0;
-                valueDirectionColorMap->max[0] = 0.0;
-                valueDirectionColorMap->min[1] = 0.0;
-                valueDirectionColorMap->max[1] = 0.0;
-                valueDirectionColorMap->min[2] = 0.0;
-                valueDirectionColorMap->max[2] = 0.0;
-                valueDirectionColorMap->minAbs[0] = 0.0;
-                valueDirectionColorMap->maxAbs[0] = 0.0;
-                valueDirectionColorMap->minAbs[1] = 0.0;
-                valueDirectionColorMap->maxAbs[1] = 0.0;
-                valueDirectionColorMap->minAbs[2] = 0.0;
-                valueDirectionColorMap->maxAbs[2] = 0.0;
-                valueDirectionColorMap->norm = 0.0;
-            }
-            m_valueDirectionColorMapList.push_back(valueDirectionColorMap);
-            
             if(dimension == 3 )
             {
                 this->UpdateColorMapByDirection(m_commonAttributes[k].c_str(),k);
@@ -1404,15 +1352,15 @@ void ShapePopulationQT::UpdateColorMapByDirection_QT()
     const char *cmap  = arr.data();
     std::ostringstream strs;
     strs.str(""); strs.clear();
-    strs << cmap << "_mag"<<std::endl;
-    std::string cmap_mag = strs.str();
+    strs << cmap << "_ColorByDirection"<<std::endl;
+    std::string cmap_dir = strs.str();
     
     //Get the windows with this attribute
     std::vector<unsigned int > windowsIndex;
     for(unsigned int i = 0 ; i < m_selectedIndex.size() ; i++)
     {
         const char * thisCmap = m_meshList[m_selectedIndex[i]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        if(std::string(thisCmap) == std::string(cmap) || std::string(thisCmap) == cmap_mag)
+        if(std::string(thisCmap) == std::string(cmap) || std::string(thisCmap) == cmap_dir)
         {
             windowsIndex.push_back(m_selectedIndex[i]);
         }
@@ -1420,7 +1368,10 @@ void ShapePopulationQT::UpdateColorMapByDirection_QT()
     
     //Updating this "sameattributewindows" list colormap
     this->UpdateColorMapByDirection(cmap,index);
-    
+    //Update the color of vectors
+    if(m_displayVectors && (m_displayVectorsByDirection || m_displayVectorsByAbsoluteDirection)) this->UpdateVectorsByDirection();
+
+
     //Rendering those windows...
     for(unsigned int i = 0 ; i < windowsIndex.size() ; i++)
     {
@@ -1438,15 +1389,15 @@ void ShapePopulationQT::UpdateColorMapByAbsoluteDirection_QT()
     const char *cmap  = arr.data();
     std::ostringstream strs;
     strs.str(""); strs.clear();
-    strs << cmap << "_mag"<<std::endl;
-    std::string cmap_mag = strs.str();
+    strs << cmap << "_AbsoluteColorByDirection"<<std::endl;
+    std::string cmap_abs = strs.str();
     
     //Get the windows with this attribute
     std::vector<unsigned int > windowsIndex;
     for(unsigned int i = 0 ; i < m_selectedIndex.size() ; i++)
     {
         const char * thisCmap = m_meshList[m_selectedIndex[i]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        if(std::string(thisCmap) == std::string(cmap) || std::string(thisCmap) == cmap_mag)
+        if(std::string(thisCmap) == std::string(cmap) || std::string(thisCmap) == cmap_abs)
         {
             windowsIndex.push_back(m_selectedIndex[i]);
         }
@@ -1454,6 +1405,9 @@ void ShapePopulationQT::UpdateColorMapByAbsoluteDirection_QT()
     
     //Updating this "sameattributewindows" list colormap
     this->UpdateColorMapByAbsoluteDirection(cmap,index);
+    //Update the color of vectors
+    if(m_displayVectors && (m_displayVectorsByDirection || m_displayVectorsByAbsoluteDirection)) this->UpdateVectorsByDirection();
+
     
     //Rendering those windows...
     for(unsigned int i = 0 ; i < windowsIndex.size() ; i++)
@@ -1470,15 +1424,18 @@ void ShapePopulationQT::computeRangeDirection_QT()
     const char *cmap  = arr.data();
     std::ostringstream strs;
     strs.str(""); strs.clear();
-    strs << cmap << "_mag"<<std::endl;
-    std::string cmap_mag = strs.str();
+    strs << cmap << "_ColorByDirection"<<std::endl;
+    std::string cmap_dir = strs.str();
+    strs.str(""); strs.clear();
+    strs << cmap << "_AbsoluteColorByDirection"<<std::endl;
+    std::string cmap_abs = strs.str();
     
     //Get the windows with this attribute
     std::vector<unsigned int > windowsIndex;
     for(unsigned int i = 0 ; i < m_selectedIndex.size() ; i++)
     {
         const char * thisCmap = m_meshList[m_selectedIndex[i]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        if(std::string(thisCmap) == std::string(cmap) || std::string(thisCmap) == cmap_mag)
+        if(std::string(thisCmap) == std::string(cmap) || std::string(thisCmap) == cmap_dir || std::string(thisCmap) == cmap_abs)
         {
             windowsIndex.push_back(m_selectedIndex[i]);
         }
@@ -1502,15 +1459,18 @@ void ShapePopulationQT::computeNorm_QT()
     const char *cmap  = arr.data();
     std::ostringstream strs;
     strs.str(""); strs.clear();
-    strs << cmap << "_mag"<<std::endl;
-    std::string cmap_mag = strs.str();
+    strs << cmap << "_ColorByDirection"<<std::endl;
+    std::string cmap_dir = strs.str();
+    strs.str(""); strs.clear();
+    strs << cmap << "_AbsoluteColorByDirection"<<std::endl;
+    std::string cmap_abs = strs.str();
     
     //Get the windows with this attribute
     std::vector<unsigned int > windowsIndex;
     for(unsigned int i = 0 ; i < m_selectedIndex.size() ; i++)
     {
         const char * thisCmap = m_meshList[m_selectedIndex[i]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        if(std::string(thisCmap) == std::string(cmap) || std::string(thisCmap) == cmap_mag)
+        if(std::string(thisCmap) == std::string(cmap) || std::string(thisCmap) == cmap_dir || std::string(thisCmap) == cmap_abs)
         {
             windowsIndex.push_back(m_selectedIndex[i]);
         }
@@ -1586,18 +1546,73 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_clicked()
 
 
 /* Range for the color map by direction */
+    // X coordinate
 void ShapePopulationQT::on_spinBox_VISU_min_AxisX_editingFinished()
 {
     if(spinBox_VISU_min_AxisX->value() > spinBox_VISU_max_AxisX->value())
     {
-        spinBox_VISU_min_AxisX->setValue(spinBox_VISU_max_AxisX->value());
-        return;
+        spinBox_VISU_min_AxisX->setValue(spinBox_VISU_max_AxisX->value());        
+//        return;
     }
+    if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        if(spinBox_VISU_min_AxisX->value() < 0) spinBox_VISU_min_AxisX->setValue(0);
+    }
+
+    if(m_linkCoordinate)
+    {
+        double Ymax =  spinBox_VISU_max_AxisY->value();
+        double Ymin =  spinBox_VISU_min_AxisY->value();
+        double Zmax =  spinBox_VISU_max_AxisZ->value();
+        double Zmin =  spinBox_VISU_min_AxisZ->value();
+
+        double newXmin = spinBox_VISU_min_AxisX->value();
+        double Xmax = spinBox_VISU_max_AxisX->value();
+
+        double newYmin;
+        double newZmin;
+
+        if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+        {
+            double Xmin = m_usedValueDirectionColorMap->min[0];
+
+            newYmin = Ymin + (( newXmin - Xmin ) * ( Ymax - Ymin ))/( Xmax - Xmin );
+            newZmin = Zmin + (( newXmin - Xmin ) * ( Zmax - Zmin ))/( Xmax - Xmin );
+
+            m_usedValueDirectionColorMap->min[1] = newYmin;
+            m_usedValueDirectionColorMap->min[2] = newZmin;
+
+            spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->min[1]);
+            spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
+        }
+        else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+        {
+            double Xmin = m_usedValueDirectionColorMap->minAbs[0];
+
+            newYmin = Ymin + (( newXmin - Xmin ) * ( Ymax - Ymin ))/( Xmax - Xmin );
+            newZmin = Zmin + (( newXmin - Xmin ) * ( Zmax - Zmin ))/( Xmax - Xmin );
+
+            if(newYmin > 0) m_usedValueDirectionColorMap->minAbs[1] = newYmin;
+            else m_usedValueDirectionColorMap->minAbs[1] = 0;
+            if(newZmin > 0) m_usedValueDirectionColorMap->minAbs[2] = newZmin;
+            else m_usedValueDirectionColorMap->minAbs[2] = 0;
+
+            spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->minAbs[1]);
+            spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->minAbs[2]);
+        }
+    }
+
     
-    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection) m_usedValueDirectionColorMap->min[0] = spinBox_VISU_min_AxisX->value();
-    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection) m_usedValueDirectionColorMap->minAbs[0] = spinBox_VISU_min_AxisX->value();
-    
-    this->UpdateColorMapByDirection_QT();
+    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->min[0] = spinBox_VISU_min_AxisX->value();
+        this->UpdateColorMapByDirection_QT();
+    }
+    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->minAbs[0] = spinBox_VISU_min_AxisX->value();
+        this->UpdateColorMapByAbsoluteDirection_QT();
+    }
 }
 
 void ShapePopulationQT::on_spinBox_VISU_max_AxisX_editingFinished()
@@ -1605,20 +1620,97 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisX_editingFinished()
     if(spinBox_VISU_max_AxisX->value() < spinBox_VISU_min_AxisX->value())
     {
         spinBox_VISU_max_AxisX->setValue(spinBox_VISU_min_AxisX->value());
-        return;
+//        return;
     }
     
-    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection) m_usedValueDirectionColorMap->max[0] = spinBox_VISU_max_AxisX->value();
-    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection) m_usedValueDirectionColorMap->maxAbs[0] = spinBox_VISU_max_AxisX->value();
-    
-    this->UpdateColorMapByDirection_QT();
-}
+    if(m_linkCoordinate)
+    {
+        double Ymax =  spinBox_VISU_max_AxisY->value();
+        double Ymin =  spinBox_VISU_min_AxisY->value();
+        double Zmax =  spinBox_VISU_max_AxisZ->value();
+        double Zmin =  spinBox_VISU_min_AxisZ->value();
 
+        double newXmax = spinBox_VISU_max_AxisX->value();
+        double Xmin = spinBox_VISU_min_AxisX->value();
+
+        double newYmax;
+        double newZmax;
+
+        if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+        {
+            double Xmax = m_usedValueDirectionColorMap->max[0];
+
+            newYmax = Ymax - (( Xmax - newXmax ) * ( Ymax - Ymin ))/( Xmax - Xmin );
+            newZmax = Zmax - (( Xmax - newXmax ) * ( Zmax - Zmin ))/( Xmax - Xmin );
+
+            m_usedValueDirectionColorMap->max[1] = newYmax;
+            m_usedValueDirectionColorMap->max[2] = newZmax;
+
+            spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
+            spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
+        }
+        else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+        {
+            double Xmax = m_usedValueDirectionColorMap->maxAbs[0];
+
+            newYmax = Ymax - (( Xmax - newXmax ) * ( Ymax - Ymin ))/( Xmax - Xmin );
+            newZmax = Zmax - (( Xmax - newXmax ) * ( Zmax - Zmin ))/( Xmax - Xmin );
+
+
+            m_usedValueDirectionColorMap->maxAbs[1] = newYmax;
+            m_usedValueDirectionColorMap->maxAbs[2] = newZmax;
+
+            spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->maxAbs[1]);
+            spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->maxAbs[2]);
+        }
+
+    }
+
+    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->max[0] = spinBox_VISU_max_AxisX->value();
+        this->UpdateColorMapByDirection_QT();
+    }
+    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->maxAbs[0] = spinBox_VISU_max_AxisX->value();
+        this->UpdateColorMapByAbsoluteDirection_QT();
+    }  
+}
 
 void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisX_clicked()
 {
     this->computeNorm_QT();
     this->computeRangeDirection_QT();
+
+    m_usedValueDirectionColorMap->norm = m_norm;
+
+    if(m_linkCoordinate)
+    {
+        if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+        {
+            m_usedValueDirectionColorMap->min[1] = m_commonRangeDirection[2];
+            m_usedValueDirectionColorMap->max[1] = m_commonRangeDirection[3];
+            spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->min[1]);
+            spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
+            m_usedValueDirectionColorMap->min[2] = m_commonRangeDirection[4];
+            m_usedValueDirectionColorMap->max[2] = m_commonRangeDirection[5];
+            spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
+            spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
+        }
+        else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+        {
+            m_usedValueDirectionColorMap->minAbs[1] = m_commonRangeDirectionAbs[2];
+            m_usedValueDirectionColorMap->maxAbs[1] = m_commonRangeDirectionAbs[3];
+            spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->minAbs[1]);
+            spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->maxAbs[1]);
+            m_usedValueDirectionColorMap->minAbs[2] = m_commonRangeDirectionAbs[4];
+            m_usedValueDirectionColorMap->maxAbs[2] = m_commonRangeDirectionAbs[5];
+            spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->minAbs[2]);
+            spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->maxAbs[2]);
+        }
+    }
+
     if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
     {
         m_usedValueDirectionColorMap->min[0] = m_commonRangeDirection[0];
@@ -1637,6 +1729,376 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisX_clicked()
     }
 }
 
+    // Y coordinate
+void ShapePopulationQT::on_spinBox_VISU_min_AxisY_editingFinished()
+{
+    if(spinBox_VISU_min_AxisY->value() > spinBox_VISU_max_AxisY->value())
+    {
+        spinBox_VISU_min_AxisY->setValue(spinBox_VISU_max_AxisY->value());
+//        return;
+    }
+    if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        if(spinBox_VISU_min_AxisY->value() < 0) spinBox_VISU_min_AxisY->setValue(0);
+    }
+
+    if(m_linkCoordinate)
+    {
+        double Xmax =  spinBox_VISU_max_AxisX->value();
+        double Xmin =  spinBox_VISU_min_AxisX->value();
+        double Zmax =  spinBox_VISU_max_AxisZ->value();
+        double Zmin =  spinBox_VISU_min_AxisZ->value();
+
+        double newYmin = spinBox_VISU_min_AxisY->value();
+        double Ymax = spinBox_VISU_max_AxisY->value();
+
+        double newXmin;
+        double newZmin;
+
+        if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+        {
+            double Ymin = m_usedValueDirectionColorMap->min[1];
+
+            newXmin = Xmin + (( newYmin - Ymin ) * ( Xmax - Xmin ))/( Ymax - Ymin );
+            newZmin = Zmin + (( newYmin - Ymin ) * ( Zmax - Zmin ))/( Ymax - Ymin );
+
+            m_usedValueDirectionColorMap->min[0] = newXmin;
+            m_usedValueDirectionColorMap->min[2] = newZmin;
+
+            spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->min[0]);
+            spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
+        }
+        else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+        {
+            double Ymin = m_usedValueDirectionColorMap->minAbs[1];
+
+            newXmin = Xmin + (( newYmin - Ymin ) * ( Xmax - Xmin ))/( Ymax - Ymin );
+            newZmin = Zmin + (( newYmin - Ymin ) * ( Zmax - Zmin ))/( Ymax - Ymin );
+
+            if(newXmin > 0) m_usedValueDirectionColorMap->minAbs[0] = newXmin;
+            else m_usedValueDirectionColorMap->minAbs[0] = 0;
+            if(newZmin > 0) m_usedValueDirectionColorMap->minAbs[2] = newZmin;
+            else m_usedValueDirectionColorMap->minAbs[2] = 0;
+
+            spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->minAbs[0]);
+            spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->minAbs[2]);
+        }
+    }
+
+    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->min[1] = spinBox_VISU_min_AxisY->value();
+        this->UpdateColorMapByDirection_QT();
+    }
+    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->minAbs[1] = spinBox_VISU_min_AxisY->value();
+        this->UpdateColorMapByAbsoluteDirection_QT();
+    }
+}
+
+void ShapePopulationQT::on_spinBox_VISU_max_AxisY_editingFinished()
+{
+    if(spinBox_VISU_max_AxisY->value() < spinBox_VISU_min_AxisY->value())
+    {
+        spinBox_VISU_max_AxisY->setValue(spinBox_VISU_min_AxisY->value());
+//        return;
+    }
+
+    if(m_linkCoordinate)
+    {
+        double Xmax =  spinBox_VISU_max_AxisX->value();
+        double Xmin =  spinBox_VISU_min_AxisX->value();
+        double Zmax =  spinBox_VISU_max_AxisZ->value();
+        double Zmin =  spinBox_VISU_min_AxisZ->value();
+
+        double newYmax = spinBox_VISU_max_AxisY->value();
+        double Ymin = spinBox_VISU_min_AxisY->value();
+
+        double newXmax;
+        double newZmax;
+
+        if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+        {
+            double Ymax = m_usedValueDirectionColorMap->max[1];
+
+            newXmax = Xmax - (( Ymax - newYmax ) * ( Xmax - Xmin ))/( Ymax - Ymin );
+            newZmax = Zmax - (( Ymax - newYmax ) * ( Zmax - Zmin ))/( Ymax - Ymin );
+
+            m_usedValueDirectionColorMap->max[0] = newXmax;
+            m_usedValueDirectionColorMap->max[2] = newZmax;
+
+            spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->max[0]);
+            spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
+        }
+        else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+        {
+            double Ymax = m_usedValueDirectionColorMap->maxAbs[1];
+
+            newXmax = Xmax - (( Ymax - newYmax ) * ( Xmax - Xmin ))/( Ymax - Ymin );
+            newZmax = Zmax - (( Ymax - newYmax ) * ( Zmax - Zmin ))/( Ymax - Ymin );
+
+            m_usedValueDirectionColorMap->maxAbs[0] = newXmax;
+            m_usedValueDirectionColorMap->maxAbs[2] = newZmax;
+
+            spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
+            spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->maxAbs[2]);
+        }
+    }
+
+    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->max[1] = spinBox_VISU_max_AxisY->value();
+        this->UpdateColorMapByDirection_QT();
+    }
+    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->maxAbs[1] = spinBox_VISU_max_AxisY->value();
+        this->UpdateColorMapByAbsoluteDirection_QT();
+    }
+}
+
+
+void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisY_clicked()
+{
+    this->computeNorm_QT();
+    this->computeRangeDirection_QT();
+
+    m_usedValueDirectionColorMap->norm = m_norm;
+
+    if(m_linkCoordinate)
+    {
+        if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+        {
+            m_usedValueDirectionColorMap->min[0] = m_commonRangeDirection[0];
+            m_usedValueDirectionColorMap->max[0] = m_commonRangeDirection[1];
+            spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->min[0]);
+            spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->max[0]);
+            m_usedValueDirectionColorMap->min[2] = m_commonRangeDirection[4];
+            m_usedValueDirectionColorMap->max[2] = m_commonRangeDirection[5];
+            spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
+            spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
+        }
+        else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+        {
+            m_usedValueDirectionColorMap->minAbs[0] = m_commonRangeDirectionAbs[0];
+            m_usedValueDirectionColorMap->maxAbs[0] = m_commonRangeDirectionAbs[1];
+            spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->minAbs[0]);
+            spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
+            m_usedValueDirectionColorMap->minAbs[2] = m_commonRangeDirectionAbs[4];
+            m_usedValueDirectionColorMap->maxAbs[2] = m_commonRangeDirectionAbs[5];
+            spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->minAbs[2]);
+            spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->maxAbs[2]);
+        }
+    }
+
+    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->min[1] = m_commonRangeDirection[2];
+        m_usedValueDirectionColorMap->max[1] = m_commonRangeDirection[3];
+        spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->min[1]);
+        spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
+        this->UpdateColorMapByDirection_QT();
+    }
+    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->minAbs[1] = m_commonRangeDirectionAbs[2];
+        m_usedValueDirectionColorMap->maxAbs[1] = m_commonRangeDirectionAbs[3];
+        spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->minAbs[1]);
+        spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->maxAbs[1]);
+        this->UpdateColorMapByAbsoluteDirection_QT();
+    }
+}
+
+    // Z coordinate
+void ShapePopulationQT::on_spinBox_VISU_min_AxisZ_editingFinished()
+{
+    if(spinBox_VISU_min_AxisZ->value() > spinBox_VISU_max_AxisZ->value())
+    {
+        spinBox_VISU_min_AxisZ->setValue(spinBox_VISU_max_AxisZ->value());
+//        return;
+    }
+    if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        if(spinBox_VISU_min_AxisZ->value() < 0) spinBox_VISU_min_AxisZ->setValue(0);
+    }
+
+    if(m_linkCoordinate)
+    {
+        double Xmax =  spinBox_VISU_max_AxisX->value();
+        double Xmin =  spinBox_VISU_min_AxisX->value();
+        double Ymax =  spinBox_VISU_max_AxisY->value();
+        double Ymin =  spinBox_VISU_min_AxisY->value();
+
+        double newZmin = spinBox_VISU_min_AxisZ->value();
+        double Zmax = spinBox_VISU_max_AxisZ->value();
+
+        double newXmin;
+        double newYmin;
+        if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+        {
+            double Zmin = m_usedValueDirectionColorMap->min[2];
+
+            newXmin = Xmin + (( newZmin - Zmin ) * ( Xmax - Xmin ))/( Zmax - Zmin );
+            newYmin = Ymin + (( newZmin - Zmin ) * ( Ymax - Ymin ))/( Zmax - Zmin );
+
+            m_usedValueDirectionColorMap->min[0] = newXmin;
+            m_usedValueDirectionColorMap->min[1] = newYmin;
+
+            spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->min[0]);
+            spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->min[1]);
+        }
+        else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+        {
+            double Zmin = m_usedValueDirectionColorMap->minAbs[2];
+
+            newXmin = Xmin + (( newZmin - Zmin ) * ( Xmax - Xmin ))/( Zmax - Zmin );
+            newYmin = Ymin + (( newZmin - Zmin ) * ( Ymax - Ymin ))/( Zmax - Zmin );
+
+            if(newXmin > 0) m_usedValueDirectionColorMap->minAbs[0] = newXmin;
+            else m_usedValueDirectionColorMap->minAbs[0] = 0;
+            if(newYmin > 0) m_usedValueDirectionColorMap->minAbs[1] = newYmin;
+            else m_usedValueDirectionColorMap->minAbs[1] = 0;
+
+            spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->minAbs[0]);
+            spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->minAbs[1]);
+        }
+    }
+
+    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->min[2] = spinBox_VISU_min_AxisZ->value();
+        this->UpdateColorMapByDirection_QT();
+    }
+    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->minAbs[2] = spinBox_VISU_min_AxisZ->value();
+        this->UpdateColorMapByAbsoluteDirection_QT();
+    }
+}
+
+void ShapePopulationQT::on_spinBox_VISU_max_AxisZ_editingFinished()
+{
+    if(spinBox_VISU_max_AxisZ->value() < spinBox_VISU_min_AxisZ->value())
+    {
+        spinBox_VISU_max_AxisZ->setValue(spinBox_VISU_min_AxisZ->value());
+//        return;
+    }
+
+    if(m_linkCoordinate)
+    {
+        double Xmax =  spinBox_VISU_max_AxisX->value();
+        double Xmin =  spinBox_VISU_min_AxisX->value();
+        double Ymax =  spinBox_VISU_max_AxisY->value();
+        double Ymin =  spinBox_VISU_min_AxisY->value();
+
+        double newZmax = spinBox_VISU_max_AxisZ->value();
+        double Zmin = spinBox_VISU_min_AxisZ->value();
+
+        double newXmax;
+        double newYmax;
+
+        if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+        {
+            double Zmax = m_usedValueDirectionColorMap->max[2];
+
+            newXmax = Xmax - (( Zmax - newZmax ) * ( Xmax - Xmin ))/( Zmax - Zmin );
+            newYmax = Ymax - (( Zmax - newZmax ) * ( Ymax - Ymin ))/( Zmax - Zmin );
+
+
+            m_usedValueDirectionColorMap->max[0] = newXmax;
+            m_usedValueDirectionColorMap->max[1] = newYmax;
+
+            spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->max[0]);
+            spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
+        }
+        else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+        {
+            double Zmax = m_usedValueDirectionColorMap->maxAbs[2];
+
+            newXmax = Xmax - (( Zmax - newZmax ) * ( Xmax - Xmin ))/( Zmax - Zmin );
+            newYmax = Ymax - (( Zmax - newZmax ) * ( Ymax - Ymin ))/( Zmax - Zmin );
+
+
+            m_usedValueDirectionColorMap->maxAbs[0] = newXmax;
+            m_usedValueDirectionColorMap->maxAbs[1] = newYmax;
+
+            spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
+            spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->maxAbs[1]);
+        }
+    }
+
+    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->max[2] = spinBox_VISU_max_AxisZ->value();
+        this->UpdateColorMapByDirection_QT();
+    }
+    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->maxAbs[2] = spinBox_VISU_max_AxisZ->value();
+        this->UpdateColorMapByAbsoluteDirection_QT();
+    }
+}
+
+
+void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisZ_clicked()
+{
+    this->computeNorm_QT();
+    this->computeRangeDirection_QT();
+
+    m_usedValueDirectionColorMap->norm = m_norm;
+
+    if(m_linkCoordinate)
+    {
+        if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+        {
+            m_usedValueDirectionColorMap->min[0] = m_commonRangeDirection[0];
+            m_usedValueDirectionColorMap->max[0] = m_commonRangeDirection[1];
+            spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->min[0]);
+            spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->max[0]);
+            m_usedValueDirectionColorMap->min[1] = m_commonRangeDirection[2];
+            m_usedValueDirectionColorMap->max[1] = m_commonRangeDirection[3];
+            spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->min[1]);
+            spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
+        }
+        else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+        {
+            m_usedValueDirectionColorMap->minAbs[0] = m_commonRangeDirectionAbs[0];
+            m_usedValueDirectionColorMap->maxAbs[0] = m_commonRangeDirectionAbs[1];
+            spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->minAbs[0]);
+            spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
+            m_usedValueDirectionColorMap->minAbs[1] = m_commonRangeDirectionAbs[2];
+            m_usedValueDirectionColorMap->maxAbs[1] = m_commonRangeDirectionAbs[3];
+            spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->minAbs[1]);
+            spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->maxAbs[1]);
+        }
+    }
+
+    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->min[2] = m_commonRangeDirection[4];
+        m_usedValueDirectionColorMap->max[2] = m_commonRangeDirection[5];
+        spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
+        spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
+        this->UpdateColorMapByDirection_QT();
+    }
+    else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+    {
+        m_usedValueDirectionColorMap->minAbs[2] = m_commonRangeDirectionAbs[4];
+        m_usedValueDirectionColorMap->maxAbs[2] = m_commonRangeDirectionAbs[5];
+        spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->minAbs[2]);
+        spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->maxAbs[2]);
+        this->UpdateColorMapByAbsoluteDirection_QT();
+    }
+}
+
+void ShapePopulationQT::on_pushButton_VISU_link_coordinate_clicked()
+{
+    m_linkCoordinate = !m_linkCoordinate;
+    if(m_linkCoordinate)pushButton_VISU_link_coordinate->setIcon(QIcon(":/resources/LinkOn.png"));
+    else pushButton_VISU_link_coordinate->setIcon(QIcon(":/resources/LinkOff.png"));
+
+}
 
 /* End */
 
@@ -1701,8 +2163,7 @@ void ShapePopulationQT::on_radioButton_displayColorMapByDirection_toggled(bool c
         ColorMapByDirection->show();
         ColorMapByMagnitude->hide();
     }
-    if (m_displayAbsoluteColorMapByDirection == false) this->displayColorMapByDirection(checked);
-    else this->displayAbsoluteColorMapByDirection(true);
+    this->displayColorMapByDirection(checked);
     
     int index = this->comboBox_VISU_attribute->currentIndex();
     m_usedValueDirectionColorMap = m_valueDirectionColorMapList[index];
@@ -1731,7 +2192,7 @@ void ShapePopulationQT::on_radioButton_displayColorMapByDirection_toggled(bool c
 void ShapePopulationQT::on_checkBox_displayAbsoluteColorMapByDirection_toggled(bool checked)
 {
     this->displayAbsoluteColorMapByDirection(checked);
-    if(!checkBox_displayAbsoluteColorMapByDirection->isChecked())
+    if(!checkBox_displayAbsoluteColorMapByDirection->isChecked() && !radioButton_displayColorMapByMagnitude->isChecked())
     {
         this->displayColorMapByDirection(true);
     }

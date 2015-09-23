@@ -375,13 +375,13 @@
              </rect>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="ColorMapByDirection">
              <widget class="QCheckBox" name="checkBox_displayAbsoluteColorMapByDirection">
               <property name="geometry">
                <rect>
-                <x>10</x>
+                <x>0</x>
                 <y>10</y>
                 <width>271</width>
                 <height>20</height>
@@ -391,7 +391,7 @@
                <string>Display color map by absolute direction</string>
               </property>
              </widget>
-             <widget class="QLabel" name="label_VISU_attribute_4">
+             <widget class="QLabel" name="label_VISU_range_2">
               <property name="geometry">
                <rect>
                 <x>0</x>
@@ -637,6 +637,19 @@
                 <string>⟳</string>
                </property>
               </widget>
+             </widget>
+             <widget class="QPushButton" name="pushButton_VISU_link_coordinate">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>100</y>
+                <width>21</width>
+                <height>21</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
              </widget>
             </widget>
             <widget class="QWidget" name="ColorMapByMagnitude">

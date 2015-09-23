@@ -48,6 +48,7 @@ protected:
     bool m_toolsDisplayed;
     bool m_updateOnPositionChanged;
     bool m_updateOnAttributeChanged;
+    bool m_linkCoordinate;
     unsigned int m_numberOfMeshes;
     QString m_lastDirectory;
     QString m_colormapDirectory;
@@ -162,6 +163,16 @@ protected:
     void on_spinBox_VISU_min_AxisX_editingFinished();
     void on_spinBox_VISU_max_AxisX_editingFinished();
     void on_pushButton_VISU_resetRange_AxisX_clicked();
+
+    void on_spinBox_VISU_min_AxisY_editingFinished();
+    void on_spinBox_VISU_max_AxisY_editingFinished();
+    void on_pushButton_VISU_resetRange_AxisY_clicked();
+
+    void on_spinBox_VISU_min_AxisZ_editingFinished();
+    void on_spinBox_VISU_max_AxisZ_editingFinished();
+    void on_pushButton_VISU_resetRange_AxisZ_clicked();
+
+    void on_pushButton_VISU_link_coordinate_clicked();
     
     void on_spinBox_VISU_position_valueChanged(double arg1);
     void on_pushButton_VISU_delete_clicked();

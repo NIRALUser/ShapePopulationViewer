@@ -655,16 +655,7 @@ void ShapePopulationBase::computeNorm(const char * a_cmap)
         found = cmap.rfind(key3);
         cmap = cmap.substr(0,found);
         
-        int numPts = mesh->GetPolyData()->GetPoints()->GetNumberOfPoints();
-        vtkDataArray *vector;
-        vector = mesh->GetPolyData()->GetPointData()->GetScalars(cmap.c_str());
-        
-        // norm max
-        std::vector<double> normVector;
-        for( int j = 0; j < numPts; ++j )
-            normVector.push_back(sqrt( vector->GetComponent(j,0)*vector->GetComponent(j,0) + vector->GetComponent(j,1)*vector->GetComponent(j,1) + vector->GetComponent(j,2)*vector->GetComponent(j,2) ));
-        std::sort (normVector.begin(), normVector.end()); // using default comparison (operator <)
-        norm = normVector[numPts-1];
+        norm = mesh->GetPolyData()->GetPointData()->GetScalars(cmap.c_str())->GetMaxNorm();
         
         // Compute the bigger norm
         if(i == 0) m_norm = norm;
@@ -720,26 +711,23 @@ void ShapePopulationBase::UpdateColorMapByDirection(const char * cmap,int index)
         min[2] = m_usedValueDirectionColorMap->min[2];
         max[2] = m_usedValueDirectionColorMap->max[2];
         
+//        std::cout<<"min[0] "<<min[0]<<" min[1] "<<min[1]<<" min[2] "<<min[2]<<std::endl;
+//        std::cout<<"max[0] "<<max[0]<<" max[1] "<<max[1]<<" max[2] "<<max[2]<<std::endl;
+
         // RGB scalar corresponding
         for( int l = 0; l < numPts; ++l )
         {
-            float x = vector->GetComponent(l,0);
-            float y = vector->GetComponent(l,1);
-            float z = vector->GetComponent(l,2);
-            
-            if(max[0] != min[0]) RGB[0] = ((255/(max[0]-min[0]))*(x/norm)-(255*min[0])/(max[0]-min[0]));
-            else if (max[0] != 0) RGB[0] = 255;
-            else if (max[0] == 0) RGB[0] = 0;
-            
-            if(max[1] != min[1]) RGB[1] = ((255/(max[1]-min[1]))*(y/norm)-(255*min[1])/(max[1]-min[1]));
-            else if (max[1] != 0) RGB[1] = 255;
-            else if (max[1] == 0) RGB[1] = 0;
-            
-            
-            if(max[2] != min[2]) RGB[2] = ((255/(max[2]-min[2]))*(z/norm)-(255*min[2])/(max[2]-min[2]));
-            else if (max[2] != 0) RGB[2] = 255;
-            else if (max[2] == 0) RGB[2] = 0;
-            
+            for(int k = 0; k < 3; k++)
+            {
+                if((vector->GetComponent(l,k)/norm) >= min[k] && (vector->GetComponent(l,k)/norm) <= max[k])
+                {
+                    if(max[k] != min[k]) RGB[k] = ((255/(max[k]-min[k]))*(vector->GetComponent(l,k)/norm)-(255*min[k])/(max[k]-min[k]));
+                    else if (max[k] != 0) RGB[k] = 255;
+                    else if (max[k] == 0) RGB[k] = 0;
+                }
+                else if((vector->GetComponent(l,k)/norm) < min[k]) RGB[k] = 0;
+                else if((vector->GetComponent(l,k)/norm) > max[k]) RGB[k] = 255;
+            }
             scalars->InsertTuple(l,RGB);
         }
         mesh->GetPolyData()->GetPointData()->AddArray(scalars);
@@ -795,23 +783,17 @@ void ShapePopulationBase::UpdateColorMapByAbsoluteDirection(const char * cmap, i
         // RGB scalar corresponding
         for( int l = 0; l < numPts; ++l )
         {
-            float x = fabs(vector->GetComponent(l,0));
-            float y = fabs(vector->GetComponent(l,1));
-            float z = fabs(vector->GetComponent(l,2));
-            
-            if(max[0] != min[0]) RGB[0] = ((255/(max[0]-min[0]))*(x/norm)-(255*min[0])/(max[0]-min[0]));
-            else if (max[0] != 0) RGB[0] = 255;
-            else if (max[0] == 0) RGB[0] = 0;
-            
-            if(max[1] != min[1]) RGB[1] = ((255/(max[1]-min[1]))*(y/norm)-(255*min[1])/(max[1]-min[1]));
-            else if (max[1] != 0) RGB[1] = 255;
-            else if (max[1] == 0) RGB[1] = 0;
-            
-            
-            if(max[2] != min[2]) RGB[2] = ((255/(max[2]-min[2]))*(z/norm)-(255*min[2])/(max[2]-min[2]));
-            else if (max[2] != 0) RGB[2] = 255;
-            else if (max[2] == 0) RGB[2] = 0;
-            
+            for(int k = 0; k < 3; k++)
+            {
+                if(fabs(vector->GetComponent(l,k))/norm >= min[k] && fabs(vector->GetComponent(l,k))/norm <= max[k])
+                {
+                    if(max[k] != min[k]) RGB[k] = ((255/(max[k]-min[k]))*(fabs(vector->GetComponent(l,k))/norm)-(255*min[k])/(max[k]-min[k]));
+                    else if (max[k] != 0) RGB[k] = 255;
+                    else if (max[k] == 0) RGB[k] = 0;
+                }
+                else if((fabs(vector->GetComponent(l,k))/norm) < min[k]) RGB[k] = 0;
+                else if((fabs(vector->GetComponent(l,k))/norm) > max[k]) RGB[k] = 255;
+            }
             scalars->InsertTuple(l,RGB);
         }
         mesh->GetPolyData()->GetPointData()->AddArray(scalars);
@@ -896,7 +878,6 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
             vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
             
             // Set Active Vectors
-            //            std::cout<<"--- i "<<i<<" a_cmap "<<a_cmap<<" strs_mag "<<strs_mag.str().c_str()<<" strs_dir "<<strs_dir.str().c_str()<<" strs_abs "<<strs_mag.str().c_str()<<std::endl;
             mesh->GetPolyData()->GetPointData()->SetActiveVectors(a_cmap);
             
             // Set Active scalars
@@ -959,7 +940,7 @@ void ShapePopulationBase::displayColorMapByMagnitude(bool display)
 {
     if(display) m_displayColorMapByMagnitude = true;
     else m_displayColorMapByMagnitude = false;
-    
+
     for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
     {
         // display of the color map by magnitude
@@ -1025,7 +1006,7 @@ void ShapePopulationBase::displayAbsoluteColorMapByDirection(bool display)
 {
     if(display) m_displayAbsoluteColorMapByDirection = true;
     else m_displayAbsoluteColorMapByDirection = false;
-    
+
     for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
     {
         // display of the color map by absolute direction
