@@ -9,5 +9,6 @@
         <file>resources/logo.png</file>
         <file>resources/LinkOff.png</file>
         <file>resources/LinkOn.png</file>
+        <file>resources/SphereWithGradientColors_PointToPoint.vtk</file>
     </qresource>
 </RCC>

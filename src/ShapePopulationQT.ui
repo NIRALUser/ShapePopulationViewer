@@ -152,7 +152,7 @@
           </size>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tab_INFO">
           <attribute name="title">
@@ -377,7 +377,7 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="ColorMapByDirection">
+            <widget class="QWidget" name="stackedWidget_ColorMapByDirection">
              <widget class="QCheckBox" name="checkBox_displayAbsoluteColorMapByDirection">
               <property name="geometry">
                <rect>
@@ -642,7 +642,7 @@
               <property name="geometry">
                <rect>
                 <x>10</x>
-                <y>100</y>
+                <y>101</y>
                 <width>21</width>
                 <height>21</height>
                </rect>
@@ -652,7 +652,7 @@
               </property>
              </widget>
             </widget>
-            <widget class="QWidget" name="ColorMapByMagnitude">
+            <widget class="QWidget" name="stackedWidget_ColorMapByMagnitude">
              <widget class="QWidget" name="widget_VISU_arrowOptions" native="true">
               <property name="geometry">
                <rect>
@@ -1755,12 +1755,12 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>571</x>
-     <y>694</y>
+     <x>588</x>
+     <y>693</y>
     </hint>
     <hint type="destinationlabel">
-     <x>649</x>
-     <y>694</y>
+     <x>653</x>
+     <y>693</y>
     </hint>
    </hints>
   </connection>
@@ -1771,12 +1771,12 @@ p, li { white-space: pre-wrap; }
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>649</x>
-     <y>694</y>
+     <x>653</x>
+     <y>693</y>
     </hint>
     <hint type="destinationlabel">
-     <x>571</x>
-     <y>694</y>
+     <x>588</x>
+     <y>693</y>
     </hint>
    </hints>
   </connection>

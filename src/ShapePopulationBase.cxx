@@ -52,6 +52,9 @@ ShapePopulationBase::ShapePopulationBase()
     m_displayAttribute = true;
     m_displayMeshName = true;
     m_createWidget = false;
+    m_createAxis.push_back(false);
+    m_createSphere.push_back(false);
+
     
 }
 
@@ -229,11 +232,11 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     //renderWindow->SetAlphaBitPlanes(true);/*test opacity*/
     //renderWindow->SetMultiSamples(0);/*test opacity*/
     m_windowsList.push_back(renderWindow);
-    
+
     //INTERACTOR
     vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     interactor->SetRenderWindow(renderWindow);
-    
+
     //ANNOTATIONS (file name)
     vtkSmartPointer<vtkCornerAnnotation> fileName = vtkSmartPointer<vtkCornerAnnotation>::New();
     fileName->SetLinearFontScaleFactor( 2 );
@@ -312,7 +315,7 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
     if( (std::find(m_selectedIndex.begin(), m_selectedIndex.end(), index)) != (m_selectedIndex.end()) )
     {
         // UNSELECTING
-        if(selectedInteractor->GetControlKey()==1)
+        if(selectedInteractor->GetControlKey() == 1)
         {
             selectedWindow->GetRenderers()->GetFirstRenderer()->SetBackground(m_unselectedColor);
             vtkSmartPointer<vtkCamera> camera = vtkSmartPointer<vtkCamera>::New();
@@ -325,7 +328,7 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
     }
     
     // NEW SELECTION (Ctrl not pushed)
-    if(selectedInteractor->GetControlKey()==0)
+    if(selectedInteractor->GetControlKey() == 0)
     {
         for (unsigned int i = 0; i < m_selectedIndex.size();i++)                              //reset backgrounds and cameras
         {
@@ -353,7 +356,8 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
         // Update colormap to the first selected window position
         const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
         this->UpdateAttribute(cmap, m_selectedIndex);
-        this->UpdateColorMap(m_selectedIndex);
+        int dim = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+        if(dim == 1) this->UpdateColorMap(m_selectedIndex);
     }
     
     
@@ -370,7 +374,7 @@ void ShapePopulationBase::SelectAll()
      ** check Select All if
      ** display the infos you need
      */
-    
+
     m_selectedIndex.clear();
     for(unsigned int i = 0; i < m_windowsList.size(); i++)
     {
@@ -565,7 +569,6 @@ void ShapePopulationBase::computeRangeDirection(const char * a_cmap)
     double minAbs[3];
     double maxAbs[3];
     
-    
     for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
         ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
@@ -599,40 +602,30 @@ void ShapePopulationBase::computeRangeDirection(const char * a_cmap)
             min[j] = vectXYZ[0];
             max[j] = vectXYZ[numPts-1];
             std::sort (vectXYZAbs.begin(), vectXYZAbs.end()); // using default comparison (operator <)
-            minAbs[j] = vectXYZAbs[0];
+            minAbs[j] = 0.0;
             maxAbs[j] = vectXYZAbs[numPts-1];
         }
         
         // Compute the largest range
         if(i == 0)
         {
-            m_commonRangeDirection[0] = min[0];
-            m_commonRangeDirection[1] = max[0];
-            m_commonRangeDirection[2] = min[1];
-            m_commonRangeDirection[3] = max[1];
-            m_commonRangeDirection[4] = min[2];
-            m_commonRangeDirection[5] = max[2];
-            m_commonRangeDirectionAbs[0] = minAbs[0];
-            m_commonRangeDirectionAbs[1] = maxAbs[0];
-            m_commonRangeDirectionAbs[2] = minAbs[1];
-            m_commonRangeDirectionAbs[3] = maxAbs[1];
-            m_commonRangeDirectionAbs[4] = minAbs[2];
-            m_commonRangeDirectionAbs[5] = maxAbs[2];
+            for(int cc = 0; cc < 3 ; cc++)
+            {
+                m_commonMin[cc] = min[cc];
+                m_commonMax[cc] = max[cc];
+                m_commonMinAbs[cc] = minAbs[cc];
+                m_commonMaxAbs[cc] = maxAbs[cc];
+            }
         }
         else
         {
-            if(m_commonRangeDirection[0] > min[0]) m_commonRangeDirection[0] = min[0];
-            if(m_commonRangeDirection[2] > min[1]) m_commonRangeDirection[2] = min[1];
-            if(m_commonRangeDirection[4] > min[2]) m_commonRangeDirection[4] = min[2];
-            if(m_commonRangeDirection[1] < max[0]) m_commonRangeDirection[1] = max[0];
-            if(m_commonRangeDirection[3] < max[1]) m_commonRangeDirection[3] = max[1];
-            if(m_commonRangeDirection[5] < max[2]) m_commonRangeDirection[5] = max[2];
-            if(m_commonRangeDirectionAbs[0] > minAbs[0]) m_commonRangeDirectionAbs[0] = minAbs[0];
-            if(m_commonRangeDirectionAbs[2] > minAbs[1]) m_commonRangeDirectionAbs[2] = minAbs[1];
-            if(m_commonRangeDirectionAbs[4] > minAbs[2]) m_commonRangeDirectionAbs[4] = minAbs[2];
-            if(m_commonRangeDirectionAbs[1] < maxAbs[0]) m_commonRangeDirectionAbs[1] = maxAbs[0];
-            if(m_commonRangeDirectionAbs[3] < maxAbs[1]) m_commonRangeDirectionAbs[3] = maxAbs[1];
-            if(m_commonRangeDirectionAbs[5] < maxAbs[2]) m_commonRangeDirectionAbs[5] = maxAbs[2];
+            for(int cc = 0; cc < 3 ; cc++)
+            {
+                if(m_commonMin[cc] > min[cc]) m_commonMin[cc] = min[cc];
+                if(m_commonMax[cc] < max[cc]) m_commonMax[cc] = max[cc];
+                if(m_commonMinAbs[cc] > minAbs[cc]) m_commonMinAbs[cc] = minAbs[cc];
+                if(m_commonMaxAbs[cc] < maxAbs[cc]) m_commonMaxAbs[cc] = maxAbs[cc];
+            }
         }
     }
 }
@@ -704,12 +697,11 @@ void ShapePopulationBase::UpdateColorMapByDirection(const char * cmap,int index)
         double norm = m_usedValueDirectionColorMap->norm;
         double max[3];
         double min[3];
-        min[0] = m_usedValueDirectionColorMap->min[0];
-        max[0] = m_usedValueDirectionColorMap->max[0];
-        min[1] = m_usedValueDirectionColorMap->min[1];
-        max[1] = m_usedValueDirectionColorMap->max[1];
-        min[2] = m_usedValueDirectionColorMap->min[2];
-        max[2] = m_usedValueDirectionColorMap->max[2];
+        for(int cc = 0; cc < 3; cc++)
+        {
+            min[cc] = m_usedValueDirectionColorMap->min[cc];
+            max[cc] = m_usedValueDirectionColorMap->max[cc];
+        }
         
 //        std::cout<<"min[0] "<<min[0]<<" min[1] "<<min[1]<<" min[2] "<<min[2]<<std::endl;
 //        std::cout<<"max[0] "<<max[0]<<" max[1] "<<max[1]<<" max[2] "<<max[2]<<std::endl;
@@ -772,13 +764,11 @@ void ShapePopulationBase::UpdateColorMapByAbsoluteDirection(const char * cmap, i
         double norm = m_usedValueDirectionColorMap->norm;
         double max[3];
         double min[3];
-        min[0] = m_usedValueDirectionColorMap->minAbs[0];
-        max[0] = m_usedValueDirectionColorMap->maxAbs[0];
-        min[1] = m_usedValueDirectionColorMap->minAbs[1];
-        max[1] = m_usedValueDirectionColorMap->maxAbs[1];
-        min[2] = m_usedValueDirectionColorMap->minAbs[2];
-        max[2] = m_usedValueDirectionColorMap->maxAbs[2];
-        
+        for(int cc = 0; cc < 3; cc++)
+        {
+            min[cc] = m_usedValueDirectionColorMap->minAbs[cc];
+            max[cc] = m_usedValueDirectionColorMap->maxAbs[cc];
+        }
         
         // RGB scalar corresponding
         for( int l = 0; l < numPts; ++l )
@@ -803,7 +793,7 @@ void ShapePopulationBase::UpdateColorMapByAbsoluteDirection(const char * cmap, i
 
 void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsigned int > a_windowIndex)
 {
-    
+
     /* FIND DIMENSION OF ATTRIBUTE */
     int dim = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(a_cmap)->GetNumberOfComponents();
     
@@ -889,8 +879,7 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
             
             // display colormap by absolute direction
             else if(m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_abs.str().c_str());
-            
-            
+                        
             // Update Glyph
             vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
             vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[a_windowIndex[i]];
@@ -916,24 +905,22 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
         
     }
     
-    /* DISPLAY OF A SPHERE WITH GRADIENT COLORS OR DISPLAY OF SCALAR BAR */
+    /* DISPLAY OF SCALAR BAR */
     for (unsigned int i = 0; i < a_windowIndex.size(); i++)
     {
-        vtkActor2D * oldScalarBar = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
+        scalarBar = (vtkScalarBarActor*)viewPropObject;
         if(m_displayColorMapByDirection && (!m_displayVectors || (m_displayVectors && (m_displayVectorsByDirection || m_displayVectorsByAbsoluteDirection))))
         {
             scalarBar->SetVisibility(0);
-            //            actorSphere->SetVisibility(1);
         }
         else
         {
             if(m_displayColorbar) scalarBar->SetVisibility(1);
-            //            actorSphere->SetVisibility(0);
         }
-    }
-    
+    }    
 }
 
 void ShapePopulationBase::displayColorMapByMagnitude(bool display)
@@ -941,32 +928,36 @@ void ShapePopulationBase::displayColorMapByMagnitude(bool display)
     if(display) m_displayColorMapByMagnitude = true;
     else m_displayColorMapByMagnitude = false;
 
-    for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
+    if(display)
     {
-        // display of the color map by magnitude
-        ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
-        const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        std::string cmap = std::string(a_cmap);
-        std::string key1 ("_ColorByDirection");
-        size_t found = cmap.rfind(key1);
-        if (found!=std::string::npos)
-            cmap.replace (found,key1.length(),"_mag");
-        std::string key2 ("_AbsoluteColorByDirection");
-        found = cmap.rfind(key2);
-        if (found!=std::string::npos)
-            cmap.replace (found,key2.length(),"_mag");
-        std::ostringstream strs;
-        strs.str(""); strs.clear();
-        strs << cmap;
-        
-        // Set Active Scalars
-        if(display) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs.str().c_str());
-        
-        // Hide or show the scalar bar and the sphere
-        vtkActor2D * oldScalarBar = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
-        if(m_displayColorbar) scalarBar->SetVisibility(1);
+        for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
+        {
+            // display of the color map by magnitude
+            ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
+            const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
+            std::string cmap = std::string(a_cmap);
+            std::string key1 ("_ColorByDirection");
+            size_t found = cmap.rfind(key1);
+            if (found!=std::string::npos)
+                cmap.replace (found,key1.length(),"_mag");
+            std::string key2 ("_AbsoluteColorByDirection");
+            found = cmap.rfind(key2);
+            if (found!=std::string::npos)
+                cmap.replace (found,key2.length(),"_mag");
+            std::ostringstream strs;
+            strs.str(""); strs.clear();
+            strs << cmap;
+
+            // Set Active Scalars
+            mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs.str().c_str());
+
+            // Hide or show the scalar bar and the sphere
+            vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+            vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
+            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            if(m_displayColorbar) scalarBar->SetVisibility(1);
+        }
     }
 }
 
@@ -974,31 +965,35 @@ void ShapePopulationBase::displayColorMapByDirection(bool display)
 {
     if(display) m_displayColorMapByDirection = true;
     else m_displayColorMapByDirection = false;
-    
-    for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
+
+    if(display)
     {
-        // display of the color map by direction
-        ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
-        const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        std::string cmap = std::string(a_cmap);
-        std::string key1 ("_mag");
-        size_t found = cmap.rfind(key1);
-        if (found!=std::string::npos)
-            cmap.replace (found,key1.length(),"_ColorByDirection");
-        std::string key2 ("_AbsoluteColorByDirection");
-        found = cmap.rfind(key2);
-        if (found!=std::string::npos)
-            cmap.replace (found,key2.length(),"_ColorByDirection");
-        
-        // Set Active Scalars for the ColorMap
-        if(display) mesh->GetPolyData()->GetPointData()->SetActiveScalars(cmap.c_str());
-        
-        // Hide or show the scalar bar ans the sphere
-        vtkActor2D * oldScalarBar = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
-        if((m_displayVectors && (m_displayVectorsByDirection || m_displayVectorsByAbsoluteDirection)) || !m_displayVectors) scalarBar->SetVisibility(0);
-        else if (m_displayVectors && m_displayVectorsByMagnitude && m_displayColorbar) scalarBar->SetVisibility(1);
+        for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
+        {
+            // display of the color map by direction
+            ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
+            const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
+            std::string cmap = std::string(a_cmap);
+            std::string key1 ("_mag");
+            size_t found = cmap.rfind(key1);
+            if (found!=std::string::npos)
+                cmap.replace (found,key1.length(),"_ColorByDirection");
+            std::string key2 ("_AbsoluteColorByDirection");
+            found = cmap.rfind(key2);
+            if (found!=std::string::npos)
+                cmap.replace (found,key2.length(),"_ColorByDirection");
+
+            // Set Active Scalars for the ColorMap
+            mesh->GetPolyData()->GetPointData()->SetActiveScalars(cmap.c_str());
+
+            // Hide or show the scalar bar
+            vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+            vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
+            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            if((m_displayVectors && (m_displayVectorsByDirection || m_displayVectorsByAbsoluteDirection)) || !m_displayVectors) scalarBar->SetVisibility(0);
+            else if (m_displayVectors && m_displayVectorsByMagnitude && m_displayColorbar) scalarBar->SetVisibility(1);
+        }
     }
 }
 
@@ -1007,33 +1002,37 @@ void ShapePopulationBase::displayAbsoluteColorMapByDirection(bool display)
     if(display) m_displayAbsoluteColorMapByDirection = true;
     else m_displayAbsoluteColorMapByDirection = false;
 
-    for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
+    if(display)
     {
-        // display of the color map by absolute direction
-        ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
-        const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        std::string cmap = std::string(a_cmap);
-        std::string key1 ("_ColorByDirection");
-        size_t found = cmap.rfind(key1);
-        if (found!=std::string::npos)
-            cmap.replace (found,key1.length(),"_AbsoluteColorByDirection");
-        std::string key2 ("_mag");
-        found = cmap.rfind(key2);
-        if (found!=std::string::npos)
-            cmap.replace (found,key2.length(),"_AbsoluteColorByDirection");
-        std::ostringstream strs;
-        strs.str(""); strs.clear();
-        strs << cmap;
-        
-        // Set Active Scalars for the ColorMap
-        if(display) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs.str().c_str());
-        
-        // Hide or show the scalar bar
-        vtkActor2D * oldScalarBar = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
-        if((m_displayVectors && (m_displayVectorsByDirection || m_displayVectorsByAbsoluteDirection)) || !m_displayVectors) scalarBar->SetVisibility(0);
-        else if (m_displayVectors && m_displayVectorsByMagnitude && m_displayColorbar) scalarBar->SetVisibility(1);
+        for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
+        {
+            // display of the color map by absolute direction
+            ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
+            const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
+            std::string cmap = std::string(a_cmap);
+            std::string key1 ("_ColorByDirection");
+            size_t found = cmap.rfind(key1);
+            if (found!=std::string::npos)
+                cmap.replace (found,key1.length(),"_AbsoluteColorByDirection");
+            std::string key2 ("_mag");
+            found = cmap.rfind(key2);
+            if (found!=std::string::npos)
+                cmap.replace (found,key2.length(),"_AbsoluteColorByDirection");
+            std::ostringstream strs;
+            strs.str(""); strs.clear();
+            strs << cmap;
+
+            // Set Active Scalars for the ColorMap
+            mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs.str().c_str());
+
+            // Hide or show the scalar bar
+            vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+            vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
+            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            if((m_displayVectors && (m_displayVectorsByDirection || m_displayVectorsByAbsoluteDirection)) || !m_displayVectors) scalarBar->SetVisibility(0);
+            else if (m_displayVectors && m_displayVectorsByMagnitude && m_displayColorbar) scalarBar->SetVisibility(1);
+        }
     }
 }
 
@@ -1080,9 +1079,10 @@ void ShapePopulationBase::UpdateColorMap(std::vector< unsigned int > a_windowInd
         
         
         //ScalarBar Mapper Update
-        vtkActor2D * oldScalarBar = m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
+        scalarBar = (vtkScalarBarActor*)viewPropObject;
         scalarBar->SetLookupTable( DistanceMapTFunc );
         scalarBar->SetTitle(" ");
     }
@@ -1173,16 +1173,19 @@ void ShapePopulationBase::displayVectors(bool display)
         }
         
         // Hide or show the scalar bar
-        vtkActor2D * oldScalarBar = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
+        scalarBar = (vtkScalarBarActor*)viewPropObject;
         if(!m_displayVectors)
         {
             if(m_displayColorMapByDirection) scalarBar->SetVisibility(0);
             else if (m_displayColorMapByMagnitude && m_displayColorbar) scalarBar->SetVisibility(1);
         }
         else
+        {
             if(m_displayColorbar) scalarBar->SetVisibility(1);
+        }
         
     }
 }
@@ -1191,38 +1194,42 @@ void ShapePopulationBase::displayVectorsByMagnitude(bool display)
 {
     if(display) m_displayVectorsByMagnitude = true;
     else m_displayVectorsByMagnitude = false;
-    
-    for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
+
+    if(display)
     {
-        // diplay of the color of vectors by magnitude
-        const char * a_cmap = m_meshList[m_selectedIndex[i]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        std::string cmap = std::string(a_cmap);
-        size_t found = cmap.rfind("_mag");
-        std::string new_cmap = cmap.substr(0,found);
-        found = cmap.rfind("_ColorByDirection");
-        new_cmap = new_cmap.substr(0,found);
-        found = cmap.rfind("_AbsoluteColorByDirection");
-        new_cmap = new_cmap.substr(0,found);
-        
-        if( (new_cmap != cmap) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()) )
+        for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
         {
-            vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
-            vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[m_selectedIndex[i]];
-            glyph->SetSourceConnection(arrow->GetOutputPort());
-            glyph->SetColorModeToColorByVector();
-            glyph->Update();
-            
-            vtkActorCollection * actors = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
-            vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
-            
-            if(display) glyphActor->SetVisibility(1);
-            else glyphActor->SetVisibility(0);
+            // diplay of the color of vectors by magnitude
+            const char * a_cmap = m_meshList[m_selectedIndex[i]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
+            std::string cmap = std::string(a_cmap);
+            size_t found = cmap.rfind("_mag");
+            std::string new_cmap = cmap.substr(0,found);
+            found = cmap.rfind("_ColorByDirection");
+            new_cmap = new_cmap.substr(0,found);
+            found = cmap.rfind("_AbsoluteColorByDirection");
+            new_cmap = new_cmap.substr(0,found);
+
+            if( (new_cmap != cmap) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()) )
+            {
+                vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+                vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[m_selectedIndex[i]];
+                glyph->SetSourceConnection(arrow->GetOutputPort());
+                glyph->SetColorModeToColorByVector();
+                glyph->Update();
+
+                vtkActorCollection * actors = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
+                vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
+
+                if(display) glyphActor->SetVisibility(1);
+                else glyphActor->SetVisibility(0);
+            }
+            // Hide or show the scalar bar
+            vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+            vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
+            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            if(m_displayColorbar) scalarBar->SetVisibility(1);
         }
-        // Hide or show the scalar bar
-        vtkActor2D * oldScalarBar = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
-        if(m_displayColorbar) scalarBar->SetVisibility(1);
     }
 }
 
@@ -1231,52 +1238,61 @@ void ShapePopulationBase::displayVectorsByDirection(bool display)
     if(display) m_displayVectorsByDirection = true;
     else m_displayVectorsByDirection = false;
     
-    
-    for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
+    if(display)
     {
-        //display of the color of vectors by direction
-        ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
-        const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        std::string cmap = std::string(a_cmap);
-        size_t found = cmap.rfind("_mag");
-        std::string new_cmap = cmap.substr(0,found);
-        found = cmap.rfind("_ColorByDirection");
-        new_cmap = new_cmap.substr(0,found);
-        found = cmap.rfind("_AbsoluteColorByDirection");
-        new_cmap = new_cmap.substr(0,found);
-        std::ostringstream strs;
-        strs.str(""); strs.clear();
-        strs << new_cmap;
-        
-        if( (new_cmap != cmap) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()) )
+        for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
         {
-            
-            if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+            //display of the color of vectors by direction
+            ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
+            const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
+            std::string cmap = std::string(a_cmap);
+            size_t found = cmap.rfind("_mag");
+            std::string new_cmap = cmap.substr(0,found);
+            found = cmap.rfind("_ColorByDirection");
+            new_cmap = new_cmap.substr(0,found);
+            found = cmap.rfind("_AbsoluteColorByDirection");
+            new_cmap = new_cmap.substr(0,found);
+            std::ostringstream strs;
+            strs.str(""); strs.clear();
+            strs << new_cmap;
+
+            if( (new_cmap != cmap) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()) )
             {
-                mesh->GetPolyData()->GetPointData()->SetActiveVectors(strs.str().c_str());
-                
-                vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
-                vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[m_selectedIndex[i]];
-                glyph->SetSourceConnection(arrow->GetOutputPort());
-                glyph->SetColorModeToColorByScalar();
-                glyph->Update();
-                
+
+                if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+                {
+                    mesh->GetPolyData()->GetPointData()->SetActiveVectors(strs.str().c_str());
+
+                    vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+                    vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[m_selectedIndex[i]];
+                    glyph->SetSourceConnection(arrow->GetOutputPort());
+                    glyph->SetColorModeToColorByScalar();
+                    glyph->Update();
+
+                }
+                else if (m_displayColorMapByMagnitude || m_displayAbsoluteColorMapByDirection) this->UpdateVectorsByDirection();
+
+                vtkActorCollection * actors = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
+                vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
+                if(display) glyphActor->SetVisibility(1);
+                else glyphActor->SetVisibility(0);
             }
-            else if (m_displayColorMapByMagnitude || m_displayAbsoluteColorMapByDirection) this->UpdateVectorsByDirection();
-            
-            vtkActorCollection * actors = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
-            vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
-            if(display) glyphActor->SetVisibility(1);
-            else glyphActor->SetVisibility(0);
+
+            // Hide or show the scalar bar
+            vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+            vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
+            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            if(m_displayColorMapByDirection || m_displayAbsoluteColorMapByDirection)
+            {
+                scalarBar->SetVisibility(0);
+            }
+            else if (m_displayColorMapByMagnitude && m_displayColorbar)
+            {
+                scalarBar->SetVisibility(1);
+            }
+
         }
-        
-        // Hide or show the scalar bar
-        vtkActor2D * oldScalarBar = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
-        if(m_displayColorMapByDirection || m_displayAbsoluteColorMapByDirection) scalarBar->SetVisibility(0);
-        else if (m_displayColorMapByMagnitude && m_displayColorbar) scalarBar->SetVisibility(1);
-        
     }
 }
 
@@ -1285,52 +1301,55 @@ void ShapePopulationBase::displayVectorsByAbsoluteDirection(bool display)
     if(display) m_displayVectorsByAbsoluteDirection = true;
     else m_displayVectorsByAbsoluteDirection = false;
     
-    
-    for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
+    if(display)
     {
-        //display of the color of vectors by direction
-        ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
-        const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        std::string cmap = std::string(a_cmap);
-        size_t found = cmap.rfind("_mag");
-        std::string new_cmap = cmap.substr(0,found);
-        found = cmap.rfind("_ColorByDirection");
-        new_cmap = new_cmap.substr(0,found);
-        found = cmap.rfind("_AbsoluteColorByDirection");
-        new_cmap = new_cmap.substr(0,found);
-        std::ostringstream strs;
-        strs.str(""); strs.clear();
-        strs << new_cmap;
-        
-        if( (new_cmap != cmap) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()) )
+        for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
         {
-            
-            if(m_displayAbsoluteColorMapByDirection && m_displayColorMapByDirection)
+            //display of the color of vectors by direction
+            ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
+            const char * a_cmap = mesh->GetPolyData()->GetPointData()->GetScalars()->GetName();
+            std::string cmap = std::string(a_cmap);
+            size_t found = cmap.rfind("_mag");
+            std::string new_cmap = cmap.substr(0,found);
+            found = cmap.rfind("_ColorByDirection");
+            new_cmap = new_cmap.substr(0,found);
+            found = cmap.rfind("_AbsoluteColorByDirection");
+            new_cmap = new_cmap.substr(0,found);
+            std::ostringstream strs;
+            strs.str(""); strs.clear();
+            strs << new_cmap;
+
+            if( (new_cmap != cmap) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()) )
             {
-                mesh->GetPolyData()->GetPointData()->SetActiveVectors(strs.str().c_str());
-                
-                vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
-                vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[m_selectedIndex[i]];
-                glyph->SetSourceConnection(arrow->GetOutputPort());
-                glyph->SetColorModeToColorByScalar();
-                glyph->Update();
-                
+
+                if(m_displayAbsoluteColorMapByDirection && m_displayColorMapByDirection)
+                {
+                    mesh->GetPolyData()->GetPointData()->SetActiveVectors(strs.str().c_str());
+
+                    vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+                    vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[m_selectedIndex[i]];
+                    glyph->SetSourceConnection(arrow->GetOutputPort());
+                    glyph->SetColorModeToColorByScalar();
+                    glyph->Update();
+
+                }
+                else if (m_displayColorMapByMagnitude || m_displayColorMapByDirection) this->UpdateVectorsByDirection();
+
+                vtkActorCollection * actors = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
+                vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
+                if(display) glyphActor->SetVisibility(1);
+                else glyphActor->SetVisibility(0);
             }
-            else if (m_displayColorMapByMagnitude || m_displayColorMapByDirection) this->UpdateVectorsByDirection();
-            
-            vtkActorCollection * actors = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
-            vtkSmartPointer<vtkActor> glyphActor = actors->GetLastActor();
-            if(display) glyphActor->SetVisibility(1);
-            else glyphActor->SetVisibility(0);
+
+            // Hide or show the scalar bar
+            vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+            vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
+            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            if(m_displayColorMapByDirection) scalarBar->SetVisibility(0);
+            else if (m_displayColorMapByMagnitude && m_displayColorbar) scalarBar->SetVisibility(1);
+
         }
-        
-        // Hide or show the scalar bar
-        vtkActor2D * oldScalarBar = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors2D()->GetLastActor2D();
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)oldScalarBar;
-        if(m_displayColorMapByDirection) scalarBar->SetVisibility(0);
-        else if (m_displayColorMapByMagnitude && m_displayColorbar) scalarBar->SetVisibility(1);
-        
     }
 }
 
@@ -1363,8 +1382,8 @@ void ShapePopulationBase::UpdateVectorsByDirection()
         
         // Set Active Scalars to color vectors
         if(m_displayVectorsByDirection) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_dir.str().c_str());
-        else if (m_displayVectorsByAbsoluteDirection) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_abs.str().c_str());
-        
+        else if(m_displayVectorsByAbsoluteDirection) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_abs.str().c_str());
+
         // Set Active Vectors
         mesh->GetPolyData()->GetPointData()->SetActiveVectors(strs.str().c_str());
         
@@ -1391,7 +1410,7 @@ void ShapePopulationBase::displayColorbar(bool display)
 {
     for(unsigned int i = 0; i < m_windowsList.size() ; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         
         // cornerAnnotation
         vtkObject * viewPropObject = propCollection->GetItemAsObject(5);
@@ -1401,7 +1420,7 @@ void ShapePopulationBase::displayColorbar(bool display)
         if(display)
         {
             m_displayColorbar = true;
-            if(m_displayColorMapByDirection == false) scalarBar->SetVisibility(1);
+            if(m_displayColorMapByMagnitude || m_displayVectorsByMagnitude) scalarBar->SetVisibility(1);
         }
         else
         {
@@ -1458,6 +1477,172 @@ void ShapePopulationBase::displayMeshName(bool display)
         }
     }
 }
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                            AXIS                                               * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
+void ShapePopulationBase::displayAxis(bool display)
+{
+    for (unsigned int i = 0; i < m_windowsList.size() ;i++)
+    {
+        vtkRenderWindow *renderWindow = m_windowsList[i];
+
+        if(display)
+        {
+            if((find(m_selectedIndex.begin(), m_selectedIndex.end(), i)) != (m_selectedIndex.end()) )
+            {
+                if(!m_createAxis[i])
+                {
+                    vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+                    vtkSmartPointer<vtkAxesActor> actorAxis = vtkSmartPointer<vtkAxesActor>::New();
+
+                    vtkOrientationMarkerWidget* widgetAxis = vtkOrientationMarkerWidget::New();
+                    widgetAxis->SetOutlineColor( 0.9300, 0.5700, 0.1300 ); // color for the frame around the axes
+                    widgetAxis->SetOrientationMarker( actorAxis );
+                    widgetAxis->SetInteractor( iren );
+                    widgetAxis->SetViewport( 0.0, 0.0, 0.2, 0.2 ); // size of the frame
+                    widgetAxis->SetEnabled( 1 );
+                    widgetAxis->InteractiveOn();
+
+                    m_widgetAxis.push_back(widgetAxis);
+
+                    m_createAxis[i] = true;
+
+                    m_createAxis.push_back(false);
+                }
+            }
+            else
+            {
+                vtkOrientationMarkerWidget* widgetAxis = vtkOrientationMarkerWidget::New();
+                m_widgetAxis.push_back(widgetAxis);
+                m_createAxis.push_back(false);
+            }
+        }
+
+        renderWindow->Render();
+    }
+}
+
+void ShapePopulationBase::deleteAxis()
+{
+    for (unsigned int i = 0; i < m_widgetAxis.size() ;i++)
+    {
+        if(m_createAxis[i])
+        {
+            m_widgetAxis[i]->SetEnabled( 0 );
+            m_widgetAxis[i]->Delete();
+        }
+        m_createAxis[i] = false;
+
+    }
+    m_widgetAxis.clear();
+}
+
+void ShapePopulationBase::creationAxis(int index)
+{
+    vtkRenderWindow *renderWindow = m_windowsList[index];
+
+    vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+
+    vtkSmartPointer<vtkAxesActor> actorAxis = vtkSmartPointer<vtkAxesActor>::New();
+
+    vtkOrientationMarkerWidget* widgetAxis = vtkOrientationMarkerWidget::New();
+    widgetAxis = m_widgetAxis[index];
+    widgetAxis->SetOutlineColor( 0.9300, 0.5700, 0.1300 ); // color for the frame around the axes
+    widgetAxis->SetOrientationMarker( actorAxis );
+    widgetAxis->SetInteractor( iren );
+    widgetAxis->SetViewport( 0.0, 0.0, 0.2, 0.2 ); // size of the frame
+    widgetAxis->SetEnabled( 1 );
+    widgetAxis->InteractiveOn();
+
+    m_createAxis[index] = true;
+}
+
+
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+// *                                            SHPERE                                             * //
+// * ///////////////////////////////////////////////////////////////////////////////////////////// * //
+
+
+void ShapePopulationBase::displaySphere(bool display)
+{
+    for (unsigned int i = 0; i < m_windowsList.size() ;i++)
+    {
+        vtkRenderWindow *renderWindow = m_windowsList[i];
+
+        if(display)
+        {
+            if((find(m_selectedIndex.begin(), m_selectedIndex.end(), i)) != (m_selectedIndex.end()) )
+            {
+                if(!m_createAxis[i])
+                {
+                    vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+                    vtkSmartPointer<vtkAxesActor> actorSphere = vtkSmartPointer<vtkAxesActor>::New();
+
+                    vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
+                    widgetSphere->SetOutlineColor( 0.9300, 0.5700, 0.1300 ); // color for the frame around the axes
+                    widgetSphere->SetOrientationMarker( actorSphere );
+                    widgetSphere->SetInteractor( iren );
+                    widgetSphere->SetViewport( 0.0, 0.0, 0.2, 0.2 ); // size of the frame
+                    widgetSphere->SetEnabled( 1 );
+                    widgetSphere->InteractiveOn();
+
+                    m_widgetSphere.push_back(widgetSphere);
+
+                    m_createSphere[i] = true;
+
+                    m_createSphere.push_back(false);
+                }
+            }
+            else
+            {
+                vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
+                m_widgetSphere.push_back(widgetSphere);
+                m_createSphere.push_back(false);
+            }
+        }
+
+        renderWindow->Render();
+    }
+}
+
+void ShapePopulationBase::deleteSphere()
+{
+    for (unsigned int i = 0; i < m_widgetSphere.size() ;i++)
+    {
+        if(m_createSphere[i])
+        {
+            m_widgetSphere[i]->SetEnabled( 0 );
+            m_widgetSphere[i]->Delete();
+        }
+        m_createSphere[i] = false;
+
+    }
+    m_widgetSphere.clear();
+}
+
+void ShapePopulationBase::creationSphere(int index)
+{
+    vtkRenderWindow *renderWindow = m_windowsList[index];
+
+    vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+
+    vtkSmartPointer<vtkAxesActor> actorSphere = vtkSmartPointer<vtkAxesActor>::New();
+
+    vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
+    widgetSphere = m_widgetAxis[index];
+    widgetSphere->SetOutlineColor( 0.9300, 0.5700, 0.1300 ); // color for the frame around the axes
+    widgetSphere->SetOrientationMarker( actorSphere );
+    widgetSphere->SetInteractor( iren );
+    widgetSphere->SetViewport( 0.0, 0.0, 0.2, 0.2 ); // size of the frame
+    widgetSphere->SetEnabled( 1 );
+    widgetSphere->InteractiveOn();
+
+    m_createSphere[index] = true;
+}
+
+
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                            CAMERA                                             * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //

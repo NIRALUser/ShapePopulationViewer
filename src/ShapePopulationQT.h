@@ -9,6 +9,7 @@
 #include "backgroundDialogQT.h"
 #include "CSVloaderQT.h"
 #include <iostream>
+#include <vtkInteractorStyleTrackballCamera.h>
 
 // QT
 #include <QMainWindow>
@@ -20,6 +21,8 @@
 #include <QColorDialog>             //ColorPicker
 #include <vtkDelimitedTextReader.h> //CSVloader
 #include <QUrl>                     //DropFiles
+
+#include <vtkOrientationMarkerWidget.h>
 
 
 #include <QDebug>
@@ -58,8 +61,9 @@ protected:
     cameraDialogQT * m_cameraDialog;
     backgroundDialogQT * m_backgroundDialog;
     CSVloaderQT * m_CSVloaderDialog;
-    
+
     void CreateWidgets();
+
     
     //SELECTION
     void ClickEvent(vtkObject* a_selectedObject, unsigned long notUseduLong, void* notUsedVoid);
@@ -181,6 +185,7 @@ protected:
     void on_radioButton_displayColorMapByMagnitude_toggled(bool checked);
     void on_radioButton_displayColorMapByDirection_toggled(bool checked);
     void on_checkBox_displayAbsoluteColorMapByDirection_toggled(bool checked);
+
     //slots for gradView signals
     void slot_gradArrow_moved(qreal newPos);
     void slot_gradArrow_selected(qreal newPos);

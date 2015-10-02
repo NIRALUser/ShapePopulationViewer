@@ -27,12 +27,14 @@
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <string.h>
+#include <vtkOrientationMarkerWidget.h>
+
 
 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
 #include "vtkMaskPoints.h"
-
+#include <vtkAxesActor.h>
 
 
 
@@ -78,6 +80,11 @@ class ShapePopulationBase
     bool m_createWidget;
     double m_norm;
     vtkSmartPointer<vtkActor> actorSphere;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetAxis;
+    std::vector<bool> m_createAxis;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetSphere;
+    std::vector<bool> m_createSphere;
+
     
     void CreateNewWindow(std::string a_filePath);
     
@@ -94,8 +101,10 @@ class ShapePopulationBase
     
     //COLORMAP
     double m_commonRange[2];
-    double m_commonRangeDirection[6];
-    double m_commonRangeDirectionAbs[6];
+    double m_commonMin[3];
+    double m_commonMax[3];
+    double m_commonMinAbs[3];
+    double m_commonMaxAbs[3];
     void computeCommonAttributes();
     double* computeCommonRange(const char * a_cmap, std::vector<unsigned int> a_windowIndex);
     void computeRangeDirection(const char *a_cmap);
@@ -122,7 +131,17 @@ class ShapePopulationBase
     void displayColorbar(bool display);
     void displayAttribute(bool display);
     void displayMeshName(bool display);
-    
+
+    // AXIS
+    void displayAxis(bool display);
+    void deleteAxis();
+    void creationAxis(int index);
+
+    // SPHERE
+    void displaySphere(bool display);
+    void deleteSphere();
+    void creationSphere(int index);
+
     //CAMERA/VIEW
     void AlignMesh(bool alignment);
     void ChangeView(int x, int y, int z);
