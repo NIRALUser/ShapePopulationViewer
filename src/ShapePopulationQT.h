@@ -54,6 +54,7 @@ protected:
     bool m_linkCoordinate;
     bool m_updateAttribute;
     bool m_clickEvent;
+    bool m_displayColorMap;
     unsigned int m_numberOfMeshes;
     QString m_lastDirectory;
     QString m_colormapDirectory;
@@ -125,6 +126,10 @@ protected:
     void on_checkBox_displayColorbar_toggled(bool checked);
     void on_checkBox_displayAttribute_toggled(bool checked);
     void on_checkBox_displayMeshName_toggled(bool checked);
+    void on_checkBox_displayAxis_toggled(bool checked);
+    void on_checkBox_displaySphere_toggled(bool checked);
+    void on_checkBox_displayTitles_toggled(bool checked);
+
     
     //SYNCHRO
     void on_radioButton_SYNC_realtime_toggled();
@@ -162,20 +167,20 @@ protected:
     
     //COLORMAP
     void on_comboBox_VISU_attribute_currentIndexChanged();
-    void on_spinBox_VISU_min_editingFinished();
+    void on_spinBox_VISU_min_valueChanged(double min);
+    void on_spinBox_VISU_max_valueChanged(double max);
     void on_pushButton_VISU_resetRange_clicked();
-    void on_spinBox_VISU_max_editingFinished();
     
-    void on_spinBox_VISU_min_AxisX_editingFinished();
-    void on_spinBox_VISU_max_AxisX_editingFinished();
+    void on_spinBox_VISU_min_AxisX_valueChanged(double newXmin);
+    void on_spinBox_VISU_max_AxisX_valueChanged(double newXmax);
     void on_pushButton_VISU_resetRange_AxisX_clicked();
 
-    void on_spinBox_VISU_min_AxisY_editingFinished();
-    void on_spinBox_VISU_max_AxisY_editingFinished();
+    void on_spinBox_VISU_min_AxisY_valueChanged(double newYmin);
+    void on_spinBox_VISU_max_AxisY_valueChanged(double newYmax);
     void on_pushButton_VISU_resetRange_AxisY_clicked();
 
-    void on_spinBox_VISU_min_AxisZ_editingFinished();
-    void on_spinBox_VISU_max_AxisZ_editingFinished();
+    void on_spinBox_VISU_min_AxisZ_valueChanged(double newZmin);
+    void on_spinBox_VISU_max_AxisZ_valueChanged(double newZmax);
     void on_pushButton_VISU_resetRange_AxisZ_clicked();
 
     void on_pushButton_VISU_link_coordinate_clicked();

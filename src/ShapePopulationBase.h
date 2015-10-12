@@ -35,6 +35,9 @@
 #include "vtkArrowSource.h"
 #include "vtkMaskPoints.h"
 #include <vtkAxesActor.h>
+#include <vtkAssembly.h>
+#include <vtkTextActor.h>
+#include <vtkVectorText.h>
 
 
 
@@ -77,14 +80,23 @@ class ShapePopulationBase
     bool m_displayColorbar;
     bool m_displayAttribute;
     bool m_displayMeshName;
+    bool m_displayAxis;
+    bool m_displaySphere;
+    bool m_displayTitles;
     bool m_createWidget;
     bool m_clickEvent;
     double m_norm;
     vtkSmartPointer<vtkActor> m_actorSphere;
     std::vector< vtkOrientationMarkerWidget* > m_widgetAxis;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetTitleAxis;
     std::vector<bool> m_createAxis;
     std::vector< vtkOrientationMarkerWidget* > m_widgetSphere;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetTitleSphere;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetAxisByDirection;
     std::vector<bool> m_createSphere;
+    std::vector<bool> m_createTitleSphere;
+    std::vector<bool> m_createTitleAxis;
+
 
     
     void CreateNewWindow(std::string a_filePath);
@@ -132,16 +144,25 @@ class ShapePopulationBase
     void displayColorbar(bool display);
     void displayAttribute(bool display);
     void displayMeshName(bool display);
+    void displayAxis(bool display);
+    void displaySphere(bool display);
+    void displayTitles(bool display);
 
     // AXIS
-    void displayAxis(bool display);
-    void deleteAxis();
-    void creationAxis(int index);
+    void displayAxisWidget(bool display);
+    void deleteAxisWidget();
+    void creationAxisWidget(int index);
+    void displayTitleAxisWidget(bool display);
+    void deleteTitleAxisWidget();
+    void creationTitleAxisWidget(int index);
 
     // SPHERE
-    void displaySphere(bool display);
-    void deleteSphere();
-    void creationSphere(int index);
+    void displaySphereWidget(bool display);
+    void deleteSphereWidget();
+    void creationSphereWidget(int index);
+    void displayTitleSphereWidget(bool display);
+    void deleteTitleSphereWidget();
+    void creationTitleSphereWidget(int index);
 
     //CAMERA/VIEW
     void AlignMesh(bool alignment);

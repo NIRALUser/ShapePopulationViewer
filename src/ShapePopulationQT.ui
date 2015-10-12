@@ -550,6 +550,9 @@
                        <property name="maximum">
                         <double>999999999.000000000000000</double>
                        </property>
+                       <property name="singleStep">
+                        <double>0.100000000000000</double>
+                       </property>
                       </widget>
                      </item>
                      <item row="1" column="1">
@@ -1713,8 +1716,32 @@ p, li { white-space: pre-wrap; }
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
+          <property name="leftMargin">
+           <number>5</number>
+          </property>
+          <property name="topMargin">
+           <number>5</number>
+          </property>
+          <property name="rightMargin">
+           <number>5</number>
+          </property>
+          <property name="bottomMargin">
+           <number>5</number>
+          </property>
           <item row="0" column="0" colspan="2">
            <widget class="QFrame" name="frame_DISPLAY">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>140</width>
+              <height>120</height>
+             </size>
+            </property>
             <property name="autoFillBackground">
              <bool>true</bool>
             </property>
@@ -1725,6 +1752,21 @@ p, li { white-space: pre-wrap; }
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
+             <property name="spacing">
+              <number>10</number>
+             </property>
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
+             <property name="topMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>5</number>
+             </property>
+             <property name="bottomMargin">
+              <number>5</number>
+             </property>
              <item>
               <widget class="QCheckBox" name="checkBox_displayColorbar">
                <property name="text">
@@ -1749,6 +1791,36 @@ p, li { white-space: pre-wrap; }
               <widget class="QCheckBox" name="checkBox_displayAttribute">
                <property name="text">
                 <string>Attribute Name</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkBox_displayAxis">
+               <property name="text">
+                <string>Axis</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkBox_displaySphere">
+               <property name="text">
+                <string>Sphere</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkBox_displayTitles">
+               <property name="text">
+                <string>Titles</string>
                </property>
                <property name="checked">
                 <bool>true</bool>

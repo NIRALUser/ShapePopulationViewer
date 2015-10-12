@@ -47,10 +47,15 @@ ShapePopulationBase::ShapePopulationBase()
     m_displayColorbar = true;
     m_displayAttribute = true;
     m_displayMeshName = true;
+    m_displaySphere = true;
+    m_displayAxis = true;
+    m_displayTitles = true;
     m_createWidget = false;
     m_clickEvent = false;
     m_createAxis.push_back(false);
     m_createSphere.push_back(false);
+    m_createTitleSphere.push_back(false);
+    m_createTitleAxis.push_back(false);
 
     
 }
@@ -119,6 +124,15 @@ void ShapePopulationBase::setLabelColor(double a_labelColor[])
         vtkSmartPointer<vtkTextProperty> labelProperty = scalarBar->GetLabelTextProperty();
         labelProperty->SetColor(m_labelColor);
         
+
+        // Title of the axis
+//        if(!m_widgetTitleAxis.empty()) deleteTitleAxisWidget();
+//        this->displayTitleAxisWidget(true);
+
+        // Title of the sphere
+//        if(!m_widgetTitleSphere.empty()) deleteTitleSphereWidget();
+//        this->displayTitleSphereWidget(true);
+
         m_windowsList[i]->Render();
     }
 }
@@ -182,20 +196,6 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     
     vtkSmartPointer<vtkPolyData> SphereWithGradientColors = MeshSphereWithGradientColors->GetPolyData();
     
-    //translate the sphere
-//    vtkSmartPointer<vtkTransform> translation = vtkSmartPointer<vtkTransform>::New();
-//    translation->Translate(60.0, 20.0, 0.0);
-//    translation->Scale(0.5, 0.5, 0.5);
-    
-//    vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-//#if (VTK_MAJOR_VERSION < 6)
-//    transformFilter->SetInputConnection(m_SphereWithGradientColors>GetProducerPort());
-//#else
-//    transformFilter->SetInputData(m_SphereWithGradientColors);
-//#endif
-//    transformFilter->SetTransform(translation);
-//    transformFilter->Update();
-    
     //mapper of the sphere
     vtkSmartPointer<vtkPolyDataMapper> mapperSphere = vtkSmartPointer<vtkPolyDataMapper>::New();
 #if (VTK_MAJOR_VERSION < 6)
@@ -203,15 +203,11 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 #else
     mapperSphere->SetInputData(SphereWithGradientColors);
 #endif
-
     
     //actor of the sphere
     m_actorSphere = vtkSmartPointer<vtkActor>::New();
     m_actorSphere->SetMapper(mapperSphere);
-    
-    // Set Active Scalars
-//    m_SphereWithGradientColors->GetPointData()->SetActiveScalars("ColorByDirection");
-    
+        
     /* END SPHERE WITH GRADIENT COLORS*/
     
     
@@ -1471,17 +1467,101 @@ void ShapePopulationBase::displayMeshName(bool display)
     }
 }
 
+void ShapePopulationBase::displayAxis(bool display)
+{
+    for(unsigned int i = 0; i < m_windowsList.size() ; i++)
+    {
+        if(display)
+        {
+            m_displayAxis = true;
+            if(m_displayAbsoluteColorMapByDirection || (m_displayVectors[m_selectedIndex[0]] && m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]]))
+            {
+                displayAxisWidget(true);
+                if(!(m_displayAbsoluteColorMapByDirection && m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]]))
+                {
+                    displayTitleAxisWidget(true);
+                }
+
+            }
+        }
+        else
+        {
+            m_displayAxis = false;
+            if(!m_widgetAxis.empty()) deleteAxisWidget();
+            if(!m_widgetTitleAxis.empty()) deleteTitleAxisWidget();
+        }
+    }
+}
+
+void ShapePopulationBase::displaySphere(bool display)
+{
+    for(unsigned int i = 0; i < m_windowsList.size() ; i++)
+    {
+        if(display)
+        {
+            m_displaySphere = true;
+            if((m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection) || (m_displayVectors[m_selectedIndex[0]] && m_displayVectorsByDirection[m_selectedIndex[i]]))
+            {
+                displaySphereWidget(true);
+                if(!(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection && m_displayVectorsByDirection[m_selectedIndex[0]]))
+                {
+                    displayTitleSphereWidget(true);
+                }
+            }
+        }
+        else
+        {
+            m_displaySphere = false;
+            if(!m_widgetSphere.empty()) deleteSphereWidget();
+            if(!m_widgetTitleSphere.empty()) deleteTitleSphereWidget();
+        }
+    }
+}
+
+void ShapePopulationBase::displayTitles(bool display)
+{
+    for(unsigned int i = 0; i < m_windowsList.size() ; i++)
+    {
+        if(display)
+        {
+            m_displayTitles = true;
+            if((m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection) || (m_displayVectors[m_selectedIndex[i]] && m_displayVectorsByDirection[m_selectedIndex[i]]))
+            {
+                if(!(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection && m_displayVectorsByDirection[m_selectedIndex[i]]))
+                {
+                    displayTitleSphereWidget(true);
+                }
+            }
+            if((m_displayAbsoluteColorMapByDirection) || (m_displayVectors[m_selectedIndex[i]] && m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]]))
+            {
+                if(!(m_displayAbsoluteColorMapByDirection && m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]]))
+                {
+                    displayTitleAxisWidget(true);
+                }
+            }
+
+        }
+        else
+        {
+            m_displayTitles = false;
+            if(!m_widgetTitleAxis.empty()) deleteTitleAxisWidget();
+            if(!m_widgetTitleSphere.empty()) deleteTitleSphereWidget();
+        }
+    }
+}
+
+
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                            AXIS                                               * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
-void ShapePopulationBase::displayAxis(bool display)
+void ShapePopulationBase::displayAxisWidget(bool display)
 {
     for (unsigned int i = 0; i < m_windowsList.size() ;i++)
     {
         vtkRenderWindow *renderWindow = m_windowsList[i];
 
-        if(display)
+        if(display && m_displayAxis)
         {
             if((find(m_selectedIndex.begin(), m_selectedIndex.end(), i)) != (m_selectedIndex.end()) )
             {
@@ -1491,12 +1571,12 @@ void ShapePopulationBase::displayAxis(bool display)
                     vtkSmartPointer<vtkAxesActor> actorAxis = vtkSmartPointer<vtkAxesActor>::New();
 
                     vtkOrientationMarkerWidget* widgetAxis = vtkOrientationMarkerWidget::New();
-                    widgetAxis->SetOutlineColor( 0.9300, 0.5700, 0.1300 ); // color for the frame around the axes
+                    widgetAxis->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
                     widgetAxis->SetOrientationMarker( actorAxis );
                     widgetAxis->SetInteractor( iren );
-                    widgetAxis->SetViewport( 0.0, 0.0, 0.2, 0.2 ); // size of the frame
+                    widgetAxis->SetViewport( 0.0, 0.05, 0.15, 0.3 ); // size and position of the frame
                     widgetAxis->SetEnabled( 1 );
-                    widgetAxis->InteractiveOn();
+                    widgetAxis->InteractiveOff();
 
                     m_widgetAxis.push_back(widgetAxis);
 
@@ -1517,7 +1597,7 @@ void ShapePopulationBase::displayAxis(bool display)
     }
 }
 
-void ShapePopulationBase::deleteAxis()
+void ShapePopulationBase::deleteAxisWidget()
 {
     for (unsigned int i = 0; i < m_widgetAxis.size() ;i++)
     {
@@ -1532,25 +1612,123 @@ void ShapePopulationBase::deleteAxis()
     m_widgetAxis.clear();
 }
 
-void ShapePopulationBase::creationAxis(int index)
+void ShapePopulationBase::creationAxisWidget(int index)
 {
-    vtkRenderWindow *renderWindow = m_windowsList[index];
+    if(m_displayAxis)
+    {
+        vtkRenderWindow *renderWindow = m_windowsList[index];
 
-    vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+        vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
 
-    vtkSmartPointer<vtkAxesActor> actorAxis = vtkSmartPointer<vtkAxesActor>::New();
+        vtkSmartPointer<vtkAxesActor> actorAxis = vtkSmartPointer<vtkAxesActor>::New();
 
-    vtkOrientationMarkerWidget* widgetAxis = vtkOrientationMarkerWidget::New();
-    widgetAxis = m_widgetAxis[index];
-    widgetAxis->SetOutlineColor( 0.9300, 0.5700, 0.1300 ); // color for the frame around the axes
-    widgetAxis->SetOrientationMarker( actorAxis );
-    widgetAxis->SetInteractor( iren );
-    widgetAxis->SetViewport( 0.0, 0.0, 0.2, 0.2 ); // size of the frame
-    widgetAxis->SetEnabled( 1 );
-    widgetAxis->InteractiveOn();
+        vtkOrientationMarkerWidget* widgetAxis = vtkOrientationMarkerWidget::New();
+        widgetAxis = m_widgetAxis[index];
+        widgetAxis->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
+        widgetAxis->SetOrientationMarker( actorAxis );
+        widgetAxis->SetInteractor( iren );
+        widgetAxis->SetViewport( 0.0, 0.05, 0.15, 0.3 ); // size and position of the frame
+        widgetAxis->SetEnabled( 1 );
+        widgetAxis->InteractiveOff();
 
-    m_createAxis[index] = true;
+        m_createAxis[index] = true;
+    }
 }
+
+void ShapePopulationBase::displayTitleAxisWidget(bool display)
+{
+    for (unsigned int i = 0; i < m_windowsList.size() ;i++)
+    {
+        vtkRenderWindow *renderWindow = m_windowsList[i];
+
+        if(display && m_displayTitles && m_displayAxis)
+        {
+            if((find(m_selectedIndex.begin(), m_selectedIndex.end(), i)) != (m_selectedIndex.end()) )
+            {
+                if(!m_createTitleAxis[i])
+                {
+                    vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+
+                    // TITLE
+                    vtkSmartPointer<vtkTextActor> actorTitleAxis = vtkSmartPointer<vtkTextActor>::New();
+                    actorTitleAxis->GetTextProperty()->SetFontSize ( 14 );
+                    if(m_displayAbsoluteColorMapByDirection && !m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]]) actorTitleAxis->SetInput( "Color Map" );
+                    else if(!m_displayAbsoluteColorMapByDirection && m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]]) actorTitleAxis->SetInput( "Color of vectors" );
+//                    else if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection && m_displayVectorsByDirection[m_selectedIndex[0]]) actorTitleAxis->SetInput( "Color Map and Color of vectors" );
+                    actorTitleAxis->GetTextProperty()->SetColor ( m_labelColor );
+
+                    vtkOrientationMarkerWidget* widgetTitleAxis = vtkOrientationMarkerWidget::New();
+                    widgetTitleAxis->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
+                    widgetTitleAxis->SetOrientationMarker( actorTitleAxis );
+                    widgetTitleAxis->SetInteractor( iren );
+                    widgetTitleAxis->SetViewport( 0.05, 0.3, 0.15, 0.35 ); // size and position of the frame
+                    widgetTitleAxis->SetEnabled( 1 );
+                    widgetTitleAxis->InteractiveOn();
+
+                    m_widgetTitleAxis.push_back(widgetTitleAxis);
+
+                    m_createTitleAxis[i] = true;
+
+                    m_createTitleAxis.push_back(false);
+                }
+            }
+            else
+            {
+                vtkOrientationMarkerWidget* widgetTitleAxis = vtkOrientationMarkerWidget::New();
+                m_widgetTitleAxis.push_back(widgetTitleAxis);
+
+                m_createTitleAxis.push_back(false);
+            }
+        }
+
+        renderWindow->Render();
+    }
+}
+
+void ShapePopulationBase::deleteTitleAxisWidget()
+{
+    for (unsigned int i = 0; i < m_widgetTitleAxis.size() ;i++)
+    {
+        if(m_createTitleAxis[i])
+        {
+            m_widgetTitleAxis[i]->SetEnabled( 0 );
+            m_widgetTitleAxis[i]->Delete();
+        }
+        m_createTitleAxis[i] = false;
+
+    }
+    m_widgetTitleAxis.clear();
+}
+
+void ShapePopulationBase::creationTitleAxisWidget(int index)
+{
+    if(m_displayTitles && m_displayAxis)
+    {
+        vtkRenderWindow *renderWindow = m_windowsList[index];
+
+        vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+
+        // TITLE
+        vtkSmartPointer<vtkTextActor> actorTitleAxis = vtkSmartPointer<vtkTextActor>::New();
+        actorTitleAxis->GetTextProperty()->SetFontSize ( 14 );
+        if(m_displayAbsoluteColorMapByDirection && !m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]]) actorTitleAxis->SetInput( "Color Map" );
+        else if(!m_displayAbsoluteColorMapByDirection && m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]]) actorTitleAxis->SetInput( "Color of vectors" );
+        actorTitleAxis->GetTextProperty()->SetColor ( m_labelColor );
+
+        vtkOrientationMarkerWidget* widgetTitleAxis = vtkOrientationMarkerWidget::New();
+        widgetTitleAxis->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
+        widgetTitleAxis->SetOrientationMarker( actorTitleAxis );
+        widgetTitleAxis->SetInteractor( iren );
+        widgetTitleAxis->SetViewport( 0.05, 0.3, 0.15, 0.35 ); // size and position of the frame
+        widgetTitleAxis->SetEnabled( 1 );
+        widgetTitleAxis->InteractiveOff();
+
+        m_widgetTitleAxis.push_back(widgetTitleAxis);
+
+        m_createTitleAxis[index] = true;
+    }
+}
+
 
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -1558,13 +1736,13 @@ void ShapePopulationBase::creationAxis(int index)
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 
-void ShapePopulationBase::displaySphere(bool display)
+void ShapePopulationBase::displaySphereWidget(bool display)
 {
     for (unsigned int i = 0; i < m_windowsList.size() ;i++)
     {
         vtkRenderWindow *renderWindow = m_windowsList[i];
 
-        if(display)
+        if(display && m_displaySphere)
         {
             if((find(m_selectedIndex.begin(), m_selectedIndex.end(), i)) != (m_selectedIndex.end()) )
             {
@@ -1572,15 +1750,34 @@ void ShapePopulationBase::displaySphere(bool display)
                 {
                     vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
 
+                    // SPHERE
                     vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
-                    widgetSphere->SetOutlineColor( 0.9300, 0.5700, 0.1300 ); // color for the frame around the axes
                     widgetSphere->SetOrientationMarker( m_actorSphere );
                     widgetSphere->SetInteractor( iren );
-                    widgetSphere->SetViewport( 0.0, 0.0, 0.2, 0.2 ); // size of the frame
+                    widgetSphere->SetViewport( 0.85, 0.05, 1, 0.33 ); // size and position of the frame
                     widgetSphere->SetEnabled( 1 );
-                    widgetSphere->InteractiveOn();
+                    widgetSphere->InteractiveOff();
 
                     m_widgetSphere.push_back(widgetSphere);
+
+                    // AXIS
+                    vtkSmartPointer<vtkAxesActor> actorAxisByDirection = vtkSmartPointer<vtkAxesActor>::New();
+                    // color of axis
+                    actorAxisByDirection->GetXAxisShaftProperty()->SetColor(1,0.5,0.5);
+                    actorAxisByDirection->GetXAxisTipProperty()->SetColor(1,0.5,0.5);
+                    actorAxisByDirection->GetYAxisShaftProperty()->SetColor(0.5,1,0.5);
+                    actorAxisByDirection->GetYAxisTipProperty()->SetColor(0.5,1,0.5);
+                    actorAxisByDirection->GetZAxisShaftProperty()->SetColor(0.5,0.5,1);
+                    actorAxisByDirection->GetZAxisTipProperty()->SetColor(0.5,0.5,1);
+
+                    vtkOrientationMarkerWidget* widgetAxisByDirection = vtkOrientationMarkerWidget::New();
+                    widgetAxisByDirection->SetOrientationMarker( actorAxisByDirection );
+                    widgetAxisByDirection->SetInteractor( iren );
+                    widgetAxisByDirection->SetViewport( 0.70, 0.05, 0.85, 0.33 ); // size and position of the frame
+                    widgetAxisByDirection->SetEnabled( 1 );
+                    widgetAxisByDirection->InteractiveOff();
+
+                    m_widgetAxisByDirection.push_back(widgetAxisByDirection);
 
                     m_createSphere[i] = true;
 
@@ -1591,6 +1788,8 @@ void ShapePopulationBase::displaySphere(bool display)
             {
                 vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
                 m_widgetSphere.push_back(widgetSphere);
+                vtkOrientationMarkerWidget* widgetAxisByDirection = vtkOrientationMarkerWidget::New();
+                m_widgetAxisByDirection.push_back(widgetAxisByDirection);
                 m_createSphere.push_back(false);
             }
         }
@@ -1599,7 +1798,7 @@ void ShapePopulationBase::displaySphere(bool display)
     }
 }
 
-void ShapePopulationBase::deleteSphere()
+void ShapePopulationBase::deleteSphereWidget()
 {
     for (unsigned int i = 0; i < m_widgetSphere.size() ;i++)
     {
@@ -1607,31 +1806,148 @@ void ShapePopulationBase::deleteSphere()
         {
             m_widgetSphere[i]->SetEnabled( 0 );
             m_widgetSphere[i]->Delete();
+            m_widgetAxisByDirection[i]->SetEnabled( 0 );
+            m_widgetAxisByDirection[i]->Delete();
         }
         m_createSphere[i] = false;
 
     }
     m_widgetSphere.clear();
+    m_widgetAxisByDirection.clear();
 }
 
-void ShapePopulationBase::creationSphere(int index)
+void ShapePopulationBase::creationSphereWidget(int index)
 {
-    vtkRenderWindow *renderWindow = m_windowsList[index];
+    if(m_displaySphere)
+    {
+        vtkRenderWindow *renderWindow = m_windowsList[index];
 
-    vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+        vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
 
-    vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
-    widgetSphere = m_widgetSphere[index];
-    widgetSphere->SetOutlineColor( 0.9300, 0.5700, 0.1300 ); // color for the frame around the axes
-    widgetSphere->SetOrientationMarker( m_actorSphere );
-    widgetSphere->SetInteractor( iren );
-    widgetSphere->SetViewport( 0.0, 0.0, 0.2, 0.2 ); // size of the frame
-    widgetSphere->SetEnabled( 1 );
-    widgetSphere->InteractiveOn();
+        // SPHERE
+        vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
+        widgetSphere = m_widgetSphere[index];
+        widgetSphere->SetOrientationMarker( m_actorSphere );
+        widgetSphere->SetInteractor( iren );
+        widgetSphere->SetViewport( 0.85, 0.05, 1, 0.3 ); // size and position of the frame
+        widgetSphere->SetEnabled( 1 );
+        widgetSphere->InteractiveOff();
 
-    m_createSphere[index] = true;
+
+        // AXIS
+        vtkSmartPointer<vtkAxesActor> actorAxisByDirection = vtkSmartPointer<vtkAxesActor>::New();
+
+        // color of axis
+        actorAxisByDirection->GetXAxisShaftProperty()->SetColor(1,0.5,0.5);
+        actorAxisByDirection->GetXAxisTipProperty()->SetColor(1,0.5,0.5);
+        actorAxisByDirection->GetYAxisShaftProperty()->SetColor(0.5,1,0.5);
+        actorAxisByDirection->GetYAxisTipProperty()->SetColor(0.5,1,0.5);
+        actorAxisByDirection->GetZAxisShaftProperty()->SetColor(0.5,0.5,1);
+        actorAxisByDirection->GetZAxisTipProperty()->SetColor(0.5,0.5,1);
+
+        vtkOrientationMarkerWidget* widgetAxisByDirection = vtkOrientationMarkerWidget::New();
+        widgetAxisByDirection = m_widgetAxisByDirection[index];
+        widgetAxisByDirection->SetOrientationMarker( actorAxisByDirection );
+        widgetAxisByDirection->SetInteractor( iren );
+        widgetAxisByDirection->SetViewport( 0.70, 0.05, 0.85, 0.3 ); // size and position of the frame
+        widgetAxisByDirection->SetEnabled( 1 );
+        widgetAxisByDirection->InteractiveOff();
+
+        m_createSphere[index] = true;
+    }
+}
+void ShapePopulationBase::displayTitleSphereWidget(bool display)
+{
+    for (unsigned int i = 0; i < m_windowsList.size() ;i++)
+    {
+        vtkRenderWindow *renderWindow = m_windowsList[i];
+
+        if(display && m_displayTitles && m_displaySphere)
+        {
+            if((find(m_selectedIndex.begin(), m_selectedIndex.end(), i)) != (m_selectedIndex.end()) )
+            {
+                if(!m_createTitleSphere[i])
+                {
+                    vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+
+                    // TITLE
+                    vtkSmartPointer<vtkTextActor> actorTitleSphere = vtkSmartPointer<vtkTextActor>::New();
+                    actorTitleSphere->GetTextProperty()->SetFontSize ( 14 );
+                    if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection && !m_displayVectorsByDirection[m_selectedIndex[0]]) actorTitleSphere->SetInput ( "Color Map" );
+                    else if(m_displayVectorsByDirection[m_selectedIndex[0]]) actorTitleSphere->SetInput ( "Color of vectors" );
+                    actorTitleSphere->GetTextProperty()->SetColor ( m_labelColor );
+
+                    vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();
+                    widgetTitleSphere->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
+                    widgetTitleSphere->SetOrientationMarker( actorTitleSphere );
+                    widgetTitleSphere->SetInteractor( iren );
+                    widgetTitleSphere->SetViewport( 0.8, 0.3, 0.95, 0.35 ); // size and position of the frame
+                    widgetTitleSphere->SetEnabled( 1 );
+                    widgetTitleSphere->InteractiveOff();
+
+                    m_widgetTitleSphere.push_back(widgetTitleSphere);
+
+                    m_createTitleSphere[i] = true;
+
+                    m_createTitleSphere.push_back(false);
+                }
+            }
+            else
+            {
+                vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();
+                m_widgetTitleSphere.push_back(widgetTitleSphere);
+
+                m_createTitleSphere.push_back(false);
+            }
+        }
+
+        renderWindow->Render();
+    }
 }
 
+void ShapePopulationBase::deleteTitleSphereWidget()
+{
+    for (unsigned int i = 0; i < m_widgetTitleSphere.size() ;i++)
+    {
+        if(m_createTitleSphere[i])
+        {
+            m_widgetTitleSphere[i]->SetEnabled( 0 );
+            m_widgetTitleSphere[i]->Delete();
+        }
+        m_createTitleSphere[i] = false;
+
+    }
+    m_widgetTitleSphere.clear();
+}
+
+void ShapePopulationBase::creationTitleSphereWidget(int index)
+{
+    if(m_displayTitles && m_displaySphere)
+    {
+        vtkRenderWindow *renderWindow = m_windowsList[index];
+
+        vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
+
+        // TITLE
+        vtkSmartPointer<vtkTextActor> actorTitleSphere = vtkSmartPointer<vtkTextActor>::New();
+        actorTitleSphere->GetTextProperty()->SetFontSize ( 14 );
+        if(m_displayAbsoluteColorMapByDirection && !m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]]) actorTitleSphere->SetInput ( "Color Map" );
+        else if(!m_displayAbsoluteColorMapByDirection && m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]]) actorTitleSphere->SetInput ( "Color of vectors" );
+        actorTitleSphere->GetTextProperty()->SetColor ( m_labelColor );
+
+        vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();
+        widgetTitleSphere->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
+        widgetTitleSphere->SetOrientationMarker( actorTitleSphere );
+        widgetTitleSphere->SetInteractor( iren );
+        widgetTitleSphere->SetViewport( 0.0, 0.3, 0.15, 0.35 ); // size and position of the frame
+        widgetTitleSphere->SetEnabled( 1 );
+        widgetTitleSphere->InteractiveOff();
+
+        m_widgetTitleSphere.push_back(widgetTitleSphere);
+
+        m_createTitleSphere[index] = true;
+    }
+}
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                            CAMERA                                             * //
