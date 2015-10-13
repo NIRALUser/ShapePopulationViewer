@@ -55,6 +55,7 @@ protected:
     bool m_updateAttribute;
     bool m_clickEvent;
     bool m_displayColorMap;
+    bool m_firstDisplayVector;
     unsigned int m_numberOfMeshes;
     QString m_lastDirectory;
     QString m_colormapDirectory;

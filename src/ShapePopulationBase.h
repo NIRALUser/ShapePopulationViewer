@@ -149,18 +149,18 @@ class ShapePopulationBase
     void displayTitles(bool display);
 
     // AXIS
-    void displayAxisWidget(bool display);
+    void displayAxisWidget();
     void deleteAxisWidget();
     void creationAxisWidget(int index);
-    void displayTitleAxisWidget(bool display);
+    void displayTitleAxisWidget();
     void deleteTitleAxisWidget();
     void creationTitleAxisWidget(int index);
 
     // SPHERE
-    void displaySphereWidget(bool display);
+    void displaySphereWidget();
     void deleteSphereWidget();
     void creationSphereWidget(int index);
-    void displayTitleSphereWidget(bool display);
+    void displayTitleSphereWidget();
     void deleteTitleSphereWidget();
     void creationTitleSphereWidget(int index);
 
