@@ -8,38 +8,29 @@
 #include "cameraConfigStruct.h"
 #include "valueDirectionColorMapStruct.h"
 
-#include <vtkCamera.h>                  //Camera
-#include <vtkPolyDataMapper.h>          //Mapper
-#include <vtkActor.h>                   //Actor
-#include <vtkProperty.h>                //Actor Opacity
-#include <vtkRenderer.h>                //Renderer
-#include <vtkRenderWindow.h>            //RenderWindow
-#include <vtkRenderWindowInteractor.h>  //Interactor
-#include <vtkCornerAnnotation.h>        //Window Annotations
-#include <vtkTextProperty.h>            //Annotations Text
-#include <vtkScalarBarActor.h>          //ScalarBar
-#include <vtkColorTransferFunction.h>   //LookUpTable
-#include <vtkCommand.h>                 //Event
-#include <vtkRendererCollection.h>      //GetRenderers
-#include <vtkActor2DCollection.h>       //GetActors2D
-
-
-#include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
+#include <vtkCamera.h>                      //Camera
+#include <vtkPolyDataMapper.h>              //Mapper
+#include <vtkActor.h>                       //Actor
+#include <vtkProperty.h>                    //Actor Opacity
+#include <vtkRenderer.h>                    //Renderer
+#include <vtkRenderWindow.h>                //RenderWindow
+#include <vtkRenderWindowInteractor.h>      //Interactor
+#include <vtkCornerAnnotation.h>            //Window Annotations
+#include <vtkTextProperty.h>                //Annotations Text
+#include <vtkScalarBarActor.h>              //ScalarBar
+#include <vtkColorTransferFunction.h>       //LookUpTable
+#include <vtkCommand.h>                     //Event
+#include <vtkRendererCollection.h>          //GetRenderers
+#include <vtkActor2DCollection.h>           //GetActors2D
+#include <vtkAxesActor.h>                   //Axes Actor
+#include <vtkTextActor.h>                   //Text Actor
+#include <vtkOrientationMarkerWidget.h>     //Widgets
+#include <vtkSphereSource.h>                //Sphere
 #include <string.h>
-#include <vtkOrientationMarkerWidget.h>
-
-
 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
 #include "vtkMaskPoints.h"
-#include <vtkAxesActor.h>
-#include <vtkAssembly.h>
-#include <vtkTextActor.h>
-#include <vtkVectorText.h>
-
-
 
 #include <set>
 
@@ -70,9 +61,9 @@ class ShapePopulationBase
     valueDirectionColorMapStruct * m_usedValueDirectionColorMap;
     std::vector< valueDirectionColorMapStruct * > m_valueDirectionColorMapList;
     bool m_renderAllSelection;
-    bool m_displayColorMapByMagnitude;
-    bool m_displayColorMapByDirection;
-    bool m_displayAbsoluteColorMapByDirection;
+    std::vector<bool> m_displayColorMapByMagnitude;
+    std::vector<bool> m_displayColorMapByDirection;
+    std::vector<bool> m_displayAbsoluteColorMapByDirection;
     std::vector<bool> m_displayVectors;
     std::vector<bool> m_displayVectorsByMagnitude;
     std::vector<bool> m_displayVectorsByDirection;
@@ -84,21 +75,18 @@ class ShapePopulationBase
     bool m_displaySphere;
     bool m_displayTitles;
     bool m_createWidget;
-    bool m_clickEvent;
     double m_norm;
-    vtkSmartPointer<vtkActor> m_actorSphere;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetAxis;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetTitleAxis;
     std::vector<bool> m_createAxis;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetSphere;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetTitleSphere;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetAxisByDirection;
     std::vector<bool> m_createSphere;
     std::vector<bool> m_createTitleSphere;
     std::vector<bool> m_createTitleAxis;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetAxis;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetTitleAxis;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetSphere;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetTitleSphere;
+    std::vector< vtkOrientationMarkerWidget* > m_widgetAxisByDirection;
 
 
-    
     void CreateNewWindow(std::string a_filePath);
     
     //SELECTION
@@ -148,21 +136,22 @@ class ShapePopulationBase
     void displaySphere(bool display);
     void displayTitles(bool display);
 
-    // AXIS
-    void displayAxisWidget();
-    void deleteAxisWidget();
+    // AXIS WIDGETS and SPHERE WIDGETS
+        //Axis widgets
     void creationAxisWidget(int index);
-    void displayTitleAxisWidget();
-    void deleteTitleAxisWidget();
+    void deleteAxisWidget(int index);
     void creationTitleAxisWidget(int index);
-
-    // SPHERE
-    void displaySphereWidget();
-    void deleteSphereWidget();
+    void deleteTitleAxisWidget(int index);
+        // Sphere widgets
+    vtkActor* creationSphereActor();
     void creationSphereWidget(int index);
-    void displayTitleSphereWidget();
-    void deleteTitleSphereWidget();
+    void deleteSphereWidget(int index);
     void creationTitleSphereWidget(int index);
+    void deleteTitleSphereWidget(int index);
+        // Delete axis and sphere widgets
+    void deleteAllWidgets();
+        // Initialization of all the widgets
+    void initializationAllWidgets();
 
     //CAMERA/VIEW
     void AlignMesh(bool alignment);

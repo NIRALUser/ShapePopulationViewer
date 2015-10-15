@@ -10,7 +10,6 @@ ShapePopulationQT::ShapePopulationQT()
     m_updateOnPositionChanged = true;
     m_updateOnAttributeChanged = true;
     m_linkCoordinate = true;
-    m_updateAttribute = false;
     m_displayColorMap = false;
     m_firstDisplayVector = true;
     m_numberOfMeshes = 0;
@@ -61,6 +60,14 @@ ShapePopulationQT::ShapePopulationQT()
     this->checkBox_displayAxis->setStyleSheet(QString::fromStdString(eyeStyleSheet));
     this->checkBox_displaySphere->setStyleSheet(QString::fromStdString(eyeStyleSheet));
     this->checkBox_displayTitles->setStyleSheet(QString::fromStdString(eyeStyleSheet));
+
+    // ToolTip
+    this->checkBox_displayAbsoluteColorMapByDirection->setToolTip("This color map by direction has been created \nby taking the absolute value of each coordinates");
+    this->radioButton_displayColorMapByDirection->setToolTip("This color map has been created by \nassociating one color at one direction");
+    this->checkBox_displayAxis->setToolTip("Manage display of the marks \nof color by absolute direction");
+    this->checkBox_displayTitles->setToolTip("Manage display of the titles of \nthe marks containing axes or spheres.\nThese titles indicate if the marker is used for \na color map or a color of vectors.");
+    this->checkBox_displaySphere->setToolTip("Manage display of the marks \nof color by direction");
+
 
     QPalette backgroundColor = frame_DISPLAY->palette();
     backgroundColor.setColor( backgroundRole(), QColor( 255, 255, 255 ) );
@@ -353,10 +360,13 @@ void ShapePopulationQT::deleteSelection()
     
     // Deleting the selection, the widget, and the data
     QGridLayout *Qlayout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
-    
+
+    // delete of all axis, sphere, and titles widgets
+    deleteAllWidgets();
+
     for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
-        for(unsigned int j = 0; j < m_widgetList.size(); j++)\
+        for(unsigned int j = 0; j < m_widgetList.size(); j++)
         {
             if( j == m_selectedIndex[i])
             {
@@ -383,6 +393,7 @@ void ShapePopulationQT::deleteSelection()
             }
         }
     }
+
     m_numberOfMeshes = m_fileList.size();
     spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
     
@@ -426,18 +437,19 @@ void ShapePopulationQT::deleteSelection()
         // Tab Vectors
         if(checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
         tab_vectors->setDisabled(true);
-        // ColorMap by direction
+        // Display the color map by magnitude and disabled the color map by direction
         if (radioButton_displayColorMapByDirection->isChecked())
         {
-            m_updateAttribute = true;
-            if(m_displayAbsoluteColorMapByDirection) checkBox_displayAbsoluteColorMapByDirection->click();
             radioButton_displayColorMapByMagnitude->click();
         }
-        m_updateAttribute = false;
         radioButton_displayColorMapByDirection->setEnabled(false);
 
+
+        // initialization of all axis, sphere, and titles widgets
+        initializationAllWidgets();
+
         this->updateInfo_QT();
-        on_spinBox_DISPLAY_columns_editingFinished();
+        on_spinBox_DISPLAY_columns_valueChanged();
     }
 }
 
@@ -671,55 +683,25 @@ void ShapePopulationQT::CreateWidgets()
     }
     RealTimeRenderSynchro(radioButton_SYNC_realtime->isChecked());              //Start with a realtime synchro
 
-    /* AXIS and SPHERE WIDGET */
-
-    m_widgetAxis.clear();
-    m_createAxis.clear();
-
-    m_widgetSphere.clear();
-    m_widgetAxisByDirection.clear();
-    m_createSphere.clear();
-
-    m_widgetTitleAxis.clear();
-    m_createTitleAxis.clear();
-
-    m_widgetTitleSphere.clear();
-    m_createTitleSphere.clear();
-    for (unsigned int i = 0; i < m_widgetList.size(); i++)
-    {
-        vtkOrientationMarkerWidget* widgetAxis = vtkOrientationMarkerWidget::New();
-        m_widgetAxis.push_back(widgetAxis);
-        m_createAxis.push_back(false);
-
-        vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
-        vtkOrientationMarkerWidget* widgetAxisByDirection = vtkOrientationMarkerWidget::New();
-
-        m_widgetSphere.push_back(widgetSphere);
-        m_widgetAxisByDirection.push_back(widgetAxisByDirection);
-        m_createSphere.push_back(false);
-
-        vtkOrientationMarkerWidget* widgetTitleAxis = vtkOrientationMarkerWidget::New();
-
-        m_widgetTitleAxis.push_back(widgetTitleAxis);
-        m_createTitleAxis.push_back(false);
-
-        vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();
-
-        m_widgetTitleSphere.push_back(widgetTitleSphere);
-        m_createTitleSphere.push_back(false);
-    }
-
-
+    /* AXIS and SPHERE WIDGETS */
+    deleteAllWidgets(); // delete of all widgets (axis, sphere, titles of these widgets)
+    initializationAllWidgets(); // initialization of all the widgets
 
     /* ATTRIBUTES & COLORBARS */
     ShapePopulationBase::SelectAll();
 
+    m_displayColorMapByMagnitude.clear();
+    m_displayColorMapByDirection.clear();
+    m_displayAbsoluteColorMapByDirection.clear();
     m_displayVectors.clear();
     m_displayVectorsByMagnitude.clear();
     m_displayVectorsByDirection.clear();
     m_displayVectorsByAbsoluteDirection.clear();
     for (unsigned int i = 0; i < m_widgetList.size(); i++)
     {
+        m_displayColorMapByMagnitude.push_back(false);
+        m_displayColorMapByDirection.push_back(false);
+        m_displayAbsoluteColorMapByDirection.push_back(false);
         m_displayVectors.push_back(false);
         m_displayVectorsByMagnitude.push_back(false);
         m_displayVectorsByDirection.push_back(false);
@@ -812,12 +794,18 @@ void ShapePopulationQT::CreateWidgets()
     if (checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
     if (radioButton_displayColorMapByDirection->isChecked())
     {
-        if(m_displayAbsoluteColorMapByDirection) checkBox_displayAbsoluteColorMapByDirection->click();
+        if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]]) checkBox_displayAbsoluteColorMapByDirection->click();
+    }
+    else
+    {
+        this->displayColorMapByMagnitude(true);
+        stackedWidget_ColorMapByMagnitude->show();
+        stackedWidget_ColorMapByDirection->hide();
+        this->RenderAll();
     }
     radioButton_displayColorMapByMagnitude->click();
-    stackedWidget_ColorMapByMagnitude->show();
-    stackedWidget_ColorMapByDirection->hide();
-    
+
+
     /* Options enabled or not for Vectors */
     const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
     int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
@@ -833,6 +821,7 @@ void ShapePopulationQT::CreateWidgets()
         widget_VISU_optionVectors->setDisabled(true);
     }
     /* */
+
     
     this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
     this->menuOptions->setEnabled(true);
@@ -855,7 +844,7 @@ void ShapePopulationQT::CreateWidgets()
         sum += nextOdd;                                         //simple integer square root, will give the ceiling of the colNumber => cols >= rows
     }
     spinBox_DISPLAY_columns->setValue(colNumber+1);             //Display the number of columns in spinBox_DISPLAY_columns,
-    on_spinBox_DISPLAY_columns_editingFinished();                  //and display the Widgets according to this number.
+    on_spinBox_DISPLAY_columns_valueChanged();                  //and display the Widgets according to this number.
 
     m_createWidget = false;
 
@@ -884,7 +873,6 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
     /* VTK SELECTION */
     ShapePopulationBase::ClickEvent(a_selectedObject,notUseduLong,notUsedVoid);
     
-    m_clickEvent = false;
 
     if(m_selectedIndex.size() == 0)
     {
@@ -912,7 +900,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         new_cmap = new_cmap.substr(0,found);
         if( (new_cmap !=std::string(cmap)) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()))
             dim = 3;
-        
+
         if (dim == 1)
         {
             // Tab Vectors
@@ -930,7 +918,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                 widget_VISU_colorVectors->setDisabled(true);
                 widget_VISU_optionVectors->setDisabled(true);
             }
-            // radio button of teh color map by direction
+            // radio button of the color map by direction
             radioButton_displayColorMapByDirection->setEnabled(true);
         }
         this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
@@ -948,13 +936,12 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
             }
         }
         
-        
         /* DISPLAY INFOS */
         this->updateInfo_QT();
         this->updateAttribute_QT();
 
 
-        /* UPDATE VECTORS and BUTTONS*/
+        /* UPDATE COLOR MAPS and VECTORS and BUTTONS*/
         if( (std::find(m_selectedIndex.begin(), m_selectedIndex.end(), index)) != (m_selectedIndex.end()) ) // new selection
         {
             if(m_selectedIndex.size() > 1 )
@@ -965,6 +952,30 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                     this->setVectorDensity(this->spinbox_arrowDens->value());
                     this->setVectorScale((double)this->spinbox_vectorScale->value()/100);
 
+                    // COLOR MAP
+                    // Update the color map by magnitude to the first selected window position
+                    if(m_displayColorMapByMagnitude[m_selectedIndex[0]])
+                    {
+                        m_displayColorMapByDirection[index] = false;
+                        m_displayAbsoluteColorMapByDirection[index] = false;
+                        this->displayColorMapByMagnitude(true);
+
+                    }
+                    // Update the color map by direction to the first selected window position
+                    else if(m_displayColorMapByDirection[m_selectedIndex[0]])
+                    {
+                        m_displayColorMapByMagnitude[index] = false;
+                        m_displayAbsoluteColorMapByDirection[index] = false;
+                        this->displayColorMapByDirection(true);
+                    }
+                    // Update the color map by absolute direction to the first selected window position
+                    else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
+                    {
+                        m_displayColorMapByMagnitude[index] = false;
+                        m_displayAbsoluteColorMapByDirection[index] = false;
+                        this->displayAbsoluteColorMapByDirection(true);
+                    }
+                    // VECTORS
                     if(m_displayVectors[m_selectedIndex[0]])
                     {
                         m_displayVectors[index] = true;
@@ -1007,26 +1018,19 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                 if(selectedInteractor->GetControlKey() == 0)  // Ctrl not pushed
                 {
                     // Update the button selected according the color map
-                    std::string a_cmap = std::string(cmap);
-                    std::string key1 ("_ColorByDirection");
-                    size_t found1 = a_cmap.rfind(key1);
-                    if (found1!=std::string::npos)
+                    if (m_displayColorMapByMagnitude[index])
+                    {
+                        radioButton_displayColorMapByMagnitude->click();
+                    }
+                    else if (m_displayColorMapByDirection[index])
                     {
                         if(checkBox_displayAbsoluteColorMapByDirection->isChecked()) checkBox_displayAbsoluteColorMapByDirection->click();
                         radioButton_displayColorMapByDirection->click();
                     }
-                    std::string key2 ("_AbsoluteColorByDirection");
-                    found1 = a_cmap.rfind(key2);
-                    if (found1!=std::string::npos)
+                    else if (m_displayAbsoluteColorMapByDirection[index])
                     {
                         radioButton_displayColorMapByDirection->click();
                         if(!checkBox_displayAbsoluteColorMapByDirection->isChecked()) checkBox_displayAbsoluteColorMapByDirection->click();
-                    }
-                    std::string key3 ("_mag");
-                    found1 = a_cmap.rfind(key3);
-                    if (found1!=std::string::npos)
-                    {
-                        radioButton_displayColorMapByMagnitude->click();
                     }
 
                     // Update the button selected according the color of vectors
@@ -1053,51 +1057,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                 }
             }
         }
-
-        // Creation of axis in the case of new selection
-//        if(selectedInteractor->GetControlKey() == 1) // Ctrl pushed
-//        {
-            if( (std::find(m_selectedIndex.begin(), m_selectedIndex.end(), index)) != (m_selectedIndex.end()) ) // new selection
-            {
-                if(m_displayAbsoluteColorMapByDirection || m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]])
-                {
-                    if(!m_createAxis[index])
-                    {
-                        creationAxisWidget(index);
-                    }
-                    if(m_displayVectors[m_selectedIndex[0]])
-                    {
-                        if(!(m_displayAbsoluteColorMapByDirection && m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]]))
-                        {
-                            if(!m_createTitleAxis[index])
-                            {
-                                creationTitleAxisWidget(index);
-                            }
-                        }
-                    }
-                }
-                if(m_displayColorMapByDirection || m_displayVectorsByDirection[m_selectedIndex[0]])
-                {
-                    if(!m_createSphere[index])
-                    {
-                        creationSphereWidget(index);
-                    }
-                    if(m_displayVectors[m_selectedIndex[0]])
-                    {
-                        if(!(m_displayColorMapByDirection && m_displayVectorsByDirection[m_selectedIndex[0]]))
-                        {
-                            if(!m_createTitleSphere[index])
-                            {
-                                creationTitleSphereWidget(index);
-                            }
-                        }
-                    }
-                }
-            }
-//        }
     }
-
-    m_clickEvent = false;
 }
 
 void ShapePopulationQT::SelectAll()
@@ -1325,7 +1285,7 @@ void ShapePopulationQT::on_radioButton_DISPLAY_square_toggled()
     resizeWidgetInArea();
 }
 
-void ShapePopulationQT::on_spinBox_DISPLAY_columns_editingFinished()
+void ShapePopulationQT::on_spinBox_DISPLAY_columns_valueChanged()
 {
     if(m_numberOfMeshes == 0) return;
     this->scrollArea->setVisible(false);
@@ -1440,8 +1400,6 @@ void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged()
 
 void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
 {
-    m_updateAttribute = true;
-
     if(m_selectedIndex.size() == 0 || m_updateOnAttributeChanged == false) return;
     
     int index = this->comboBox_VISU_attribute->currentIndex();
@@ -1457,7 +1415,20 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         {
             this->setVectorDensity(this->spinbox_arrowDens->value());
         }
+
+        // Update Attribute and commonRange
+        this->UpdateAttribute(cmap, m_selectedIndex);
+
+        // Change the colorbar selected
+        m_usedColorBar = m_colorBarList[index]; //the colorbar depends of the attribute
+        this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
+        spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
+        spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
         
+        // Display colormap
+        this->UpdateColorMap(m_selectedIndex);
+        this->updateArrowPosition();
+
         /* Options enabled or not for Vectors */
         if (dimension == 1)
         {
@@ -1467,14 +1438,11 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
             // ColorMap by direction
             if (radioButton_displayColorMapByDirection->isChecked())
             {
-                m_updateAttribute = true;
-                if(m_displayAbsoluteColorMapByDirection) checkBox_displayAbsoluteColorMapByDirection->click();
                 radioButton_displayColorMapByMagnitude->click();
             }
-            m_updateAttribute = false;
             radioButton_displayColorMapByDirection->setEnabled(false);
         }
-        else
+        else if(dimension == 3)
         {
             // Tab Vectors
             tab_vectors->setEnabled(true);
@@ -1485,25 +1453,11 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
             }
             // ColorMap by direction
             radioButton_displayColorMapByDirection->setEnabled(true);
-        }
-        
-        // Update Attribute and commonRange
-        this->UpdateAttribute(cmap, m_selectedIndex);
-        
-        // Change the colorbar selected
-        m_usedColorBar = m_colorBarList[index]; //the colorbar depends of the attribute
-        this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
-        spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
-        spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
-        
-        // Update the Range of the color map by direction
-        if(dimension == 3)
-        {            
+
+            // Update the Range of the color map by direction
             m_usedValueDirectionColorMap = m_valueDirectionColorMapList[index];
-
             m_displayColorMap = true;
-
-            if(m_displayColorMapByDirection && !m_displayAbsoluteColorMapByDirection)
+            if(m_displayColorMapByDirection[m_selectedIndex[0]] && !m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
             {
                 spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->min[0]);
                 spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->max[0]);
@@ -1513,7 +1467,7 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
                 spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[2]);
 
             }
-            else if (m_displayColorMapByDirection && m_displayAbsoluteColorMapByDirection)
+            else if (m_displayColorMapByDirection[m_selectedIndex[0]] && m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
             {
                 spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->minAbs[0]);
                 spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
@@ -1525,18 +1479,11 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
 
             m_displayColorMap = false;
         }
-        
-        
-        // Display colormap
-        this->UpdateColorMap(m_selectedIndex);
-        this->updateArrowPosition();
 
         // Render
         m_renderAllSelection = true;
         this->RenderSelection();
         m_renderAllSelection = false;
-
-        m_updateAttribute = false;
     }
 }
 
@@ -1796,7 +1743,7 @@ void ShapePopulationQT::on_spinBox_VISU_min_AxisX_valueChanged(double newXmin)
             spinBox_VISU_min_AxisX->setValue(spinBox_VISU_max_AxisX->value());
         }
 
-        if(m_displayColorMapByDirection)
+        if(m_displayColorMapByDirection[m_selectedIndex[0]])
         {
             if(m_linkCoordinate)
             {
@@ -1855,7 +1802,7 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisX_valueChanged(double newXmax)
             double newYmax;
             double newZmax;
 
-            if(m_displayColorMapByDirection)
+            if(m_displayColorMapByDirection[m_selectedIndex[0]])
             {
                 double Xmax = m_usedValueDirectionColorMap->max[0];
 
@@ -1868,7 +1815,7 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisX_valueChanged(double newXmax)
                 m_usedValueDirectionColorMap->max[2] = newZmax;
                 spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
             }
-            else if(m_displayAbsoluteColorMapByDirection)
+            else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
             {
                 double Xmax = m_usedValueDirectionColorMap->maxAbs[0];
 
@@ -1885,12 +1832,12 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisX_valueChanged(double newXmax)
 
         }
 
-        if(m_displayColorMapByDirection)
+        if(m_displayColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->max[0] = newXmax;
             this->UpdateColorMapByDirection_QT();
         }
-        else if(m_displayAbsoluteColorMapByDirection)
+        else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->maxAbs[0] = newXmax;
             this->UpdateColorMapByAbsoluteDirection_QT();
@@ -1907,7 +1854,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisX_clicked()
 
     if(m_linkCoordinate)
     {
-        if(m_displayColorMapByDirection)
+        if(m_displayColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->min[1] = m_commonMin[1];
             m_usedValueDirectionColorMap->max[1] = m_commonMax[1];
@@ -1918,7 +1865,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisX_clicked()
             spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
             spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
         }
-        else if(m_displayAbsoluteColorMapByDirection)
+        else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->maxAbs[1] = m_commonMaxAbs[1];
             spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->maxAbs[1]);
@@ -1927,7 +1874,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisX_clicked()
         }
     }
 
-    if(m_displayColorMapByDirection)
+    if(m_displayColorMapByDirection[m_selectedIndex[0]])
     {
         m_usedValueDirectionColorMap->min[0] = m_commonMin[0];
         m_usedValueDirectionColorMap->max[0] = m_commonMax[0];
@@ -1935,7 +1882,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisX_clicked()
         spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->max[0]);
         this->UpdateColorMapByDirection_QT();
     }
-    else if(m_displayAbsoluteColorMapByDirection)
+    else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
     {
         m_usedValueDirectionColorMap->maxAbs[0] = m_commonMaxAbs[0];
         spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
@@ -1958,7 +1905,7 @@ void ShapePopulationQT::on_spinBox_VISU_min_AxisY_valueChanged(double newYmin)
             spinBox_VISU_min_AxisY->setValue(spinBox_VISU_max_AxisY->value());
         }
 
-        if(m_displayColorMapByDirection)
+        if(m_displayColorMapByDirection[m_selectedIndex[0]])
         {
             if(m_linkCoordinate)
             {
@@ -2018,7 +1965,7 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisY_valueChanged(double newYmax)
             double newXmax;
             double newZmax;
 
-            if(m_displayColorMapByDirection)
+            if(m_displayColorMapByDirection[m_selectedIndex[0]])
             {
                 double Ymax = m_usedValueDirectionColorMap->max[1];
 
@@ -2031,7 +1978,7 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisY_valueChanged(double newYmax)
                 m_usedValueDirectionColorMap->max[2] = newZmax;
                 spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
             }
-            else if(m_displayAbsoluteColorMapByDirection)
+            else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
             {
                 double Ymax = m_usedValueDirectionColorMap->maxAbs[1];
 
@@ -2046,12 +1993,12 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisY_valueChanged(double newYmax)
             }
         }
 
-        if(m_displayColorMapByDirection)
+        if(m_displayColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->max[1] = newYmax;
             this->UpdateColorMapByDirection_QT();
         }
-        else if(m_displayAbsoluteColorMapByDirection)
+        else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->maxAbs[1] = newYmax;
             this->UpdateColorMapByAbsoluteDirection_QT();
@@ -2069,7 +2016,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisY_clicked()
 
     if(m_linkCoordinate)
     {
-        if(m_displayColorMapByDirection)
+        if(m_displayColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->min[0] = m_commonMin[0];
             m_usedValueDirectionColorMap->max[0] = m_commonMax[0];
@@ -2080,7 +2027,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisY_clicked()
             spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
             spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
         }
-        else if(m_displayAbsoluteColorMapByDirection)
+        else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->maxAbs[0] = m_commonMaxAbs[0];
             spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
@@ -2089,7 +2036,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisY_clicked()
         }
     }
 
-    if(m_displayColorMapByDirection)
+    if(m_displayColorMapByDirection[m_selectedIndex[0]])
     {
         m_usedValueDirectionColorMap->min[1] = m_commonMin[1];
         m_usedValueDirectionColorMap->max[1] = m_commonMax[1];
@@ -2097,7 +2044,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisY_clicked()
         spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
         this->UpdateColorMapByDirection_QT();
     }
-    else if(m_displayAbsoluteColorMapByDirection)
+    else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
     {
         m_usedValueDirectionColorMap->maxAbs[1] = m_commonMaxAbs[1];
         spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->maxAbs[1]);
@@ -2120,7 +2067,7 @@ void ShapePopulationQT::on_spinBox_VISU_min_AxisZ_valueChanged(double newZmin)
             spinBox_VISU_min_AxisZ->setValue(spinBox_VISU_max_AxisZ->value());
         }
 
-        if(m_displayColorMapByDirection)
+        if(m_displayColorMapByDirection[m_selectedIndex[0]])
         {
             if(m_linkCoordinate)
             {
@@ -2181,7 +2128,7 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisZ_valueChanged(double newZmax)
             double newXmax;
             double newYmax;
 
-            if(m_displayColorMapByDirection)
+            if(m_displayColorMapByDirection[m_selectedIndex[0]])
             {
                 double Zmax = m_usedValueDirectionColorMap->max[2];
 
@@ -2195,7 +2142,7 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisZ_valueChanged(double newZmax)
                 m_usedValueDirectionColorMap->max[1] = newYmax;
                 spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
             }
-            else if(m_displayAbsoluteColorMapByDirection)
+            else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
             {
                 double Zmax = m_usedValueDirectionColorMap->maxAbs[2];
 
@@ -2211,12 +2158,12 @@ void ShapePopulationQT::on_spinBox_VISU_max_AxisZ_valueChanged(double newZmax)
             }
         }
 
-        if(m_displayColorMapByDirection)
+        if(m_displayColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->max[2] = newZmax;
             this->UpdateColorMapByDirection_QT();
         }
-        else if(m_displayAbsoluteColorMapByDirection)
+        else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->maxAbs[2] = newZmax;
             this->UpdateColorMapByAbsoluteDirection_QT();
@@ -2234,7 +2181,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisZ_clicked()
 
     if(m_linkCoordinate)
     {
-        if(m_displayColorMapByDirection)
+        if(m_displayColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->min[0] = m_commonMin[0];
             m_usedValueDirectionColorMap->max[0] = m_commonMax[0];
@@ -2245,7 +2192,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisZ_clicked()
             spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->min[1]);
             spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
         }
-        else if(m_displayAbsoluteColorMapByDirection)
+        else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
         {
             m_usedValueDirectionColorMap->maxAbs[0] = m_commonMaxAbs[0];
             spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
@@ -2254,7 +2201,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisZ_clicked()
         }
     }
 
-    if(m_displayColorMapByDirection)
+    if(m_displayColorMapByDirection[m_selectedIndex[0]])
     {
         m_usedValueDirectionColorMap->min[2] = m_commonMin[2];
         m_usedValueDirectionColorMap->max[2] = m_commonMax[2];
@@ -2262,7 +2209,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_AxisZ_clicked()
         spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
         this->UpdateColorMapByDirection_QT();
     }
-    else if(m_displayAbsoluteColorMapByDirection)
+    else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
     {
         m_usedValueDirectionColorMap->maxAbs[2] = m_commonMaxAbs[2];
         spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->maxAbs[2]);
@@ -2334,37 +2281,6 @@ void ShapePopulationQT::on_radioButton_displayColorMapByMagnitude_toggled(bool c
     }
     if(checkBox_displayAbsoluteColorMapByDirection->isChecked()) checkBox_displayAbsoluteColorMapByDirection->click();
 
-
-    // Axis and Sphere
-    if(checked)
-    {
-        // Hide or show axis and title of this widget
-        if(m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]])
-        {
-            this->displayAxisWidget();
-            this->displayTitleAxisWidget();
-        }
-        else
-        {
-            if(!m_widgetAxis.empty()) this->deleteAxisWidget();
-            if(!m_widgetTitleAxis.empty()) this->deleteTitleAxisWidget();
-        }
-
-        // Hide or show sphere and title of this widget
-        if(m_displayVectorsByDirection[m_selectedIndex[0]])
-        {
-            this->displaySphereWidget();
-            this->displayTitleSphereWidget();
-        }
-        else
-        {
-            if(!m_widgetSphere.empty()) this->deleteSphereWidget();
-            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget();
-        }
-    }
-
-
-
     this->RenderAll();
 }
 
@@ -2393,36 +2309,9 @@ void ShapePopulationQT::on_radioButton_displayColorMapByDirection_toggled(bool c
     spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
 
     // display color map by direction
-    this->displayColorMapByDirection(checked);
+    if(!m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]]) this->displayColorMapByDirection(checked);
 
     m_displayColorMap = false;
-
-    if(checked)
-    {
-        // Hide or show sphere
-        if(!m_clickEvent)
-        {
-            this->displaySphereWidget();
-        }
-
-        if(m_displayVectors[m_selectedIndex[0]])
-        {
-            // Title of sphere
-            if(!m_displayVectorsByDirection[m_selectedIndex[0]])
-            {
-                this->displayTitleSphereWidget();
-            }
-            else
-            {
-                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget();
-            }
-            // Hide or show axis and title of this widget
-            if(m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]])
-            {
-                this->displayTitleAxisWidget();
-            }
-        }
-    }
 
     this->RenderAll();
 }
@@ -2448,10 +2337,8 @@ void ShapePopulationQT::on_checkBox_displayAbsoluteColorMapByDirection_toggled(b
         spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
         spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
     }
-    else if(!m_displayColorMapByMagnitude) // color map by absolute direction
+    else if(!m_displayColorMapByMagnitude[m_selectedIndex[0]]) // color map by absolute direction
     {
-        m_displayColorMapByDirection = false;
-
         // range
         spinBox_VISU_min_AxisX->setDisabled(true);
         spinBox_VISU_min_AxisY->setDisabled(true);
@@ -2467,72 +2354,12 @@ void ShapePopulationQT::on_checkBox_displayAbsoluteColorMapByDirection_toggled(b
 
     // display color map by absolute direction or by direction
     this->displayAbsoluteColorMapByDirection(checked);
-    if(!checkBox_displayAbsoluteColorMapByDirection->isChecked() && !radioButton_displayColorMapByMagnitude->isChecked())
+    if(!m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]] && !m_displayColorMapByMagnitude[m_selectedIndex[0]])
     {
-        if(!m_updateAttribute) this->displayColorMapByDirection(true);
+        this->displayColorMapByDirection(true);
     }
 
     m_displayColorMap = false;
-
-    if(checked) // color map by abs direction
-    {
-        this->displayAxisWidget();
-        if(m_displayVectors[m_selectedIndex[0]])
-        {
-            if(!m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]])
-            {
-                this->displayTitleAxisWidget();
-            }
-            else
-            {
-                if(!m_widgetTitleAxis.empty()) this->deleteTitleAxisWidget();
-            }
-            if(m_displayVectorsByDirection[m_selectedIndex[0]])
-            {
-                this->displayTitleSphereWidget();
-            }
-            else
-            {
-                if(!m_widgetSphere.empty()) this->deleteSphereWidget();
-                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget();
-            }
-        }
-        else
-        {
-            if(!m_widgetSphere.empty()) this->deleteSphereWidget();
-            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget();
-        }
-    }
-    else if(!m_displayColorMapByMagnitude) // color map by direction
-    {
-        this->displaySphereWidget();
-        if(m_displayVectors[m_selectedIndex[0]])
-        {
-            if(!m_displayVectorsByDirection[m_selectedIndex[0]])
-            {
-                this->displayTitleSphereWidget();
-            }
-            else
-            {
-                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget();
-            }
-            if(m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]])
-            {
-                this->displayTitleAxisWidget();
-            }
-            else
-            {
-                if(!m_widgetAxis.empty()) this->deleteAxisWidget();
-                if(!m_widgetTitleAxis.empty()) this->deleteTitleAxisWidget();
-            }
-        }
-        else
-        {
-            if(!m_widgetAxis.empty()) this->deleteAxisWidget();
-            if(!m_widgetTitleAxis.empty()) this->deleteTitleAxisWidget();
-        }
-    }
-
 
     this->RenderAll();
 }
@@ -2741,17 +2568,18 @@ void ShapePopulationQT::updateAttribute_QT()
 // *                                           VECTORS                                             * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
-void ShapePopulationQT::on_slider_vectorScale_valueChanged(int value)
-{
-    double val = (double)value/100;
-    this->setVectorScale(val);
-    this->RenderAll();
-}
 
 void ShapePopulationQT::on_slider_meshOpacity_valueChanged(int value)
 {
     double val = (double)value/100;
     this->setMeshOpacity(val);
+    this->RenderAll();
+}
+
+void ShapePopulationQT::on_slider_vectorScale_valueChanged(int value)
+{
+    double val = (double)value/100;
+    this->setVectorScale(val);
     this->RenderAll();
 }
 
@@ -2789,78 +2617,12 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
     }
     this->displayVectors(checked);
 
-    // Axis and sphere
-    if(checked) // display vectors
-    {
-        if(m_displayColorMapByDirection || radioButton_displayVectorsbyDirection->isChecked())
-        {
-            this->displaySphereWidget();
-            if(!(m_displayColorMapByDirection && radioButton_displayVectorsbyDirection->isChecked()))
-            {
-                this->displayTitleSphereWidget();
-            }
-        }
-        if(m_displayAbsoluteColorMapByDirection || radioButton_displayVectorsByAbsoluteDirection->isChecked())
-        {
-            this->displayAxisWidget();
-            if(!(m_displayAbsoluteColorMapByDirection && radioButton_displayVectorsByAbsoluteDirection->isChecked()))
-            {
-                this->displayTitleAxisWidget();
-            }
-        }
-
-    }
-    else // delete of vectors
-    {
-        // Hide axis
-        if(!m_displayAbsoluteColorMapByDirection)
-        {
-            if(!m_widgetAxis.empty()) this->deleteAxisWidget();
-        }
-
-        // Hide sphere
-        if(!m_displayColorMapByDirection)
-        {
-            if(!m_widgetSphere.empty()) this->deleteSphereWidget();
-        }
-        // delete of titles of axis and sphere
-        if(!m_widgetTitleAxis.empty()) this->deleteTitleAxisWidget();
-        if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget();
-    }
-
     this->RenderAll();
 }
 
 void ShapePopulationQT::on_radioButton_displayVectorsbyMagnitude_toggled(bool checked)
 {
     this->displayVectorsByMagnitude(checked);
-
-    if(checked)
-    {
-        // Hide or show axis and title of this widget
-        if(m_displayAbsoluteColorMapByDirection)
-        {
-            this->displayAxisWidget();
-            this->displayTitleAxisWidget();
-        }
-        else
-        {
-            if(!m_widgetAxis.empty()) this->deleteAxisWidget();
-            if(!m_widgetTitleAxis.empty()) this->deleteTitleAxisWidget();
-        }
-
-        // Hide or show sphere and title of this widget
-        if(m_displayColorMapByDirection)
-        {
-            this->displaySphereWidget();
-            this->displayTitleSphereWidget();
-        }
-        else
-        {
-            if(!m_widgetSphere.empty()) this->deleteSphereWidget();
-            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget();
-        }
-    }
 
     this->RenderAll();
 }
@@ -2869,33 +2631,6 @@ void ShapePopulationQT::on_radioButton_displayVectorsbyDirection_toggled(bool ch
 {
     this->displayVectorsByDirection(checked);
 
-    if(checked)
-    {
-        // Show sphere
-        this->displaySphereWidget();
-        // Title of this widget
-        if(!m_displayColorMapByDirection)
-        {
-            this->displayTitleSphereWidget();
-        }
-        else
-        {
-            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget();
-        }
-
-        // Hide or show axis and title of this widget
-        if(m_displayAbsoluteColorMapByDirection)
-        {
-            this->displayAxisWidget();
-            this->displayTitleAxisWidget();
-        }
-        else
-        {
-            if(!m_widgetAxis.empty()) this->deleteAxisWidget();
-            if(!m_widgetTitleAxis.empty()) this->deleteTitleAxisWidget();
-        }
-    }
-
     this->RenderAll();
 }
 
@@ -2903,32 +2638,6 @@ void ShapePopulationQT::on_radioButton_displayVectorsByAbsoluteDirection_toggled
 {
     this->displayVectorsByAbsoluteDirection(checked);
 
-    if(checked)
-    {
-        // Show axis
-        this->displayAxisWidget();
-        // Title of this widget
-        if(!m_displayAbsoluteColorMapByDirection)
-        {
-            this->displayTitleAxisWidget();
-        }
-        else
-        {
-            if(!m_widgetTitleAxis.empty()) this->deleteTitleAxisWidget();
-        }
-
-        // Hide or show sphere  and title of this widget
-        if(m_displayColorMapByDirection)
-        {
-            this->displaySphereWidget();
-            this->displayTitleSphereWidget();
-        }
-        else
-        {
-            if(!m_widgetSphere.empty()) this->deleteSphereWidget();
-            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget();
-        }
-    }
     this->RenderAll();
 }
 

@@ -52,14 +52,13 @@ protected:
     bool m_updateOnPositionChanged;
     bool m_updateOnAttributeChanged;
     bool m_linkCoordinate;
-    bool m_updateAttribute;
-    bool m_clickEvent;
     bool m_displayColorMap;
     bool m_firstDisplayVector;
     unsigned int m_numberOfMeshes;
     QString m_lastDirectory;
     QString m_colormapDirectory;
     QString m_exportDirectory;
+    QString m_pathSphere;
     QFileInfoList m_fileList;
     std::vector<QVTKWidget *> m_widgetList;
     cameraDialogQT * m_cameraDialog;
@@ -95,8 +94,7 @@ protected:
     void updateAttribute_QT();
     void updateArrowPosition();
     void updateInfo_QT();
-    
-    
+        
     protected slots:
     
     //QUIT
@@ -123,7 +121,7 @@ protected:
     //DISPLAY
     void on_radioButton_DISPLAY_all_toggled();
     void on_radioButton_DISPLAY_square_toggled();
-    void on_spinBox_DISPLAY_columns_editingFinished();
+    void on_spinBox_DISPLAY_columns_valueChanged();
     void on_checkBox_displayColorbar_toggled(bool checked);
     void on_checkBox_displayAttribute_toggled(bool checked);
     void on_checkBox_displayMeshName_toggled(bool checked);
@@ -168,28 +166,26 @@ protected:
     
     //COLORMAP
     void on_comboBox_VISU_attribute_currentIndexChanged();
+    // range
     void on_spinBox_VISU_min_valueChanged(double min);
     void on_spinBox_VISU_max_valueChanged(double max);
     void on_pushButton_VISU_resetRange_clicked();
-    
     void on_spinBox_VISU_min_AxisX_valueChanged(double newXmin);
     void on_spinBox_VISU_max_AxisX_valueChanged(double newXmax);
     void on_pushButton_VISU_resetRange_AxisX_clicked();
-
     void on_spinBox_VISU_min_AxisY_valueChanged(double newYmin);
     void on_spinBox_VISU_max_AxisY_valueChanged(double newYmax);
     void on_pushButton_VISU_resetRange_AxisY_clicked();
-
     void on_spinBox_VISU_min_AxisZ_valueChanged(double newZmin);
     void on_spinBox_VISU_max_AxisZ_valueChanged(double newZmax);
     void on_pushButton_VISU_resetRange_AxisZ_clicked();
-
     void on_pushButton_VISU_link_coordinate_clicked();
-    
+    // arrows of the gradient widget
     void on_spinBox_VISU_position_valueChanged(double arg1);
     void on_pushButton_VISU_delete_clicked();
     void on_pushButton_VISU_add_clicked();
     void on_pushButton_VISU_reset_clicked();
+    // color map
     void on_radioButton_displayColorMapByMagnitude_toggled(bool checked);
     void on_radioButton_displayColorMapByDirection_toggled(bool checked);
     void on_checkBox_displayAbsoluteColorMapByDirection_toggled(bool checked);
@@ -201,13 +197,13 @@ protected:
     void slot_no_gradArrow_selected();
     
     //VECTORS
+    void on_slider_meshOpacity_valueChanged(int value);
+    void on_slider_vectorScale_valueChanged(int value);
+    void on_slider_arrowDens_valueChanged(int value);
     void on_checkBox_displayVectors_toggled(bool checked);
     void on_radioButton_displayVectorsbyMagnitude_toggled(bool checked);
     void on_radioButton_displayVectorsbyDirection_toggled(bool checked);
     void on_radioButton_displayVectorsByAbsoluteDirection_toggled(bool checked);
-    void on_slider_meshOpacity_valueChanged(int value);
-    void on_slider_vectorScale_valueChanged(int value);
-    void on_slider_arrowDens_valueChanged(int value);
     
     //EXPORT
 #ifndef SPV_EXTENSION
