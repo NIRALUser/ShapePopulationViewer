@@ -74,7 +74,7 @@ class ShapePopulationBase
     bool m_displayAxis;
     bool m_displaySphere;
     bool m_displayTitles;
-    bool m_createWidget;
+    bool m_noUpdateVectorsByDirection;
     double m_norm;
     std::vector<bool> m_createAxis;
     std::vector<bool> m_createSphere;

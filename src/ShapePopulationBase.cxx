@@ -47,7 +47,7 @@ ShapePopulationBase::ShapePopulationBase()
     m_displaySphere = true;
     m_displayAxis = true;
     m_displayTitles = true;
-    m_createWidget = false;
+    m_noUpdateVectorsByDirection = false;
     m_createAxis.push_back(false);
     m_createSphere.push_back(false);
     m_createTitleSphere.push_back(false);
@@ -335,9 +335,15 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
     {
         // Update colormap to the first selected window position
         const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
+        const char * cmap_newSelected = m_meshList[index]->GetPolyData()->GetPointData()->GetScalars()->GetName();
+
+        if(strcmp(cmap,cmap_newSelected))
+        {
+            m_noUpdateVectorsByDirection = true;
+        }
         this->UpdateAttribute(cmap, m_selectedIndex);
-        int dim = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
-        if(dim == 1) this->UpdateColorMap(m_selectedIndex);
+//        int dim = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+        /*if(dim == 1)*/ this->UpdateColorMap(m_selectedIndex);
     }
     
     
@@ -772,7 +778,7 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
 {
 
     /* FIND DIMENSION OF ATTRIBUTE */
-    int dim = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(a_cmap)->GetNumberOfComponents();
+    int dim = m_meshList[a_windowIndex[0]]->GetPolyData()->GetPointData()->GetScalars(a_cmap)->GetNumberOfComponents();
     
     //test if _mag => in that case, we will take the cmap without _mag for the vectors
     std::string cmap = std::string(a_cmap);
@@ -864,9 +870,12 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
             glyph->Update();
             
             // Vectors
-            if(!m_createWidget)
+            if(!m_noUpdateVectorsByDirection)
             {
-                if(m_displayVectorsByDirection[a_windowIndex[i]] || m_displayVectorsByAbsoluteDirection[a_windowIndex[i]]) this->UpdateVectorsByDirection();
+                if(m_displayVectorsByDirection[a_windowIndex[i]] || m_displayVectorsByAbsoluteDirection[a_windowIndex[i]])
+                {
+                    this->UpdateVectorsByDirection();
+                }
             }
             
             // Glyph visibility
@@ -928,7 +937,7 @@ void ShapePopulationBase::displayColorMapByMagnitude(bool display)
             // Set Active Scalars
             mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs.str().c_str());
 
-            // Hide or show the scalar bar and the sphere
+            // Hide or show the scalar bar
             vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
             vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
             vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
@@ -1181,10 +1190,10 @@ void ShapePopulationBase::setVectorScale(double value)
         //        glyph->SetSourceConnection(arrow->GetOutputPort());
         glyph->SetScaleFactor(value);
         glyph->Update();
-        if(!m_createWidget)
-        {
-            if(m_displayVectors[m_selectedIndex[i]] && (m_displayVectorsByDirection[m_selectedIndex[i]] || m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]])) this->UpdateVectorsByDirection();
-        }
+//        if(!m_noUpdateVectorsByDirection)
+//        {
+            if(m_displayVectorsByDirection[m_selectedIndex[i]] || m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]]) this->UpdateVectorsByDirection();
+//        }
     }
 }
 
@@ -1204,10 +1213,10 @@ void ShapePopulationBase::setVectorDensity(double value)
         vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[m_selectedIndex[i]];
         glyph->SetInputConnection(filter->GetOutputPort());
         glyph->Update();
-        if(!m_createWidget)
-        {
-            if(m_displayVectors[m_selectedIndex[i]] && (m_displayVectorsByDirection[m_selectedIndex[i]] || m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]])) this->UpdateVectorsByDirection();
-        }
+//        if(!m_noUpdateVectorsByDirection)
+//        {
+            if(m_displayVectorsByDirection[m_selectedIndex[i]] || m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]]) this->UpdateVectorsByDirection();
+//        }
     }
 }
 
@@ -1817,7 +1826,6 @@ void ShapePopulationBase::creationTitleAxisWidget(int index)
         actorTitleAxis->GetTextProperty()->SetFontSize ( 14 );
         if(m_displayAbsoluteColorMapByDirection[index] && !m_displayVectorsByAbsoluteDirection[index]) actorTitleAxis->SetInput( "Color Map" );
         else if(!m_displayAbsoluteColorMapByDirection[index] && m_displayVectorsByAbsoluteDirection[index]) actorTitleAxis->SetInput( "Color of vectors" );
-        else actorTitleAxis->SetInput( "NOT GOOD" );
         actorTitleAxis->GetTextProperty()->SetColor ( m_labelColor );
 
         vtkOrientationMarkerWidget* widgetTitleAxis = vtkOrientationMarkerWidget::New();
@@ -1991,7 +1999,6 @@ void ShapePopulationBase::creationTitleSphereWidget(int index)
         actorTitleSphere->GetTextProperty()->SetFontSize ( 14 );
         if(m_displayColorMapByDirection[index] && !m_displayVectorsByDirection[index]) actorTitleSphere->SetInput ( "Color Map" );
         else if(!m_displayColorMapByDirection[index] && m_displayVectorsByDirection[index]) actorTitleSphere->SetInput ( "Color of vectors" );
-        else actorTitleSphere->SetInput( "NOT GOOD" );
         actorTitleSphere->GetTextProperty()->SetColor ( m_labelColor );
 
         vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();

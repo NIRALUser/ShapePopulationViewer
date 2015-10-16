@@ -713,7 +713,7 @@ void ShapePopulationQT::CreateWidgets()
     m_colorBarList.clear();                                                     // clear the existing colorbars
     
     m_updateOnAttributeChanged = false;
-    m_createWidget = true;
+    m_noUpdateVectorsByDirection = true;
     m_valueDirectionColorMapList.clear();
     
     
@@ -846,7 +846,7 @@ void ShapePopulationQT::CreateWidgets()
     spinBox_DISPLAY_columns->setValue(colNumber+1);             //Display the number of columns in spinBox_DISPLAY_columns,
     on_spinBox_DISPLAY_columns_valueChanged();                  //and display the Widgets according to this number.
 
-    m_createWidget = false;
+    m_noUpdateVectorsByDirection = false;
 
 }
 
@@ -893,7 +893,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         this->groupBox_VISU->setEnabled(true);
         
         const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-        int dim = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+        int dim = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
         
         std::string new_cmap = std::string(cmap);
         size_t found = new_cmap.rfind("_mag");
@@ -928,7 +928,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         m_valueDirectionColorMapList.clear();
         for(unsigned int k = 0 ; k < m_commonAttributes.size() ; k++)
         {
-            int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[k].c_str())->GetNumberOfComponents();
+            int dimension = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[k].c_str())->GetNumberOfComponents();
             if(dimension == 3 )
             {
                 this->UpdateColorMapByDirection(m_commonAttributes[k].c_str(),k);
@@ -942,116 +942,138 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
 
 
         /* UPDATE COLOR MAPS and VECTORS and BUTTONS*/
-        if( (std::find(m_selectedIndex.begin(), m_selectedIndex.end(), index)) != (m_selectedIndex.end()) ) // new selection
+        if(dim == 1)
         {
-            if(m_selectedIndex.size() > 1 )
+            deleteAllWidgets();
+            initializationAllWidgets();
+            m_displayColorMapByDirection[index] = false;
+            m_displayAbsoluteColorMapByDirection[index] = false;
+            m_displayColorMapByMagnitude[index] = true;
+            m_displayVectors[index] = false;
+            m_displayVectorsByMagnitude[index] = false;
+            m_displayVectorsByDirection[index] = false;
+            m_displayVectorsByAbsoluteDirection[index] = false;
+            // Show the scalar bar
+            vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[index]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+            vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
+            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            if(m_displayColorbar) scalarBar->SetVisibility(1);
+
+        }
+        else if(dim == 3)
+        {
+            if( (std::find(m_selectedIndex.begin(), m_selectedIndex.end(), index)) != (m_selectedIndex.end()) ) // new selection
             {
-                if(selectedInteractor->GetControlKey() == 1)  // Ctrl pushed
+                if(m_selectedIndex.size() > 1 )
                 {
-                    // Update the scale and density of vectors by direction to the first selected window position
-                    this->setVectorDensity(this->spinbox_arrowDens->value());
-                    this->setVectorScale((double)this->spinbox_vectorScale->value()/100);
+                    if(selectedInteractor->GetControlKey() == 1)  // Ctrl pushed
+                    {
+                        // Update the scale and density of vectors by direction to the first selected window position
+                        this->setVectorDensity(this->spinbox_arrowDens->value());
+                        this->setVectorScale((double)this->spinbox_vectorScale->value()/100);
 
-                    // COLOR MAP
-                    // Update the color map by magnitude to the first selected window position
-                    if(m_displayColorMapByMagnitude[m_selectedIndex[0]])
-                    {
-                        m_displayColorMapByDirection[index] = false;
-                        m_displayAbsoluteColorMapByDirection[index] = false;
-                        this->displayColorMapByMagnitude(true);
+                        // COLOR MAP
+                        // Update the color map by magnitude to the first selected window position
+                        if(m_displayColorMapByMagnitude[m_selectedIndex[0]])
+                        {
+                            m_displayColorMapByDirection[index] = false;
+                            m_displayAbsoluteColorMapByDirection[index] = false;
+                            this->displayColorMapByMagnitude(true);
 
-                    }
-                    // Update the color map by direction to the first selected window position
-                    else if(m_displayColorMapByDirection[m_selectedIndex[0]])
-                    {
-                        m_displayColorMapByMagnitude[index] = false;
-                        m_displayAbsoluteColorMapByDirection[index] = false;
-                        this->displayColorMapByDirection(true);
-                    }
-                    // Update the color map by absolute direction to the first selected window position
-                    else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
-                    {
-                        m_displayColorMapByMagnitude[index] = false;
-                        m_displayAbsoluteColorMapByDirection[index] = false;
-                        this->displayAbsoluteColorMapByDirection(true);
-                    }
-                    // VECTORS
-                    if(m_displayVectors[m_selectedIndex[0]])
-                    {
-                        m_displayVectors[index] = true;
-                        // Update the color of vectors by magnitude to the first selected window position
-                        if(m_displayVectorsByMagnitude[m_selectedIndex[0]])
-                        {
-                            m_displayVectorsByDirection[index] = false;
-                            m_displayVectorsByAbsoluteDirection[index] = false;
-                            this->displayVectorsByMagnitude(true);
                         }
-                        // Update the color of vectors by direction to the first selected window position
-                        else if(m_displayVectorsByDirection[m_selectedIndex[0]])
+                        // Update the color map by direction to the first selected window position
+                        else if(m_displayColorMapByDirection[m_selectedIndex[0]])
                         {
-                            m_displayVectorsByMagnitude[index] = false;
-                            m_displayVectorsByAbsoluteDirection[index] = false;
-                            this->displayVectorsByDirection(true);
+                            m_displayColorMapByMagnitude[index] = false;
+                            m_displayAbsoluteColorMapByDirection[index] = false;
+                            this->displayColorMapByDirection(true);
                         }
-                        // Update the color of vectors by absolute direction to the first selected window position
-                        else if(m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]])
+                        // Update the color map by absolute direction to the first selected window position
+                        else if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
                         {
-                            m_displayVectorsByDirection[index] = false;
-                            m_displayVectorsByMagnitude[index] = false;
-                            this->displayVectorsByAbsoluteDirection(true);
+                            m_displayColorMapByMagnitude[index] = false;
+                            m_displayAbsoluteColorMapByDirection[index] = false;
+                            this->displayAbsoluteColorMapByDirection(true);
                         }
-                    }
-                    else
-                    {
-                        m_displayVectors[index] = false;
-                        m_displayVectorsByMagnitude[index] = m_displayVectorsByMagnitude[m_selectedIndex[0]];
-                        m_displayVectorsByDirection[index] = m_displayVectorsByDirection[m_selectedIndex[0]];
-                        m_displayVectorsByAbsoluteDirection[index] = m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]];
-                        this->displayVectors(false);
+                        // VECTORS
+                        if(m_displayVectors[m_selectedIndex[0]])
+                        {
+                            m_displayVectors[index] = true;
+                            // Update the color of vectors by magnitude to the first selected window position
+                            if(m_displayVectorsByMagnitude[m_selectedIndex[0]])
+                            {
+                                m_displayVectorsByDirection[index] = false;
+                                m_displayVectorsByAbsoluteDirection[index] = false;
+                                this->displayVectorsByMagnitude(true);
+                            }
+                            // Update the color of vectors by direction to the first selected window position
+                            else if(m_displayVectorsByDirection[m_selectedIndex[0]])
+                            {
+                                m_displayVectorsByMagnitude[index] = false;
+                                m_displayVectorsByAbsoluteDirection[index] = false;
+                                this->displayVectorsByDirection(true);
+                            }
+                            // Update the color of vectors by absolute direction to the first selected window position
+                            else if(m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]])
+                            {
+                                m_displayVectorsByDirection[index] = false;
+                                m_displayVectorsByMagnitude[index] = false;
+                                this->displayVectorsByAbsoluteDirection(true);
+                            }
+                        }
+                        else
+                        {
+                            m_displayVectors[index] = false;
+                            m_displayVectorsByMagnitude[index] = m_displayVectorsByMagnitude[m_selectedIndex[0]];
+                            m_displayVectorsByDirection[index] = m_displayVectorsByDirection[m_selectedIndex[0]];
+                            m_displayVectorsByAbsoluteDirection[index] = m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]];
+                            this->displayVectors(false);
+                        }
                     }
                 }
-            }
 
-            // Update the buttons selected
-            else if(m_selectedIndex.size() == 1)
-            {
-                if(selectedInteractor->GetControlKey() == 0)  // Ctrl not pushed
+                // Update the buttons selected
+                else if(m_selectedIndex.size() == 1)
                 {
-                    // Update the button selected according the color map
-                    if (m_displayColorMapByMagnitude[index])
+                    if(selectedInteractor->GetControlKey() == 0)  // Ctrl not pushed
                     {
-                        radioButton_displayColorMapByMagnitude->click();
-                    }
-                    else if (m_displayColorMapByDirection[index])
-                    {
-                        if(checkBox_displayAbsoluteColorMapByDirection->isChecked()) checkBox_displayAbsoluteColorMapByDirection->click();
-                        radioButton_displayColorMapByDirection->click();
-                    }
-                    else if (m_displayAbsoluteColorMapByDirection[index])
-                    {
-                        radioButton_displayColorMapByDirection->click();
-                        if(!checkBox_displayAbsoluteColorMapByDirection->isChecked()) checkBox_displayAbsoluteColorMapByDirection->click();
-                    }
+                        // Update the button selected according the color map
+                        if (m_displayColorMapByMagnitude[index])
+                        {
+                            radioButton_displayColorMapByMagnitude->click();
+                        }
+                        else if (m_displayColorMapByDirection[index])
+                        {
+                            if(checkBox_displayAbsoluteColorMapByDirection->isChecked()) checkBox_displayAbsoluteColorMapByDirection->click();
+                            radioButton_displayColorMapByDirection->click();
+                        }
+                        else if (m_displayAbsoluteColorMapByDirection[index])
+                        {
+                            radioButton_displayColorMapByDirection->click();
+                            if(!checkBox_displayAbsoluteColorMapByDirection->isChecked()) checkBox_displayAbsoluteColorMapByDirection->click();
+                        }
 
-                    // Update the button selected according the color of vectors
-                    if(!m_displayVectors[index])
-                    {
-                        if(checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
-                    }
-                    else
-                    {
-                        if(!checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
-                        if(m_displayVectorsByMagnitude[index])
+                        // Update the button selected according the color of vectors
+                        if(!m_displayVectors[index])
                         {
-                            radioButton_displayVectorsbyMagnitude->click();
+                            if(checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
                         }
-                        else if(m_displayVectorsByDirection[index])
+                        else
                         {
-                            radioButton_displayVectorsbyDirection->click();
-                        }
-                        else if(m_displayVectorsByAbsoluteDirection[index])
-                        {
-                            radioButton_displayVectorsByAbsoluteDirection->click();
+                            if(!checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
+                            if(m_displayVectorsByMagnitude[index])
+                            {
+                                radioButton_displayVectorsbyMagnitude->click();
+                            }
+                            else if(m_displayVectorsByDirection[index])
+                            {
+                                radioButton_displayVectorsbyDirection->click();
+                            }
+                            else if(m_displayVectorsByAbsoluteDirection[index])
+                            {
+                                radioButton_displayVectorsByAbsoluteDirection->click();
+                            }
                         }
                     }
                 }
@@ -1694,7 +1716,6 @@ void ShapePopulationQT::on_spinBox_VISU_min_valueChanged(double min)
         spinBox_VISU_min->setValue(spinBox_VISU_max->value());
         return;
     }
-    
     m_usedColorBar->range[0] = min;
     this->updateColorbar_QT();
     this->updateArrowPosition();
@@ -2271,15 +2292,16 @@ void ShapePopulationQT::on_pushButton_VISU_reset_clicked()
 
 void ShapePopulationQT::on_radioButton_displayColorMapByMagnitude_toggled(bool checked)
 {
-    // display color map by magnitude
-    this->displayColorMapByMagnitude(checked);
-
     if(radioButton_displayColorMapByMagnitude->isChecked())
     {
         stackedWidget_ColorMapByMagnitude->show();
         stackedWidget_ColorMapByDirection->hide();
     }
     if(checkBox_displayAbsoluteColorMapByDirection->isChecked()) checkBox_displayAbsoluteColorMapByDirection->click();
+
+    // display color map by magnitude
+    this->displayColorMapByMagnitude(checked);
+
 
     this->RenderAll();
 }
@@ -2354,7 +2376,7 @@ void ShapePopulationQT::on_checkBox_displayAbsoluteColorMapByDirection_toggled(b
 
     // display color map by absolute direction or by direction
     this->displayAbsoluteColorMapByDirection(checked);
-    if(!m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]] && !m_displayColorMapByMagnitude[m_selectedIndex[0]])
+    if(!m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]] && !radioButton_displayColorMapByMagnitude->isChecked())
     {
         this->displayColorMapByDirection(true);
     }
