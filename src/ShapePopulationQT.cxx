@@ -430,20 +430,46 @@ void ShapePopulationQT::deleteSelection()
         this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
         spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
         spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
+
+        // initialization on the color map by magnitude
+        if (checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
+        if(radioButton_displayColorMapByMagnitude->isChecked())
+        {
+            this->displayColorMapByMagnitude(true);
+            stackedWidget_ColorMapByMagnitude->show();
+            stackedWidget_ColorMapByDirection->hide();
+            this->RenderAll();
+        }
+        else
+        {
+            radioButton_displayColorMapByMagnitude->click();
+        }
+
         this->updateColorbar_QT();
         this->updateArrowPosition();
         
 
-        // Tab Vectors
-        if(checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
-        tab_vectors->setDisabled(true);
-        // Display the color map by magnitude and disabled the color map by direction
-        if (radioButton_displayColorMapByDirection->isChecked())
-        {
-            radioButton_displayColorMapByMagnitude->click();
-        }
-        radioButton_displayColorMapByDirection->setEnabled(false);
+        // Tab vectors and button for the color map by direction
+        const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
+        int dimension = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+        std::string new_cmap = std::string(cmap);
+        size_t found = new_cmap.rfind("_mag");
+        new_cmap = new_cmap.substr(0,found);
+        if( (new_cmap !=std::string(cmap)) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()))
+            dimension = 3;
 
+        if (dimension == 1)
+        {
+            tab_vectors->setDisabled(true);
+            radioButton_displayColorMapByDirection->setDisabled(true);
+        }
+        else
+        {
+            radioButton_displayColorMapByDirection->setEnabled(true);
+            tab_vectors->setEnabled(true);
+            widget_VISU_colorVectors->setDisabled(true);
+            widget_VISU_optionVectors->setDisabled(true);
+        }
 
         // initialization of all axis, sphere, and titles widgets
         initializationAllWidgets();
@@ -699,7 +725,7 @@ void ShapePopulationQT::CreateWidgets()
     m_displayVectorsByAbsoluteDirection.clear();
     for (unsigned int i = 0; i < m_widgetList.size(); i++)
     {
-        m_displayColorMapByMagnitude.push_back(false);
+        m_displayColorMapByMagnitude.push_back(true);
         m_displayColorMapByDirection.push_back(false);
         m_displayAbsoluteColorMapByDirection.push_back(false);
         m_displayVectors.push_back(false);
@@ -775,7 +801,7 @@ void ShapePopulationQT::CreateWidgets()
     this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
     spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
     spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
-    this->updateColorbar_QT();
+    this->UpdateColorMap(m_selectedIndex);
     this->updateArrowPosition();
     
     /* VECTORS UPDATE */
@@ -792,9 +818,9 @@ void ShapePopulationQT::CreateWidgets()
     /* GUI BUTTONS & ACTIONS */
     this->toolBox->setEnabled(true);
     if (checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
-    if (radioButton_displayColorMapByDirection->isChecked())
+    if (!radioButton_displayColorMapByMagnitude->isChecked())
     {
-        if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]]) checkBox_displayAbsoluteColorMapByDirection->click();
+        radioButton_displayColorMapByMagnitude->click();
     }
     else
     {
@@ -803,12 +829,16 @@ void ShapePopulationQT::CreateWidgets()
         stackedWidget_ColorMapByDirection->hide();
         this->RenderAll();
     }
-    radioButton_displayColorMapByMagnitude->click();
 
 
     /* Options enabled or not for Vectors */
     const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-    int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+    int dimension = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+    std::string new_cmap = std::string(cmap);
+    size_t found = new_cmap.rfind("_mag");
+    new_cmap = new_cmap.substr(0,found);
+    if( (new_cmap !=std::string(cmap)) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()))
+        dimension = 3;
     if (dimension == 1)
     {
         tab_vectors->setDisabled(true);
@@ -816,10 +846,12 @@ void ShapePopulationQT::CreateWidgets()
     }
     else
     {
+        radioButton_displayColorMapByDirection->setEnabled(true);
         tab_vectors->setEnabled(true);
         widget_VISU_colorVectors->setDisabled(true);
         widget_VISU_optionVectors->setDisabled(true);
     }
+
     /* */
 
     
@@ -830,7 +862,7 @@ void ShapePopulationQT::CreateWidgets()
     this->menuExport->setEnabled(true);
     this->actionOpen_Directory->setText("Add Directory");
     this->actionOpen_VTK_Files->setText("Add VTK files");
-    this->actionLoad_CSV->setText("Add CSV file");\
+    this->actionLoad_CSV->setText("Add CSV file");
     
     /* DISPLAY INFOS */
     this->updateInfo_QT();
@@ -939,7 +971,6 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         /* DISPLAY INFOS */
         this->updateInfo_QT();
         this->updateAttribute_QT();
-
 
         /* UPDATE COLOR MAPS and VECTORS and BUTTONS*/
         if(dim == 1)
@@ -1432,7 +1463,7 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         const char *cmap  = arr.data();
         
         // Update Vectors
-        int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+        int dimension = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
         if (dimension == 3)
         {
             this->setVectorDensity(this->spinbox_arrowDens->value());
@@ -2301,7 +2332,6 @@ void ShapePopulationQT::on_radioButton_displayColorMapByMagnitude_toggled(bool c
 
     // display color map by magnitude
     this->displayColorMapByMagnitude(checked);
-
 
     this->RenderAll();
 }
