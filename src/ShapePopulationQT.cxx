@@ -23,6 +23,7 @@ ShapePopulationQT::ShapePopulationQT()
     // GUI disable
     stackedWidget_ColorMapByMagnitude->show();
     stackedWidget_ColorMapByDirection->hide();
+    checkBox_displayVectorsByAbsoluteDirection->hide();
     toolBox->setDisabled(true);
     this->gradientWidget_VISU->disable();
     menuOptions->setDisabled(true);
@@ -1099,11 +1100,13 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                             }
                             else if(m_displayVectorsByDirection[index])
                             {
+                                if(checkBox_displayVectorsByAbsoluteDirection->isChecked()) checkBox_displayVectorsByAbsoluteDirection->click();
                                 radioButton_displayVectorsbyDirection->click();
                             }
                             else if(m_displayVectorsByAbsoluteDirection[index])
                             {
-                                radioButton_displayVectorsByAbsoluteDirection->click();
+                                radioButton_displayVectorsbyDirection->click();
+                                if(!checkBox_displayVectorsByAbsoluteDirection->isChecked()) checkBox_displayVectorsByAbsoluteDirection->click();
                             }
                         }
                     }
@@ -2652,10 +2655,11 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
         }
         widget_VISU_colorVectors->setEnabled(true);
         widget_VISU_optionVectors->setEnabled(true);
+        checkBox_displayVectorsByAbsoluteDirection->setEnabled(true);
 
         if(radioButton_displayVectorsbyMagnitude->isChecked()) this->displayVectorsByMagnitude(true);
-        else if(radioButton_displayVectorsbyDirection->isChecked()) this->displayVectorsByDirection(true);
-        else if(radioButton_displayVectorsByAbsoluteDirection->isChecked()) this->displayVectorsByAbsoluteDirection(true);
+        else if(radioButton_displayVectorsbyDirection->isChecked() && !checkBox_displayVectorsByAbsoluteDirection->isChecked()) this->displayVectorsByDirection(true);
+        else if(checkBox_displayVectorsByAbsoluteDirection->isChecked() && checkBox_displayVectorsByAbsoluteDirection->isChecked()) this->displayVectorsByAbsoluteDirection(true);
 
     }
     else
@@ -2666,6 +2670,7 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
 
         widget_VISU_colorVectors->setDisabled(true);
         widget_VISU_optionVectors->setDisabled(true);
+        checkBox_displayVectorsByAbsoluteDirection->setDisabled(true);
     }
     this->displayVectors(checked);
 
@@ -2674,6 +2679,10 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
 
 void ShapePopulationQT::on_radioButton_displayVectorsbyMagnitude_toggled(bool checked)
 {
+    if(radioButton_displayVectorsbyMagnitude->isChecked()) checkBox_displayVectorsByAbsoluteDirection->hide();
+    if(checkBox_displayVectorsByAbsoluteDirection->isChecked()) checkBox_displayVectorsByAbsoluteDirection->click();
+
+    // display the color of vectors
     this->displayVectorsByMagnitude(checked);
 
     this->RenderAll();
@@ -2681,15 +2690,22 @@ void ShapePopulationQT::on_radioButton_displayVectorsbyMagnitude_toggled(bool ch
 
 void ShapePopulationQT::on_radioButton_displayVectorsbyDirection_toggled(bool checked)
 {
-    this->displayVectorsByDirection(checked);
+    if(radioButton_displayVectorsbyDirection->isChecked()) checkBox_displayVectorsByAbsoluteDirection->show();
+
+    // display the color of vectors
+    if(!m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]]) this->displayVectorsByDirection(checked);
 
     this->RenderAll();
 }
 
-void ShapePopulationQT::on_radioButton_displayVectorsByAbsoluteDirection_toggled(bool checked)
+void ShapePopulationQT::on_checkBox_displayVectorsByAbsoluteDirection_toggled(bool checked)
 {
+    // display the color of vectors
     this->displayVectorsByAbsoluteDirection(checked);
-
+    if(!m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]] && !radioButton_displayVectorsbyMagnitude->isChecked())
+    {
+        this->displayVectorsByDirection(true);
+    }
     this->RenderAll();
 }
 

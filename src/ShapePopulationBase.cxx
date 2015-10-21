@@ -1468,7 +1468,11 @@ void ShapePopulationBase::displayVectorsByAbsoluteDirection(bool display)
 {
     for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
     {
-        if(display) m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]] = true;
+        if(display)
+        {
+            m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]] = true;
+            m_displayVectorsByDirection[m_selectedIndex[i]] = false;
+        }
         else m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]] = false;
 
         if(display)

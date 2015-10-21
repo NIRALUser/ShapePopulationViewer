@@ -203,7 +203,7 @@ protected:
     void on_checkBox_displayVectors_toggled(bool checked);
     void on_radioButton_displayVectorsbyMagnitude_toggled(bool checked);
     void on_radioButton_displayVectorsbyDirection_toggled(bool checked);
-    void on_radioButton_displayVectorsByAbsoluteDirection_toggled(bool checked);
+    void on_checkBox_displayVectorsByAbsoluteDirection_toggled(bool checked);
     
     //EXPORT
 #ifndef SPV_EXTENSION
