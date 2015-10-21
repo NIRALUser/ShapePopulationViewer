@@ -121,26 +121,22 @@ void ShapePopulationBase::setLabelColor(double a_labelColor[])
         labelProperty->SetColor(m_labelColor);
         
 
-        // Title of the axis
+        // Title of the axis and caption of axis
+        if(!m_widgetAxis.empty()) deleteAxisWidget(i);
         if(!m_widgetTitleAxis.empty()) deleteTitleAxisWidget(i);
-        if(m_displayVectors[i])
+        if(m_displayAbsoluteColorMapByDirection[i] || m_displayVectorsByAbsoluteDirection[i])
         {
-            if(m_displayAbsoluteColorMapByDirection[i] || m_displayVectorsByAbsoluteDirection[i])
-            {
-                this->deleteTitleSphereWidget(i);
-                this->creationTitleAxisWidget(i);
-            }
+            this->creationAxisWidget(i);
+            this->creationTitleAxisWidget(i);
         }
 
-        // Title of the sphere
+        // Title of the sphere and caption of axis
+        if(!m_widgetSphere.empty()) deleteSphereWidget(i);
         if(!m_widgetTitleSphere.empty()) deleteTitleSphereWidget(i);
-        if(m_displayVectors[i])
+        if(m_displayColorMapByDirection[i] || m_displayVectorsByDirection[i])
         {
-            if(m_displayColorMapByDirection[i] || m_displayVectorsByDirection[i])
-            {
-                this->deleteTitleSphereWidget(i);
-                this->creationTitleSphereWidget(i);
-            }
+            this->creationSphereWidget(i);
+            this->creationTitleSphereWidget(i);
         }
 
         m_windowsList[i]->Render();
@@ -1758,10 +1754,12 @@ void ShapePopulationBase::creationAxisWidget(int index)
         vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
 
         vtkSmartPointer<vtkAxesActor> actorAxis = vtkSmartPointer<vtkAxesActor>::New();
+        actorAxis->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->SetColor(m_labelColor);
+        actorAxis->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->SetColor(m_labelColor);
+        actorAxis->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->SetColor(m_labelColor);
 
         vtkOrientationMarkerWidget* widgetAxis = vtkOrientationMarkerWidget::New();
         widgetAxis = m_widgetAxis[index];
-        widgetAxis->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetAxis->SetOrientationMarker( actorAxis );
         widgetAxis->SetInteractor( iren );
         widgetAxis->SetViewport( 0.0, 0.05, 0.15, 0.3 ); // size and position of the frame
@@ -1804,12 +1802,12 @@ void ShapePopulationBase::creationTitleAxisWidget(int index)
 
         vtkOrientationMarkerWidget* widgetTitleAxis = vtkOrientationMarkerWidget::New();
         widgetTitleAxis = m_widgetTitleAxis[index];
-        widgetTitleAxis->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetTitleAxis->SetOrientationMarker( actorTitleAxis );
         widgetTitleAxis->SetInteractor( iren );
         widgetTitleAxis->SetViewport( 0.05, 0.3, 0.8, 0.4 ); // size and position of the frame
         widgetTitleAxis->SetEnabled( 1 );
         widgetTitleAxis->InteractiveOff();
+
 
         m_createTitleAxis[index] = true;
     }
@@ -1922,6 +1920,9 @@ void ShapePopulationBase::creationSphereWidget(int index)
 
         // AXIS
         vtkSmartPointer<vtkAxesActor> actorAxisByDirection = vtkSmartPointer<vtkAxesActor>::New();
+        actorAxisByDirection->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->SetColor(m_labelColor);
+        actorAxisByDirection->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->SetColor(m_labelColor);
+        actorAxisByDirection->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->SetColor(m_labelColor);
 
         // color of axis
         actorAxisByDirection->GetXAxisShaftProperty()->SetColor(1,0.5,0.5);
@@ -1978,7 +1979,6 @@ void ShapePopulationBase::creationTitleSphereWidget(int index)
 
         vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();
         widgetTitleSphere = m_widgetTitleSphere[index];
-        widgetTitleSphere->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetTitleSphere->SetOrientationMarker( actorTitleSphere );
         widgetTitleSphere->SetInteractor( iren );
         widgetTitleSphere->SetViewport( 0.05, 0.80, 0.8, 0.90 ); // size and position of the frame
@@ -2065,7 +2065,7 @@ void ShapePopulationBase::ChangeView(int x, int y, int z)
     double *coords  = firstRenderer->GetActiveCamera()->GetFocalPoint();
     double distance = firstRenderer->GetActiveCamera()->GetDistance();
     firstRenderer->GetActiveCamera()->SetPosition(coords[0]+x*distance,coords[1]+y*distance,coords[2]+z*distance);
-    
+
     
     //setroll to .001, because it breaks on y axis if roll = 0
     firstRenderer->GetActiveCamera()->SetRoll(.001);

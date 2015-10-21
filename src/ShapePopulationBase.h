@@ -26,6 +26,7 @@
 #include <vtkTextActor.h>                   //Text Actor
 #include <vtkOrientationMarkerWidget.h>     //Widgets
 #include <vtkSphereSource.h>                //Sphere
+#include <vtkCaptionActor2D.h>              //Caption's Proprety of Axis
 #include <string.h>
 
 #include "vtkGlyph3D.h"
