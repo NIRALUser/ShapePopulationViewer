@@ -2064,20 +2064,22 @@ void ShapePopulationBase::initializationAllWidgets()
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                            CAMERA                                             * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-
-void ShapePopulationBase::ChangeView(int x, int y, int z)
+void ShapePopulationBase::ChangeView(int R, int A, int S,int x_ViewUp,int y_ViewUp,int z_ViewUp)
 {
     vtkSmartPointer<vtkRenderer> firstRenderer = vtkSmartPointer<vtkRenderer>::New();
     firstRenderer = m_windowsList[m_selectedIndex[0]]->GetRenderers()->GetFirstRenderer();
-    
+    firstRenderer->ResetCamera();
+
     double *coords  = firstRenderer->GetActiveCamera()->GetFocalPoint();
     double distance = firstRenderer->GetActiveCamera()->GetDistance();
-    firstRenderer->GetActiveCamera()->SetPosition(coords[0]+x*distance,coords[1]+y*distance,coords[2]+z*distance);
+    firstRenderer->GetActiveCamera()->SetPosition(coords[0]+R*distance,coords[1]+A*distance,coords[2]+S*distance);
 
-    
     //setroll to .001, because it breaks on y axis if roll = 0
     firstRenderer->GetActiveCamera()->SetRoll(.001);
-    
+
+    // View Up
+    firstRenderer->GetActiveCamera()->SetViewUp(x_ViewUp,y_ViewUp,z_ViewUp);
+
     m_renderAllSelection = true;
     this->RenderSelection();
     m_renderAllSelection = false;
@@ -2097,7 +2099,6 @@ void ShapePopulationBase::ResetHeadcam()
     vtkSmartPointer<vtkRenderer> firstRenderer = m_windowsList[m_selectedIndex[0]]->GetRenderers()->GetFirstRenderer();
     firstRenderer->ResetCamera();
     this->UpdateCameraConfig();
-    
 }
 
 void ShapePopulationBase::UpdateCameraConfig()

@@ -1424,17 +1424,17 @@ void ShapePopulationQT::on_pushButton_VIEW_reset_clicked()
     m_renderAllSelection = false;
 }
 
-void ShapePopulationQT::on_toolButton_VIEW_P_clicked() {ChangeView(0,0,-1);}
+void ShapePopulationQT::on_toolButton_VIEW_P_clicked() {ChangeView(0,-1,0,0,0,1);}
 
-void ShapePopulationQT::on_toolButton_VIEW_A_clicked() {ChangeView(0,0,1);}
+void ShapePopulationQT::on_toolButton_VIEW_A_clicked() {ChangeView(0,1,0,0,0,1);}
 
-void ShapePopulationQT::on_toolButton_VIEW_L_clicked() {ChangeView(1,0,0);}
+void ShapePopulationQT::on_toolButton_VIEW_L_clicked() {ChangeView(-1,0,0,0,0,1);}
 
-void ShapePopulationQT::on_toolButton_VIEW_R_clicked() {ChangeView(-1,0,0);}
+void ShapePopulationQT::on_toolButton_VIEW_R_clicked() {ChangeView(1,0,0,0,0,1);}
 
-void ShapePopulationQT::on_toolButton_VIEW_S_clicked() {ChangeView(0,1,0);}
+void ShapePopulationQT::on_toolButton_VIEW_S_clicked() {ChangeView(0,0,1,0,1,0);}
 
-void ShapePopulationQT::on_toolButton_VIEW_I_clicked() {ChangeView(0,-1,0);}
+void ShapePopulationQT::on_toolButton_VIEW_I_clicked() {ChangeView(0,0,-1,0,1,0);}
 
 void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged()
 {

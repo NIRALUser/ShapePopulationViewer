@@ -156,7 +156,7 @@ class ShapePopulationBase
 
     //CAMERA/VIEW
     void AlignMesh(bool alignment);
-    void ChangeView(int x, int y, int z);
+    void ChangeView(int R, int A, int S,int x_ViewUp,int y_ViewUp,int z_ViewUp);
     void ResetHeadcam();
     virtual void UpdateCameraConfig();
     
