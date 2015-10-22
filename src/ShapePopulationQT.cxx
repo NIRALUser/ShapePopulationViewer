@@ -726,7 +726,7 @@ void ShapePopulationQT::CreateWidgets()
     m_displayVectorsByAbsoluteDirection.clear();
     for (unsigned int i = 0; i < m_widgetList.size(); i++)
     {
-        m_displayColorMapByMagnitude.push_back(true);
+        m_displayColorMapByMagnitude.push_back(false);
         m_displayColorMapByDirection.push_back(false);
         m_displayAbsoluteColorMapByDirection.push_back(false);
         m_displayVectors.push_back(false);
@@ -742,8 +742,6 @@ void ShapePopulationQT::CreateWidgets()
     m_updateOnAttributeChanged = false;
     m_noUpdateVectorsByDirection = true;
     m_valueDirectionColorMapList.clear();
-    
-    
     for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
     {
         colorBarStruct * colorBar = new colorBarStruct;                         //new colorbar for this attribute
@@ -792,10 +790,10 @@ void ShapePopulationQT::CreateWidgets()
             this->UpdateColorMapByDirection(m_commonAttributes[i].c_str(),i);
             this->UpdateColorMapByAbsoluteDirection(m_commonAttributes[i].c_str(),i);
         }
-        
     }
     m_updateOnAttributeChanged = true;
     
+
     /* RENDER WINDOWS */
     this->UpdateAttribute(m_commonAttributes[0].c_str(), m_selectedIndex);
     m_usedColorBar = m_colorBarList[0];
@@ -803,6 +801,7 @@ void ShapePopulationQT::CreateWidgets()
     spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
     spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
     this->UpdateColorMap(m_selectedIndex);
+//    this->updateColorbar_QT();
     this->updateArrowPosition();
     
     /* VECTORS UPDATE */
@@ -812,7 +811,7 @@ void ShapePopulationQT::CreateWidgets()
     
     m_numberOfMeshes = m_fileList.size();
     spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
-    
+
     /* CHECK ALIGNMENT */
     on_comboBox_alignment_currentIndexChanged();
     
@@ -831,10 +830,9 @@ void ShapePopulationQT::CreateWidgets()
         this->RenderAll();
     }
 
-
     /* Options enabled or not for Vectors */
-    const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-    int dimension = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+    const char * cmap = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars()->GetName();
+    int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
     std::string new_cmap = std::string(cmap);
     size_t found = new_cmap.rfind("_mag");
     new_cmap = new_cmap.substr(0,found);
@@ -880,7 +878,6 @@ void ShapePopulationQT::CreateWidgets()
     on_spinBox_DISPLAY_columns_valueChanged();                  //and display the Widgets according to this number.
 
     m_noUpdateVectorsByDirection = false;
-
 }
 
 
@@ -1466,7 +1463,7 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         const char *cmap  = arr.data();
         
         // Update Vectors
-        int dimension = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
+        int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
         if (dimension == 3)
         {
             this->setVectorDensity(this->spinbox_arrowDens->value());
@@ -1556,7 +1553,7 @@ void ShapePopulationQT::updateColorbar_QT()
     strs.str(""); strs.clear();
     strs << cmap << "_mag"<<std::endl;
     std::string cmap_mag = strs.str();
-    
+
     //Get the windows with this attribute
     std::vector<unsigned int > windowsIndex;
     for(unsigned int i = 0 ; i < m_selectedIndex.size() ; i++)

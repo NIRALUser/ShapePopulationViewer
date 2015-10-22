@@ -353,7 +353,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="tab_colorMap">
              <attribute name="title">
@@ -1910,7 +1910,7 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
                <property name="text">
-                <string>Axis names</string>
+                <string>Axis Names</string>
                </property>
                <property name="checked">
                 <bool>true</bool>

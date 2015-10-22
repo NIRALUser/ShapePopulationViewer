@@ -496,7 +496,6 @@ void ShapePopulationBase::RealTimeRenderSynchro(bool realtime)
 void ShapePopulationBase::computeCommonAttributes()
 {
     m_commonAttributes.clear();
-    
     for (unsigned int i = 0; i < m_meshList.size(); i++)
     {
         int numScalars = m_meshList.at(i)->GetAttributeList().size();
@@ -852,18 +851,18 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
             mesh->GetPolyData()->GetPointData()->SetActiveVectors(a_cmap);
             
             // Set Active scalars
+            // display colormap by direction
+            if(m_displayColorMapByDirection[a_windowIndex[i]]) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_dir.str().c_str());
+            
+            // display colormap by absolute direction
+            else if(m_displayAbsoluteColorMapByDirection[a_windowIndex[i]]) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_abs.str().c_str());
+
             // display colormap by magnitude
-            if(m_displayColorMapByMagnitude[a_windowIndex[i]])
+            else
             {
                 mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_mag.str().c_str());
             }
 
-            // display colormap by direction
-            else if(m_displayColorMapByDirection[a_windowIndex[i]]) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_dir.str().c_str());
-            
-            // display colormap by absolute direction
-            else if(m_displayAbsoluteColorMapByDirection[a_windowIndex[i]]) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_abs.str().c_str());
-                        
             // Update Glyph
             vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
             vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[a_windowIndex[i]];
@@ -961,7 +960,7 @@ void ShapePopulationBase::displayColorMapByMagnitude(bool display)
             if(m_displayVectorsByDirection[m_selectedIndex[i]])
             {
                 this->creationSphereWidget(m_selectedIndex[i]);
-                this->deleteTitleSphereWidget(m_selectedIndex[i]);
+                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
                 this->creationTitleSphereWidget(m_selectedIndex[i]);
             }
             else
@@ -1011,7 +1010,7 @@ void ShapePopulationBase::displayColorMapByDirection(bool display)
 
             // Hide or show sphere
             this->creationSphereWidget(m_selectedIndex[i]);
-            this->deleteTitleSphereWidget(m_selectedIndex[i]);
+            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
             this->creationTitleSphereWidget(m_selectedIndex[i]);
 
             if(m_displayVectors[m_selectedIndex[i]])
@@ -1088,7 +1087,7 @@ void ShapePopulationBase::displayAbsoluteColorMapByDirection(bool display)
             {
                 if(m_displayVectorsByDirection[m_selectedIndex[i]])
                 {
-                    this->deleteTitleSphereWidget(m_selectedIndex[i]);
+                    if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
                     this->creationTitleSphereWidget(m_selectedIndex[i]);
                 }
                 else
@@ -1273,7 +1272,7 @@ void ShapePopulationBase::displayVectors(bool display)
             if(m_displayColorMapByDirection[m_selectedIndex[i]] || m_displayVectorsByDirection[m_selectedIndex[i]])
             {
                 this->creationSphereWidget(m_selectedIndex[i]);
-                this->deleteTitleSphereWidget(m_selectedIndex[i]);
+                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
                 this->creationTitleSphereWidget(m_selectedIndex[i]);
             }
             if(m_displayAbsoluteColorMapByDirection[m_selectedIndex[i]] || m_displayVectorsByAbsoluteDirection[m_selectedIndex[i]])
@@ -1369,7 +1368,7 @@ void ShapePopulationBase::displayVectorsByMagnitude(bool display)
             if(m_displayColorMapByDirection[m_selectedIndex[i]])
             {
                 this->creationSphereWidget(m_selectedIndex[i]);
-                this->deleteTitleSphereWidget(m_selectedIndex[i]);
+                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
                 this->creationTitleSphereWidget(m_selectedIndex[i]);
             }
             else
@@ -1443,7 +1442,7 @@ void ShapePopulationBase::displayVectorsByDirection(bool display)
             // Show sphere
             this->creationSphereWidget(m_selectedIndex[i]);
             // Title of this widget
-            this->deleteTitleSphereWidget(m_selectedIndex[i]);
+            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
             this->creationTitleSphereWidget(m_selectedIndex[i]);
 
 
@@ -1531,7 +1530,7 @@ void ShapePopulationBase::displayVectorsByAbsoluteDirection(bool display)
             if(m_displayColorMapByDirection[m_selectedIndex[i]])
             {
                 this->creationSphereWidget(m_selectedIndex[i]);
-                this->deleteTitleSphereWidget(m_selectedIndex[i]);
+                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
                 this->creationTitleSphereWidget(m_selectedIndex[i]);
             }
             else
@@ -1702,7 +1701,7 @@ void ShapePopulationBase::displaySphere(bool display)
             if(m_displayColorMapByDirection[i] || m_displayVectorsByDirection[i])
             {
                 creationSphereWidget(i);
-                this->deleteTitleSphereWidget(i);
+                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(i);
                 creationTitleSphereWidget(i);
             }
         }
@@ -1764,6 +1763,7 @@ void ShapePopulationBase::creationAxisWidget(int index)
 
         vtkOrientationMarkerWidget* widgetAxis = vtkOrientationMarkerWidget::New();
         widgetAxis = m_widgetAxis[index];
+//        widgetAxis->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetAxis->SetOrientationMarker( actorAxis );
         widgetAxis->SetInteractor( iren );
         widgetAxis->SetViewport( 0.0, 0.05, 0.15, 0.3 ); // size and position of the frame
@@ -1806,6 +1806,7 @@ void ShapePopulationBase::creationTitleAxisWidget(int index)
 
         vtkOrientationMarkerWidget* widgetTitleAxis = vtkOrientationMarkerWidget::New();
         widgetTitleAxis = m_widgetTitleAxis[index];
+//        widgetTitleAxis->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetTitleAxis->SetOrientationMarker( actorTitleAxis );
         widgetTitleAxis->SetInteractor( iren );
         widgetTitleAxis->SetViewport( 0.05, 0.3, 0.8, 0.4 ); // size and position of the frame
@@ -1915,6 +1916,7 @@ void ShapePopulationBase::creationSphereWidget(int index)
 
         vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
         widgetSphere = m_widgetSphere[index];
+//        widgetSphere->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetSphere->SetOrientationMarker( actorSphere );
         widgetSphere->SetInteractor( iren );
         widgetSphere->SetViewport( 0.0, 0.40, 0.15, 0.65 ); // size and position of the frame
@@ -1938,6 +1940,7 @@ void ShapePopulationBase::creationSphereWidget(int index)
 
         vtkOrientationMarkerWidget* widgetAxisByDirection = vtkOrientationMarkerWidget::New();
         widgetAxisByDirection = m_widgetAxisByDirection[index];
+//        widgetAxisByDirection->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetAxisByDirection->SetOrientationMarker( actorAxisByDirection );
         widgetAxisByDirection->SetInteractor( iren );
         widgetAxisByDirection->SetViewport( 0.0, 0.55, 0.15, 0.80  ); // size and position of the frame
@@ -1983,6 +1986,7 @@ void ShapePopulationBase::creationTitleSphereWidget(int index)
 
         vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();
         widgetTitleSphere = m_widgetTitleSphere[index];
+//        widgetTitleSphere->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetTitleSphere->SetOrientationMarker( actorTitleSphere );
         widgetTitleSphere->SetInteractor( iren );
         widgetTitleSphere->SetViewport( 0.05, 0.80, 0.8, 0.90 ); // size and position of the frame
