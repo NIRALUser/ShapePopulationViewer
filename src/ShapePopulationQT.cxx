@@ -128,6 +128,10 @@ ShapePopulationQT::ShapePopulationQT()
     //Display
     radioButton_DISPLAY_all->toggle();                          //Display All surfaces,
     radioButton_SYNC_realtime->toggle();
+    
+    #if __APPLE__
+    Ui_ShapePopulationQT::menuBar->setNativeMenuBar(false);
+    #endif
 }
 
 
@@ -361,10 +365,10 @@ void ShapePopulationQT::deleteSelection()
     
     // Deleting the selection, the widget, and the data
     QGridLayout *Qlayout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
-
+    
     // delete of all axis, sphere, and titles widgets
     deleteAllWidgets();
-
+    
     for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
     {
         for(unsigned int j = 0; j < m_widgetList.size(); j++)
@@ -394,7 +398,7 @@ void ShapePopulationQT::deleteSelection()
             }
         }
     }
-
+    
     m_numberOfMeshes = m_fileList.size();
     spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
     
@@ -431,7 +435,7 @@ void ShapePopulationQT::deleteSelection()
         this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
         spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
         spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
-
+        
         // initialization on the color map by magnitude
         if (checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
         if(radioButton_displayColorMapByMagnitude->isChecked())
@@ -445,11 +449,11 @@ void ShapePopulationQT::deleteSelection()
         {
             radioButton_displayColorMapByMagnitude->click();
         }
-
+        
         this->updateColorbar_QT();
         this->updateArrowPosition();
         
-
+        
         // Tab vectors and button for the color map by direction
         const char * cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
         int dimension = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
@@ -458,7 +462,7 @@ void ShapePopulationQT::deleteSelection()
         new_cmap = new_cmap.substr(0,found);
         if( (new_cmap !=std::string(cmap)) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()))
             dimension = 3;
-
+        
         if (dimension == 1)
         {
             tab_vectors->setDisabled(true);
@@ -471,10 +475,10 @@ void ShapePopulationQT::deleteSelection()
             widget_VISU_colorVectors->setDisabled(true);
             widget_VISU_optionVectors->setDisabled(true);
         }
-
+        
         // initialization of all axis, sphere, and titles widgets
         initializationAllWidgets();
-
+        
         this->updateInfo_QT();
         on_spinBox_DISPLAY_columns_valueChanged();
     }
@@ -876,6 +880,7 @@ void ShapePopulationQT::CreateWidgets()
     }
     spinBox_DISPLAY_columns->setValue(colNumber+1);             //Display the number of columns in spinBox_DISPLAY_columns,
     on_spinBox_DISPLAY_columns_valueChanged();                  //and display the Widgets according to this number.
+
 
     m_noUpdateVectorsByDirection = false;
 }
