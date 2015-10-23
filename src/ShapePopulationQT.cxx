@@ -864,7 +864,7 @@ void ShapePopulationQT::CreateWidgets()
     this->actionDelete_All->setEnabled(true);
     this->menuExport->setEnabled(true);
     this->actionOpen_Directory->setText("Add Directory");
-    this->actionOpen_VTK_Files->setText("Add VTK files");
+    this->actionOpen_VTK_Files->setText("Add VTK/VTP files");
     this->actionLoad_CSV->setText("Add CSV file");
     
     /* DISPLAY INFOS */

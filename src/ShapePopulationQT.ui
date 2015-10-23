@@ -2008,12 +2008,12 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionOpen_VTK_Files">
    <property name="text">
-    <string>Open Files</string>
+    <string>Open VTK/VTP Files</string>
    </property>
   </action>
   <action name="actionLoad_CSV">
    <property name="text">
-    <string>Load CSV</string>
+    <string>Load CSV Files</string>
    </property>
   </action>
   <action name="actionExit">
