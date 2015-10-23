@@ -23,7 +23,7 @@ ShapePopulationQT::ShapePopulationQT()
     // GUI disable
     stackedWidget_ColorMapByMagnitude->show();
     stackedWidget_ColorMapByDirection->hide();
-    checkBox_displayVectorsByAbsoluteDirection->hide();
+    checkBox_displayVectorsByAbsoluteDirection->setDisabled(true);
     toolBox->setDisabled(true);
     this->gradientWidget_VISU->disable();
     menuOptions->setDisabled(true);
@@ -936,15 +936,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
         if( (new_cmap !=std::string(cmap)) && (std::find(m_commonAttributes.begin(), m_commonAttributes.end(), new_cmap) != m_commonAttributes.end()))
             dim = 3;
 
-        if (dim == 1)
-        {
-            // Tab Vectors
-            tab_vectors->setDisabled(true);
-            // ColorMap by direction
-            if (radioButton_displayColorMapByDirection->isChecked()) radioButton_displayColorMapByMagnitude->click();
-            radioButton_displayColorMapByDirection->setEnabled(false);
-        }
-        else
+        if(dim == 3)
         {
             // Tab Vectors
             tab_vectors->setEnabled(true);
@@ -987,13 +979,9 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
             m_displayVectorsByMagnitude[index] = false;
             m_displayVectorsByDirection[index] = false;
             m_displayVectorsByAbsoluteDirection[index] = false;
-            // Show the scalar bar
-            vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[index]->GetRenderers()->GetFirstRenderer()->GetViewProps();
-            vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-            scalarBar = (vtkScalarBarActor*)viewPropObject;
-            if(m_displayColorbar) scalarBar->SetVisibility(1);
-
+            // ColorMap by direction
+            if (radioButton_displayColorMapByDirection->isChecked()) radioButton_displayColorMapByMagnitude->click();
+            radioButton_displayColorMapByDirection->setEnabled(false);
         }
         else if(dim == 3)
         {
@@ -1491,7 +1479,10 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         if (dimension == 1)
         {
             // Tab Vectors
-            if(checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
+            if(checkBox_displayVectors->isChecked())
+            {
+                checkBox_displayVectors->click();
+            }
             tab_vectors->setDisabled(true);
             // ColorMap by direction
             if (radioButton_displayColorMapByDirection->isChecked())
@@ -2656,8 +2647,15 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
             m_firstDisplayVector = false;
         }
         widget_VISU_colorVectors->setEnabled(true);
+        if(!radioButton_displayVectorsbyDirection->isChecked())
+        {
+            checkBox_displayVectorsByAbsoluteDirection->setDisabled(true);
+        }
+        else
+        {
+            checkBox_displayVectorsByAbsoluteDirection->setEnabled(true);
+        }
         widget_VISU_optionVectors->setEnabled(true);
-        checkBox_displayVectorsByAbsoluteDirection->setEnabled(true);
 
         if(radioButton_displayVectorsbyMagnitude->isChecked()) this->displayVectorsByMagnitude(true);
         else if(radioButton_displayVectorsbyDirection->isChecked() && !checkBox_displayVectorsByAbsoluteDirection->isChecked()) this->displayVectorsByDirection(true);
@@ -2681,8 +2679,8 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
 
 void ShapePopulationQT::on_radioButton_displayVectorsbyMagnitude_toggled(bool checked)
 {
-    if(radioButton_displayVectorsbyMagnitude->isChecked()) checkBox_displayVectorsByAbsoluteDirection->hide();
     if(checkBox_displayVectorsByAbsoluteDirection->isChecked()) checkBox_displayVectorsByAbsoluteDirection->click();
+    if(radioButton_displayVectorsbyMagnitude->isChecked()) checkBox_displayVectorsByAbsoluteDirection->setDisabled(true);
 
     // display the color of vectors
     this->displayVectorsByMagnitude(checked);
@@ -2692,7 +2690,7 @@ void ShapePopulationQT::on_radioButton_displayVectorsbyMagnitude_toggled(bool ch
 
 void ShapePopulationQT::on_radioButton_displayVectorsbyDirection_toggled(bool checked)
 {
-    if(radioButton_displayVectorsbyDirection->isChecked()) checkBox_displayVectorsByAbsoluteDirection->show();
+    if(radioButton_displayVectorsbyDirection->isChecked()) checkBox_displayVectorsByAbsoluteDirection->setEnabled(true);
 
     // display the color of vectors
     if(!m_displayVectorsByAbsoluteDirection[m_selectedIndex[0]]) this->displayVectorsByDirection(checked);
