@@ -73,6 +73,9 @@ class ShapePopulationBase
     std::vector<bool> m_displayVectorsByMagnitude;
     std::vector<bool> m_displayVectorsByDirection;
     std::vector<bool> m_displayVectorsByAbsoluteDirection;
+    std::vector<int> m_meshOpacity;
+    std::vector<int> m_vectorScale;
+    std::vector<int> m_vectorDensity;
     bool m_displayColorbar;
     bool m_displayAttribute;
     bool m_displayMeshName;

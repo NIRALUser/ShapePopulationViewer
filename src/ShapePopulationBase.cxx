@@ -1165,6 +1165,7 @@ void ShapePopulationBase::setMeshOpacity(double value)
 {
     for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
     {
+        m_meshOpacity[m_selectedIndex[i]] = (int)(value*100);
         vtkActorCollection * actors = m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
         actors->InitTraversal();
         actors->GetNextActor()->GetProperty()->SetOpacity(value);
@@ -1175,6 +1176,8 @@ void ShapePopulationBase::setVectorScale(double value)
 {
     for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
     {
+        m_vectorScale[m_selectedIndex[i]] = (int)(value*100);
+
         //        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
         vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[m_selectedIndex[i]];
         //        glyph->SetSourceConnection(arrow->GetOutputPort());
@@ -1191,6 +1194,8 @@ void ShapePopulationBase::setVectorDensity(double value)
 {
     for(unsigned int i = 0; i < m_selectedIndex.size() ; i++)
     {
+        m_vectorDensity[m_selectedIndex[i]] = value;
+
         ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
         vtkSmartPointer<vtkMaskPoints> filter = vtkSmartPointer<vtkMaskPoints>::New();
 #if (VTK_MAJOR_VERSION < 6)

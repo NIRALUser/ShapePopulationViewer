@@ -402,6 +402,10 @@ void ShapePopulationQT::deleteSelection()
                     m_displayVectorsByDirection.erase(m_displayVectorsByDirection.begin()+j);
                     m_displayVectorsByAbsoluteDirection.erase(m_displayVectorsByAbsoluteDirection.begin()+j);
 
+                    m_meshOpacity.erase(m_meshOpacity.begin()+j);
+                    m_vectorDensity.erase(m_vectorDensity.begin()+j);
+                    m_vectorScale.erase(m_vectorScale.begin()+j);
+
                     i--;
                     break;
                 }
@@ -546,6 +550,13 @@ void ShapePopulationQT::deleteSelection()
                     {
                         this->displayVectorsByAbsoluteDirection(true);
                     }
+                    this->spinbox_meshOpacity->setValue(m_meshOpacity[j]);
+                    this->spinbox_arrowDens->setValue(m_vectorDensity[j]);
+                    this->spinbox_vectorScale->setValue(m_vectorScale[j]);
+                    this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
+                    this->setVectorDensity(this->spinbox_arrowDens->value());
+                    this->setVectorScale((double)this->spinbox_vectorScale->value()/100);
+
                 }
                 pushButton_VIEW_reset->click();
             }
@@ -799,6 +810,7 @@ void ShapePopulationQT::CreateWidgets()
     /* ATTRIBUTES & COLORBARS */
     ShapePopulationBase::SelectAll();
 
+    // Initialization of variable for the color map, color of vectors and vectors
     m_displayColorMapByMagnitude.clear();
     m_displayColorMapByDirection.clear();
     m_displayAbsoluteColorMapByDirection.clear();
@@ -806,6 +818,10 @@ void ShapePopulationQT::CreateWidgets()
     m_displayVectorsByMagnitude.clear();
     m_displayVectorsByDirection.clear();
     m_displayVectorsByAbsoluteDirection.clear();
+
+    m_meshOpacity.clear();
+    m_vectorScale.clear();
+    m_vectorDensity.clear();
     for (unsigned int i = 0; i < m_widgetList.size(); i++)
     {
         m_displayColorMapByMagnitude.push_back(false);
@@ -815,6 +831,11 @@ void ShapePopulationQT::CreateWidgets()
         m_displayVectorsByMagnitude.push_back(false);
         m_displayVectorsByDirection.push_back(false);
         m_displayVectorsByAbsoluteDirection.push_back(false);
+
+        m_meshOpacity.push_back(spinbox_meshOpacity->value());
+        m_vectorScale.push_back(spinbox_vectorScale->value());
+        m_vectorDensity.push_back(spinbox_arrowDens->value());
+
     }
 
     computeCommonAttributes();                                                  // get the common attributes in m_commonAttributes
@@ -1073,6 +1094,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                     if(selectedInteractor->GetControlKey() == 1)  // Ctrl pushed
                     {
                         // Update the scale and density of vectors by direction to the first selected window position
+                        this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
                         this->setVectorDensity(this->spinbox_arrowDens->value());
                         this->setVectorScale((double)this->spinbox_vectorScale->value()/100);
 
@@ -1138,6 +1160,11 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                 // Update the buttons selected
                 else if(m_selectedIndex.size() == 1)
                 {
+                    // Update the spin-boxes and the slider for the mesh opacity and the scale, and density of vectors
+                    this->spinbox_meshOpacity->setValue(m_meshOpacity[index]);
+                    this->spinbox_arrowDens->setValue(m_vectorDensity[index]);
+                    this->spinbox_vectorScale->setValue(m_vectorScale[index]);
+
                     // Update the button selected according the color map
                     if (m_displayColorMapByMagnitude[index])
                     {
@@ -1532,13 +1559,6 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         QByteArray arr = text.toLatin1();
         const char *cmap  = arr.data();
         
-        // Update Vectors
-        int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
-        if (dimension == 3)
-        {
-            this->setVectorDensity(this->spinbox_arrowDens->value());
-        }
-
         // Update Attribute and commonRange
         this->UpdateAttribute(cmap, m_selectedIndex);
 
@@ -1553,6 +1573,7 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         this->updateArrowPosition();
 
         /* Options enabled or not for Vectors */
+        int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(cmap)->GetNumberOfComponents();
         if (dimension == 1)
         {
             // Tab Vectors
