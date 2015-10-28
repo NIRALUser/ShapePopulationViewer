@@ -52,9 +52,8 @@ protected:
     bool m_updateOnPositionChanged;
     bool m_updateOnAttributeChanged;
     bool m_linkCoordinate;
-    bool m_displayColorMap;
+    bool m_noChange;
     bool m_firstDisplayVector;
-    bool m_reset;
     unsigned int m_numberOfMeshes;
     QString m_lastDirectory;
     QString m_colormapDirectory;

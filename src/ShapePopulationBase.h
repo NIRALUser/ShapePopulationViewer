@@ -61,6 +61,10 @@ class ShapePopulationBase
     std::vector< colorBarStruct *> m_colorBarList;
     valueDirectionColorMapStruct * m_usedValueDirectionColorMap;
     std::vector< valueDirectionColorMapStruct * > m_valueDirectionColorMapList;
+    std::vector<double> m_usedRangeColorByDirection;
+    std::vector< std::vector<double> > m_RangeColorByDirectionList;
+    std::vector<double> m_usedRangeColorByAbsDirection;
+    std::vector< std::vector<double> > m_RangeColorByAbsDirectionList;
     bool m_renderAllSelection;
     std::vector<bool> m_displayColorMapByMagnitude;
     std::vector<bool> m_displayColorMapByDirection;
