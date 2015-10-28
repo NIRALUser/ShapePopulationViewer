@@ -1893,7 +1893,7 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
                <property name="text">
-                <string>Direction Ref</string>
+                <string>Direction Reference</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -1908,7 +1908,7 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
                <property name="text">
-                <string>Ref Names</string>
+                <string>Reference Names</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
