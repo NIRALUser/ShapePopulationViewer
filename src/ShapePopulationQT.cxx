@@ -931,6 +931,10 @@ void ShapePopulationQT::CreateWidgets()
     
     /* GUI BUTTONS & ACTIONS */
     this->toolBox->setEnabled(true);
+    this->groupBox_VIEW->setEnabled(true);     // if when you load a mesh when the other meshes are all deselected
+    this->groupBox_VISU->setEnabled(true);     // if when you load a mesh when the other meshes are all deselected
+    this->tabWidget->setEnabled(true);         // if when you load a mesh when the other meshes are all deselected
+    //
     if (checkBox_displayVectors->isChecked()) checkBox_displayVectors->click();
     if (!radioButton_displayColorMapByMagnitude->isChecked())
     {
