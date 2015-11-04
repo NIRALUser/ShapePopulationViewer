@@ -513,8 +513,10 @@ void ShapePopulationQT::deleteSelection()
                 this->UpdateAttribute(m_commonAttributes[index].c_str(), m_selectedIndex);
                 m_usedColorBar = m_colorBarList[index];
                 this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
+                m_noChange = true;
                 spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
                 spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
+                m_noChange = false;
 
                 m_noUpdateVectorsByDirection = false;
 
@@ -911,9 +913,11 @@ void ShapePopulationQT::CreateWidgets()
     /* RENDER WINDOWS */
     this->UpdateAttribute(m_commonAttributes[0].c_str(), m_selectedIndex);
     m_usedColorBar = m_colorBarList[0];
+    m_noChange = true;
     this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
     spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
     spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
+    m_noChange = false;
     this->UpdateColorMap(m_selectedIndex);
 //    this->updateColorbar_QT();
     this->updateArrowPosition();
@@ -1569,9 +1573,11 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         // Change the colorbar selected
         m_usedColorBar = m_colorBarList[index]; //the colorbar depends of the attribute
         this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
+        m_noChange = true;
         spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
         spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
-        
+        m_noChange = false;
+
         // Display colormap
         this->UpdateColorMap(m_selectedIndex);
         this->updateArrowPosition();
