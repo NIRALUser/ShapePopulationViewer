@@ -7,5 +7,7 @@
         <file>resources/eyeClosedDisabled.png</file>
         <file>resources/eyeOpenDisabled.png</file>
         <file>resources/logo.png</file>
+        <file>resources/LinkOff.png</file>
+        <file>resources/LinkOn.png</file>
     </qresource>
 </RCC>
