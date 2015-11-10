@@ -678,18 +678,21 @@ void ShapePopulationBase::UpdateColorMapByDirection(const char * cmap,int index)
         m_usedValueDirectionColorMap = m_valueDirectionColorMapList[index];
         
         double norm = m_usedValueDirectionColorMap->norm;
-        double maximum[3];
+        double maximum;
         for(int cc = 0; cc < 3; cc++)
         {
+            double maximumTemp;
+
             if(fabs(m_usedValueDirectionColorMap->min[cc]) < fabs(m_usedValueDirectionColorMap->max[cc]))
             {
-                maximum[cc] = fabs(m_usedValueDirectionColorMap->max[cc]);
+                maximumTemp = fabs(m_usedValueDirectionColorMap->max[cc]);
             }
             else
             {
-                maximum[cc] = fabs(m_usedValueDirectionColorMap->min[cc]);
+                maximumTemp = fabs(m_usedValueDirectionColorMap->min[cc]);
             }
-            std::cout<<cmap<<" max "<<maximum[cc]<<std::endl;
+            if( cc == 0) maximum = maximumTemp;
+            else if ( maximum < maximumTemp) maximum = maximumTemp;
         }
         
         // RGB scalar corresponding
@@ -697,27 +700,24 @@ void ShapePopulationBase::UpdateColorMapByDirection(const char * cmap,int index)
         {
             for(int k = 0; k < 3; k++)
             {
-                if((vector->GetComponent(l,k)/norm) >= -maximum[k] && (vector->GetComponent(l,k)/norm) <= maximum[k])
+                if((vector->GetComponent(l,k)/norm) >= -maximum && (vector->GetComponent(l,k)/norm) <= maximum)
                 {
-                    if(maximum[k] != 0)
+                    if(maximum != 0)
                     {
-                        RGB[k] = (127.5/maximum[k])*(vector->GetComponent(l,k)/norm) + 127.5;
+                        RGB[k] = (127.5/maximum)*(vector->GetComponent(l,k)/norm) + 127.5;
                     }
                     else
                     {
                         RGB[k] = 127.5;
                     }
-
                 }
-                else if((vector->GetComponent(l,k)/norm) < -maximum[k]) RGB[k] = 0;
-                else if((vector->GetComponent(l,k)/norm) > maximum[k]) RGB[k] = 255;
+                else if((vector->GetComponent(l,k)/norm) < -maximum) RGB[k] = 0;
+                else if((vector->GetComponent(l,k)/norm) > maximum) RGB[k] = 255;
             }
-            if(l==2) std::cout<<"RGB "<<RGB[0]<<" "<<RGB[1]<<" "<<RGB[2]<<std::endl;
             scalars->InsertTuple(l,RGB);
         }
         mesh->GetPolyData()->GetPointData()->AddArray(scalars);
     }
-    
 }
 
 void ShapePopulationBase::UpdateColorMapByAbsoluteDirection(const char * cmap, int index)
@@ -755,12 +755,13 @@ void ShapePopulationBase::UpdateColorMapByAbsoluteDirection(const char * cmap, i
         m_usedValueDirectionColorMap = m_valueDirectionColorMapList[index];
         
         double norm = m_usedValueDirectionColorMap->norm;
-        double max[3];
-        double min[3];
+        double maximum;
         for(int cc = 0; cc < 3; cc++)
         {
-            min[cc] = m_usedValueDirectionColorMap->minAbs[cc];
-            max[cc] = m_usedValueDirectionColorMap->maxAbs[cc];
+            double maximumTemp;
+            maximumTemp = m_usedValueDirectionColorMap->maxAbs[cc];
+            if( cc == 0 ) maximum = maximumTemp;
+            else if (maximum < maximumTemp) maximum = maximumTemp;
         }
         
         // RGB scalar corresponding
@@ -768,14 +769,19 @@ void ShapePopulationBase::UpdateColorMapByAbsoluteDirection(const char * cmap, i
         {
             for(int k = 0; k < 3; k++)
             {
-                if(fabs(vector->GetComponent(l,k))/norm >= min[k] && fabs(vector->GetComponent(l,k))/norm <= max[k])
+                if(fabs(vector->GetComponent(l,k))/norm >= 0 && fabs(vector->GetComponent(l,k))/norm <= maximum)
                 {
-                    if(max[k] != min[k]) RGB[k] = ((255/(max[k]-min[k]))*(fabs(vector->GetComponent(l,k))/norm)-(255*min[k])/(max[k]-min[k]));
-                    else if (max[k] != 0) RGB[k] = 255;
-                    else if (max[k] == 0) RGB[k] = 0;
+                    if(maximum != 0)
+                    {
+                        RGB[k] = ((255/(maximum))*(fabs(vector->GetComponent(l,k))/norm));
+                    }
+                    else
+                    {
+                        RGB[k] = 0;
+                    }
                 }
-                else if((fabs(vector->GetComponent(l,k))/norm) < min[k]) RGB[k] = 0;
-                else if((fabs(vector->GetComponent(l,k))/norm) > max[k]) RGB[k] = 255;
+                else if((fabs(vector->GetComponent(l,k))/norm) < 0) RGB[k] = 0;
+                else if((fabs(vector->GetComponent(l,k))/norm) > maximum) RGB[k] = 255;
             }
             scalars->InsertTuple(l,RGB);
         }
