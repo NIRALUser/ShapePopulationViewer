@@ -2956,7 +2956,10 @@ void ShapePopulationQT::on_checkBox_displayVectors_toggled(bool checked)
         this->displayVectorsByMagnitude(false);
         this->displayVectorsByDirection(false);
         this->displayVectorsByAbsoluteDirection(false);
-
+        // reset the value of the mesh's opacity at 100 when the vectors are not displayed
+        slider_meshOpacity->setValue(100);
+        spinbox_meshOpacity->setValue(100);
+        on_slider_meshOpacity_valueChanged(100);
         widget_VISU_colorVectors->setDisabled(true);
         widget_VISU_optionVectors->setDisabled(true);
         checkBox_displayVectorsByAbsoluteDirection->setDisabled(true);
