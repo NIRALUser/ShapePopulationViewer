@@ -975,7 +975,6 @@ void ShapePopulationQT::CreateWidgets()
 
     /* */
 
-    
     this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
     this->menuOptions->setEnabled(true);
     this->actionDelete->setEnabled(true);
@@ -1559,7 +1558,7 @@ void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged()
 void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
 {
     if(m_selectedIndex.size() == 0 || m_updateOnAttributeChanged == false) return;
-    
+
     int index = this->comboBox_VISU_attribute->currentIndex();
     if (index != -1)
     {
@@ -1616,33 +1615,61 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
             m_usedRangeColorByDirection = m_RangeColorByDirectionList[index];
             m_usedRangeColorByAbsDirection = m_RangeColorByAbsDirectionList[index];
             m_noChange = true;
-            if(m_displayColorMapByDirection[m_selectedIndex[0]] && !m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
+            if(m_displayColorMapByDirection[m_selectedIndex[0]])
             {
+                // min X
+                if(spinBox_VISU_min_AxisX->value() != m_usedValueDirectionColorMap->min[0]) spinBox_VISU_min_AxisX->setMaximum(99999.99999);
                 spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->min[0]);
                 if(m_usedValueDirectionColorMap->min[0] == 0) spinBox_VISU_max_AxisX->setMinimum(0);
+
+                // max X
                 spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->max[0]);
                 if(m_usedValueDirectionColorMap->max[0] == 0) spinBox_VISU_min_AxisX->setMaximum(0);
+
+                // min Y
+                if(spinBox_VISU_min_AxisY->value() != m_usedValueDirectionColorMap->min[1]) spinBox_VISU_min_AxisY->setMaximum(99999.99999);
                 spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->min[1]);
                 if(m_usedValueDirectionColorMap->min[1] == 0) spinBox_VISU_max_AxisY->setMinimum(0);
+
+                // max Y
                 spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
                 if(m_usedValueDirectionColorMap->max[1] == 0) spinBox_VISU_min_AxisY->setMaximum(0);
+
+                // min Z
+                if(spinBox_VISU_min_AxisZ->value() != m_usedValueDirectionColorMap->min[2]) spinBox_VISU_min_AxisZ->setMaximum(99999.99999);
                 spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
                 if(m_usedValueDirectionColorMap->min[2] == 0) spinBox_VISU_max_AxisZ->setMinimum(0);
+
+                // max Z
                 spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
                 if(m_usedValueDirectionColorMap->max[2] == 0) spinBox_VISU_min_AxisZ->setMaximum(0);
             }
-            else if (m_displayColorMapByDirection[m_selectedIndex[0]] && m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
+            else if (m_displayAbsoluteColorMapByDirection[m_selectedIndex[0]])
             {
+                // min X
+                if(spinBox_VISU_min_AxisX->value() != m_usedValueDirectionColorMap->minAbs[0]) spinBox_VISU_min_AxisX->setMaximum(99999.99999);
                 spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->minAbs[0]);
                 if(m_usedValueDirectionColorMap->minAbs[0] == 0) spinBox_VISU_max_AxisX->setMinimum(0);
+
+                // max X
                 spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
                 if(m_usedValueDirectionColorMap->maxAbs[0] == 0) spinBox_VISU_min_AxisX->setMaximum(0);
+
+                // min Y
+                if(spinBox_VISU_min_AxisY->value() != m_usedValueDirectionColorMap->minAbs[1]) spinBox_VISU_min_AxisY->setMaximum(99999.99999);
                 spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->minAbs[1]);
                 if(m_usedValueDirectionColorMap->minAbs[1] == 0) spinBox_VISU_max_AxisY->setMinimum(0);
+
+                // max Y
                 spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->maxAbs[1]);
                 if(m_usedValueDirectionColorMap->maxAbs[1] == 0) spinBox_VISU_min_AxisY->setMaximum(0);
+
+                // min Z
+                if(spinBox_VISU_min_AxisZ->value() != m_usedValueDirectionColorMap->minAbs[2]) spinBox_VISU_min_AxisZ->setMaximum(99999.99999);
                 spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->minAbs[2]);
                 if(m_usedValueDirectionColorMap->minAbs[2] == 0) spinBox_VISU_max_AxisZ->setMinimum(0);
+
+                // max Z
                 spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->maxAbs[2]);
                 if(m_usedValueDirectionColorMap->maxAbs[2] == 0) spinBox_VISU_min_AxisZ->setMaximum(0);
             }
@@ -2547,16 +2574,30 @@ void ShapePopulationQT::on_radioButton_displayColorMapByDirection_toggled(bool c
     spinBox_VISU_min_AxisY->setEnabled(true);
     spinBox_VISU_min_AxisZ->setEnabled(true);
 
+    // min X
+    if(spinBox_VISU_min_AxisX->value() != m_usedValueDirectionColorMap->min[0]) spinBox_VISU_min_AxisX->setMaximum(99999.99999);
     spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->min[0]);
     if(m_usedValueDirectionColorMap->min[0] == 0) spinBox_VISU_max_AxisX->setMinimum(0);
+
+    // max X
     spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->max[0]);
     if(m_usedValueDirectionColorMap->max[0] == 0) spinBox_VISU_min_AxisX->setMaximum(0);
+
+    // min Y
+    if(spinBox_VISU_min_AxisY->value() != m_usedValueDirectionColorMap->min[1]) spinBox_VISU_min_AxisY->setMaximum(99999.99999);
     spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->min[1]);
     if(m_usedValueDirectionColorMap->min[1] == 0) spinBox_VISU_max_AxisY->setMinimum(0);
+
+    // max Y
     spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
     if(m_usedValueDirectionColorMap->max[1] == 0) spinBox_VISU_min_AxisY->setMaximum(0);
+
+    // min Z
+    if(spinBox_VISU_min_AxisZ->value() != m_usedValueDirectionColorMap->min[2]) spinBox_VISU_min_AxisZ->setMaximum(99999.99999);
     spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
     if(m_usedValueDirectionColorMap->min[2] == 0) spinBox_VISU_max_AxisZ->setMinimum(0);
+
+    // max Z
     spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
     if(m_usedValueDirectionColorMap->max[2] == 0) spinBox_VISU_min_AxisZ->setMaximum(0);
 
@@ -2579,21 +2620,35 @@ void ShapePopulationQT::on_checkBox_displayAbsoluteColorMapByDirection_toggled(b
     {
         m_usedRangeColorByDirection = m_RangeColorByDirectionList[index];
 
-        // range
+        // spin-boxes
         spinBox_VISU_min_AxisX->setEnabled(true);
         spinBox_VISU_min_AxisY->setEnabled(true);
         spinBox_VISU_min_AxisZ->setEnabled(true);
 
+            // min X
+        if(spinBox_VISU_min_AxisX->value() != m_usedValueDirectionColorMap->min[0]) spinBox_VISU_min_AxisX->setMaximum(99999.99999);
         spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->min[0]);
         if(m_usedValueDirectionColorMap->min[0] == 0) spinBox_VISU_max_AxisX->setMinimum(0);
+
+            // max X
         spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->max[0]);
         if(m_usedValueDirectionColorMap->max[0] == 0) spinBox_VISU_min_AxisX->setMaximum(0);
+
+            // min Y
+        if(spinBox_VISU_min_AxisY->value() != m_usedValueDirectionColorMap->min[1]) spinBox_VISU_min_AxisY->setMaximum(99999.99999);
         spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->min[1]);
         if(m_usedValueDirectionColorMap->min[1] == 0) spinBox_VISU_max_AxisY->setMinimum(0);
+
+            // max Y
         spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->max[1]);
         if(m_usedValueDirectionColorMap->max[1] == 0) spinBox_VISU_min_AxisY->setMaximum(0);
+
+            // min Z
+        if(spinBox_VISU_min_AxisZ->value() != m_usedValueDirectionColorMap->min[2]) spinBox_VISU_min_AxisZ->setMaximum(99999.99999);
         spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->min[2]);
         if(m_usedValueDirectionColorMap->min[2] == 0) spinBox_VISU_max_AxisZ->setMinimum(0);
+
+            // max Z
         spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->max[2]);
         if(m_usedValueDirectionColorMap->max[2] == 0) spinBox_VISU_min_AxisZ->setMaximum(0);
     }
@@ -2601,21 +2656,35 @@ void ShapePopulationQT::on_checkBox_displayAbsoluteColorMapByDirection_toggled(b
     {
         m_usedRangeColorByAbsDirection = m_RangeColorByAbsDirectionList[index];
 
-        // range
-        spinBox_VISU_min_AxisX->setDisabled(true);
-        spinBox_VISU_min_AxisY->setDisabled(true);
-        spinBox_VISU_min_AxisZ->setDisabled(true);
+        // spin-boxes
 
+            // min X
+        if(spinBox_VISU_min_AxisX->value() != m_usedValueDirectionColorMap->minAbs[0]) spinBox_VISU_min_AxisX->setMaximum(99999.99999);
         spinBox_VISU_min_AxisX->setValue(m_usedValueDirectionColorMap->minAbs[0]);
         if(m_usedValueDirectionColorMap->minAbs[0] == 0) spinBox_VISU_max_AxisX->setMinimum(0);
+        spinBox_VISU_min_AxisX->setDisabled(true);
+
+            // max X
         spinBox_VISU_max_AxisX->setValue(m_usedValueDirectionColorMap->maxAbs[0]);
         if(m_usedValueDirectionColorMap->maxAbs[0] == 0) spinBox_VISU_min_AxisX->setMaximum(0);
+
+            // min Y
+        if(spinBox_VISU_min_AxisY->value() != m_usedValueDirectionColorMap->minAbs[1]) spinBox_VISU_min_AxisY->setMaximum(99999.99999);
         spinBox_VISU_min_AxisY->setValue(m_usedValueDirectionColorMap->minAbs[1]);
         if(m_usedValueDirectionColorMap->minAbs[1] == 0) spinBox_VISU_max_AxisY->setMinimum(0);
+        spinBox_VISU_min_AxisY->setDisabled(true);
+
+            // max Y
         spinBox_VISU_max_AxisY->setValue(m_usedValueDirectionColorMap->maxAbs[1]);
         if(m_usedValueDirectionColorMap->maxAbs[1] == 0) spinBox_VISU_min_AxisY->setMaximum(0);
+
+            // min Z
+        if(spinBox_VISU_min_AxisZ->value() != m_usedValueDirectionColorMap->minAbs[2]) spinBox_VISU_min_AxisZ->setMaximum(99999.99999);
         spinBox_VISU_min_AxisZ->setValue(m_usedValueDirectionColorMap->minAbs[2]);
         if(m_usedValueDirectionColorMap->minAbs[2] == 0) spinBox_VISU_max_AxisZ->setMinimum(0);
+        spinBox_VISU_min_AxisZ->setDisabled(true);
+
+            // max Z
         spinBox_VISU_max_AxisZ->setValue(m_usedValueDirectionColorMap->maxAbs[2]);
         if(m_usedValueDirectionColorMap->maxAbs[2] == 0) spinBox_VISU_min_AxisZ->setMaximum(0);
     }

@@ -868,7 +868,7 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
             
             // Set Active Vectors
             mesh->GetPolyData()->GetPointData()->SetActiveVectors(a_cmap);
-            
+
             // Set Active scalars
             // display colormap by direction
             if(m_displayColorMapByDirection[a_windowIndex[i]]) mesh->GetPolyData()->GetPointData()->SetActiveScalars(strs_dir.str().c_str());
@@ -906,7 +906,7 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
         //        double * commonRange = computeCommonRange(strs_mag.str().c_str(), a_windowIndex);
         double * commonRange = computeCommonRange(strs_mag.str().c_str(), m_selectedIndex);
         m_commonRange[0] = commonRange[0];
-        m_commonRange[1] = commonRange[1];        
+        m_commonRange[1] = commonRange[1];
     }
     
     /* DISPLAY OF SCALAR BAR */
@@ -1223,6 +1223,7 @@ void ShapePopulationBase::setVectorDensity(double value)
         filter->SetInputData(mesh->GetPolyData());
 #endif
         filter->SetOnRatio(101-value);
+
         
         vtkSmartPointer<vtkGlyph3D> glyph = m_glyphList[m_selectedIndex[i]];
         glyph->SetInputConnection(filter->GetOutputPort());
@@ -2108,7 +2109,7 @@ void ShapePopulationBase::ChangeView(int R, int A, int S,int x_ViewUp,int y_View
     this->RenderSelection();
     m_renderAllSelection = false;
     this->UpdateCameraConfig();
-    
+
 }
 
 void ShapePopulationBase::ResetHeadcam()
