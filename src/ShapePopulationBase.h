@@ -6,7 +6,8 @@
 #include "ShapePopulationData.h"
 #include "colorBarStruct.h"
 #include "cameraConfigStruct.h"
-#include "valueDirectionColorMapStruct.h"
+#include "magnitudStruct.h"
+#include "axisColorStruct.h"
 
 #include <vtkCamera.h>                      //Camera
 #include <vtkPolyDataMapper.h>              //Mapper
@@ -28,6 +29,9 @@
 #include <vtkSphereSource.h>                //Sphere
 #include <vtkCaptionActor2D.h>              //Caption's Proprety of Axis
 #include <string.h>
+#include <vtkMath.h>
+#include <vtkDoubleArray.h>
+#include <array>
 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
@@ -59,41 +63,29 @@ class ShapePopulationBase
     std::vector<std::string> m_commonAttributes;
     colorBarStruct * m_usedColorBar;
     std::vector< colorBarStruct *> m_colorBarList;
-    valueDirectionColorMapStruct * m_usedValueDirectionColorMap;
-    std::vector< valueDirectionColorMapStruct * > m_valueDirectionColorMapList;
-    std::vector<double> m_usedRangeColorByDirection;
-    std::vector< std::vector<double> > m_RangeColorByDirectionList;
-    std::vector<double> m_usedRangeColorByAbsDirection;
-    std::vector< std::vector<double> > m_RangeColorByAbsDirectionList;
     bool m_renderAllSelection;
     std::vector<bool> m_displayColorMapByMagnitude;
     std::vector<bool> m_displayColorMapByDirection;
-    std::vector<bool> m_displayAbsoluteColorMapByDirection;
     std::vector<bool> m_displayVectors;
     std::vector<bool> m_displayVectorsByMagnitude;
     std::vector<bool> m_displayVectorsByDirection;
-    std::vector<bool> m_displayVectorsByAbsoluteDirection;
     std::vector<int> m_meshOpacity;
     std::vector<int> m_vectorScale;
     std::vector<int> m_vectorDensity;
     bool m_displayColorbar;
     bool m_displayAttribute;
     bool m_displayMeshName;
-    bool m_displayAxis;
     bool m_displaySphere;
     bool m_displayTitles;
     bool m_noUpdateVectorsByDirection;
-    double m_norm;
-    std::vector<bool> m_createAxis;
     std::vector<bool> m_createSphere;
     std::vector<bool> m_createTitleSphere;
-    std::vector<bool> m_createTitleAxis;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetAxis;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetTitleAxis;
     std::vector< vtkOrientationMarkerWidget* > m_widgetSphere;
     std::vector< vtkOrientationMarkerWidget* > m_widgetTitleSphere;
     std::vector< vtkOrientationMarkerWidget* > m_widgetAxisByDirection;
-
+    std::vector< magnitudStruct * > m_magnitude;
+    magnitudStruct* m_usedMagnitude;
+    std::vector< axisColorStruct* > m_axisColor;
 
     void CreateNewWindow(std::string a_filePath);
     
@@ -110,20 +102,13 @@ class ShapePopulationBase
     
     //COLORMAP
     double m_commonRange[2];
-    double m_commonMin[3];
-    double m_commonMax[3];
-    double m_commonMinAbs[3];
-    double m_commonMaxAbs[3];
+    double m_commonMagnitud[2];
     void computeCommonAttributes();
     double* computeCommonRange(const char * a_cmap, std::vector<unsigned int> a_windowIndex);
-    void computeRangeDirection(const char *a_cmap);
-    void computeNorm(const char *a_cmap);
     void UpdateColorMapByDirection(const char *cmap, int index);
-    void UpdateColorMapByAbsoluteDirection(const char *cmap, int index);
     void UpdateAttribute(const char *a_cmap, std::vector<unsigned int> a_windowIndex);
     void displayColorMapByMagnitude(bool display);
     void displayColorMapByDirection(bool display);
-    void displayAbsoluteColorMapByDirection(bool display);
     void UpdateColorMap(std::vector<unsigned int> a_windowIndex);
     
     //VECTORS
@@ -133,24 +118,16 @@ class ShapePopulationBase
     void displayVectors(bool display);
     void displayVectorsByMagnitude(bool display);
     void displayVectorsByDirection(bool display);
-    void displayVectorsByAbsoluteDirection(bool display);
     void UpdateVectorsByDirection();
     
     //DISPLAY
     void displayColorbar(bool display);
     void displayAttribute(bool display);
     void displayMeshName(bool display);
-    void displayAxis(bool display);
     void displaySphere(bool display);
     void displayTitles(bool display);
 
     // AXIS WIDGETS and SPHERE WIDGETS
-        //Axis widgets
-    void creationAxisWidget(int index);
-    void deleteAxisWidget(int index);
-    void creationTitleAxisWidget(int index);
-    void deleteTitleAxisWidget(int index);
-        // Sphere widgets
     vtkActor* creationSphereActor();
     void creationSphereWidget(int index);
     void deleteSphereWidget(int index);
