@@ -2021,7 +2021,7 @@ void ShapePopulationQT::on_radioButton_displayColorMapByDirection_toggled(bool c
         spinBox_VISU_max_Dir->setMinimum(m_usedMagnitude->min);
         spinBox_VISU_max_Dir->setValue(m_usedMagnitude->max);
     }
-
+    emit sig_axisColor_value(m_axisColor[m_selectedIndex[0]], m_customizeColorMapByDirectionDialog->isVisible());
 
     // display color map by direction
     this->displayColorMapByDirection(checked);
