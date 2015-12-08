@@ -545,8 +545,8 @@ void customizeColorMapByDirectionDialogQT::updateBackgroundColor_valueChanged(do
     if(dialogOpen)
     {
         widget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(m_backgroundColor);
+        widget->GetRenderWindow()->Render();
     }
-    widget->GetRenderWindow()->Render();
 
 }
 
