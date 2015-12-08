@@ -49,7 +49,7 @@ protected:
     bool m_complementaryColor;
     std::vector< QFrame* > m_frameAxis;
     std::vector< QColor > m_axisColor;
-
+    double m_backgroundColor[3];
 
 protected slots:
     void on_radioButton_sameColor_toggled(bool checked);
@@ -59,6 +59,7 @@ protected slots:
     void on_pushButton_pick_plusZAxis_clicked();
     void on_pushButton_default_clicked();
     void updateAxisColor_value(axisColorStruct* axisColor, bool dialogOpen);
+    void updateBackgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen);
 
 
 signals:

@@ -35,15 +35,9 @@ ShapePopulationBase::ShapePopulationBase()
     m_selectedColor[0] = 0.1;
     m_selectedColor[1] = 0.0;
     m_selectedColor[2] = 0.3;
-//    m_selectedColor[0] = 0.9;
-//    m_selectedColor[1] = 0.9;
-//    m_selectedColor[2] = 0.9;
     m_labelColor[0] = 1.0;
     m_labelColor[1] = 1.0;
     m_labelColor[2] = 1.0;
-//    m_labelColor[0] = 0.3;
-//    m_labelColor[1] = 0.3;
-//    m_labelColor[2] = 0.3;
     m_renderAllSelection = false; //changed
     m_displayColorbar = true;
     m_displayAttribute = true;

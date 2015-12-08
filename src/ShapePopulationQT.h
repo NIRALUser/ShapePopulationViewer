@@ -216,6 +216,7 @@ protected:
 signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
     void sig_axisColor_value(axisColorStruct* axisColor, bool dialogOpen);
+    void sig_backgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen);
 };
 
 #endif

@@ -21,6 +21,9 @@ customizeColorMapByDirectionDialogQT::customizeColorMapByDirectionDialogQT(QWidg
     m_axisColor.push_back(Qt::cyan);
     m_sameColor = false;
     m_complementaryColor = true;
+    m_backgroundColor[0] = 0.1;
+    m_backgroundColor[1] = 0.0;
+    m_backgroundColor[2] = 0.3;
 
 }
 
@@ -116,7 +119,7 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
     if(m_complementaryColor == true) ui->radioButton_complementaryColor->click();
 
     /// VISUALIZATION
-    vtkRenderer *renderer = vtkRenderer::New();
+    vtkRenderer * renderer = vtkRenderer::New();
     vtkRenderWindow *renderWindow = vtkRenderWindow::New();
     renderWindow->AddRenderer(renderer);
     vtkRenderWindowInteractor *interactor = vtkRenderWindowInteractor::New();
@@ -132,7 +135,7 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
     }
 
     // Set the background and size
-    renderer->SetBackground(1, 1, 1); // background : white
+    renderer->SetBackground(m_backgroundColor);
     renderer->ResetCamera();
 
     widget = new QVTKWidget(ui->widget_AxisColor);
@@ -533,4 +536,18 @@ void customizeColorMapByDirectionDialogQT::updateAxisColor_value(axisColorStruct
 
 }
 
+void customizeColorMapByDirectionDialogQT::updateBackgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen)
+{
 
+    m_backgroundColor[0] = backgroundColor_red;
+    m_backgroundColor[1] = backgroundColor_green;
+    m_backgroundColor[2] = backgroundColor_blue;
+
+
+    if(dialogOpen)
+    {
+        widget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(m_backgroundColor);
+    }
+    widget->GetRenderWindow()->Render();
+
+}

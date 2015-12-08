@@ -105,6 +105,7 @@ ShapePopulationQT::ShapePopulationQT()
     connect(m_customizeColorMapByDirectionDialog,SIGNAL(sig_plusYAxis_valueChanged(QColor)), this, SLOT(slot_plusYAxis_valueChanged(QColor)));
     connect(m_customizeColorMapByDirectionDialog,SIGNAL(sig_plusZAxis_valueChanged(QColor)), this, SLOT(slot_plusZAxis_valueChanged(QColor)));
     connect(this,SIGNAL(sig_axisColor_value(axisColorStruct*, bool)), m_customizeColorMapByDirectionDialog, SLOT(updateAxisColor_value(axisColorStruct*, bool)));
+    connect(this,SIGNAL(sig_backgroundColor_valueChanged(double, double, double, bool)), m_customizeColorMapByDirectionDialog, SLOT(updateBackgroundColor_valueChanged(double, double, double, bool)));
 
     //cameraDialog signals
     connect(this,SIGNAL(sig_updateCameraConfig(cameraConfigStruct)), m_cameraDialog, SLOT(updateCameraConfig(cameraConfigStruct)));
@@ -590,6 +591,7 @@ void ShapePopulationQT::slot_selectedColor_valueChanged(QColor color)
     selectedColor[2] = (double)color.blue()/255.0;
     
     this->setBackgroundSelectedColor(selectedColor);
+    emit sig_backgroundColor_valueChanged(selectedColor[0], selectedColor[1], selectedColor[2], m_customizeColorMapByDirectionDialog->isVisible());
 }
 
 
