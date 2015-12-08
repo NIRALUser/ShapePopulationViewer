@@ -438,8 +438,6 @@ void customizeColorMapByDirectionDialogQT::on_pushButton_default_clicked()
 
         m_arrowActors[i]->GetProperty()->SetColor( axisColor );
         m_labelActors[i]->GetTextProperty()->SetColor ( axisColor );
-
-
     }
 
     emit sig_plusXAxis_valueChanged(m_axisColor[2]);
@@ -550,4 +548,14 @@ void customizeColorMapByDirectionDialogQT::updateBackgroundColor_valueChanged(do
     }
     widget->GetRenderWindow()->Render();
 
+}
+
+void customizeColorMapByDirectionDialogQT::resetColor()
+{
+    m_axisColor[0] = Qt::blue;
+    m_axisColor[1] = Qt::magenta;
+    m_axisColor[2] = Qt::red;
+    m_axisColor[3] = Qt::yellow;
+    m_axisColor[4] = Qt::green;
+    m_axisColor[5] = Qt::cyan;
 }

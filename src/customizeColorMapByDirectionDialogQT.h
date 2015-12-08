@@ -60,6 +60,7 @@ protected slots:
     void on_pushButton_default_clicked();
     void updateAxisColor_value(axisColorStruct* axisColor, bool dialogOpen);
     void updateBackgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen);
+    void resetColor();
 
 
 signals:

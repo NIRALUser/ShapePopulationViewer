@@ -213,10 +213,12 @@ protected:
     void showNoExportWindow();
     
     void UpdateCameraConfig();
+
 signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
     void sig_axisColor_value(axisColorStruct* axisColor, bool dialogOpen);
     void sig_backgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen);
+    void sig_resetColor();
 };
 
 #endif

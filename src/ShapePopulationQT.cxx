@@ -106,6 +106,7 @@ ShapePopulationQT::ShapePopulationQT()
     connect(m_customizeColorMapByDirectionDialog,SIGNAL(sig_plusZAxis_valueChanged(QColor)), this, SLOT(slot_plusZAxis_valueChanged(QColor)));
     connect(this,SIGNAL(sig_axisColor_value(axisColorStruct*, bool)), m_customizeColorMapByDirectionDialog, SLOT(updateAxisColor_value(axisColorStruct*, bool)));
     connect(this,SIGNAL(sig_backgroundColor_valueChanged(double, double, double, bool)), m_customizeColorMapByDirectionDialog, SLOT(updateBackgroundColor_valueChanged(double, double, double, bool)));
+    connect(this,SIGNAL(sig_resetColor()), m_customizeColorMapByDirectionDialog, SLOT(resetColor()));
 
     //cameraDialog signals
     connect(this,SIGNAL(sig_updateCameraConfig(cameraConfigStruct)), m_cameraDialog, SLOT(updateCameraConfig(cameraConfigStruct)));
@@ -990,43 +991,28 @@ void ShapePopulationQT::CreateWidgets()
     }
 
     // Inialization of the color of axis for the color map by direction
-    for (unsigned int i = m_numberOfMeshes; i < m_widgetList.size(); i++)
+    if(m_customizeColorMapByDirectionDialog->isVisible()) m_customizeColorMapByDirectionDialog->hide();
+    emit sig_resetColor();
+    m_axisColor.clear();
+    for (unsigned int i = 0; i < m_widgetList.size(); i++)
     {
         axisColorStruct* axisColor = new axisColorStruct;
-        if(m_numberOfMeshes == 0)
-        {
-            axisColor->XAxiscolor[0] = 255;
-            axisColor->XAxiscolor[1] = 0;
-            axisColor->XAxiscolor[2] = 0;
 
-            axisColor->YAxiscolor[0] = 0;
-            axisColor->YAxiscolor[1] = 255;
-            axisColor->YAxiscolor[2] = 0;
+        axisColor->XAxiscolor[0] = 255;
+        axisColor->XAxiscolor[1] = 0;
+        axisColor->XAxiscolor[2] = 0;
 
-            axisColor->ZAxiscolor[0] = 0;
-            axisColor->ZAxiscolor[1] = 0;
-            axisColor->ZAxiscolor[2] = 255;
+        axisColor->YAxiscolor[0] = 0;
+        axisColor->YAxiscolor[1] = 255;
+        axisColor->YAxiscolor[2] = 0;
 
-            axisColor->sameColor = false;
-            axisColor->complementaryColor = true;
-        }
-        else
-        {
-            axisColor->XAxiscolor[0] = m_axisColor[m_selectedIndex[0]]->XAxiscolor[0];
-            axisColor->XAxiscolor[1] = m_axisColor[m_selectedIndex[0]]->XAxiscolor[1];
-            axisColor->XAxiscolor[2] = m_axisColor[m_selectedIndex[0]]->XAxiscolor[2];
+        axisColor->ZAxiscolor[0] = 0;
+        axisColor->ZAxiscolor[1] = 0;
+        axisColor->ZAxiscolor[2] = 255;
 
-            axisColor->YAxiscolor[0] = m_axisColor[m_selectedIndex[0]]->YAxiscolor[0];
-            axisColor->YAxiscolor[1] = m_axisColor[m_selectedIndex[0]]->YAxiscolor[1];
-            axisColor->YAxiscolor[2] = m_axisColor[m_selectedIndex[0]]->YAxiscolor[2];
+        axisColor->sameColor = false;
+        axisColor->complementaryColor = true;
 
-            axisColor->ZAxiscolor[0] = m_axisColor[m_selectedIndex[0]]->ZAxiscolor[0];
-            axisColor->ZAxiscolor[1] = m_axisColor[m_selectedIndex[0]]->ZAxiscolor[1];
-            axisColor->ZAxiscolor[2] = m_axisColor[m_selectedIndex[0]]->ZAxiscolor[2];
-
-            axisColor->sameColor = m_axisColor[m_selectedIndex[0]]->sameColor;
-            axisColor->complementaryColor = m_axisColor[m_selectedIndex[0]]->complementaryColor;
-        }
         m_axisColor.push_back(axisColor);
     }
 
