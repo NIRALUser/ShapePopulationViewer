@@ -914,6 +914,7 @@ void ShapePopulationQT::saveColorMap()
 
 void ShapePopulationQT::showCustomizeColorMapByDirectionConfigWindow()
 {
+    m_customizeColorMapByDirectionDialog->raise();
     m_customizeColorMapByDirectionDialog->show();
     m_customizeColorMapByDirectionDialog->AxisColor();
 }
