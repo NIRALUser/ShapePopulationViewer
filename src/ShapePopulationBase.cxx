@@ -43,12 +43,8 @@ ShapePopulationBase::ShapePopulationBase()
     m_displayAttribute = true;
     m_displayMeshName = true;
     m_displaySphere = true;
-    m_displayTitles = true;
     m_noUpdateVectorsByDirection = false;
     m_createSphere.push_back(false);
-    m_createTitleSphere.push_back(false);
-
-    
 }
 
 void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
@@ -117,11 +113,9 @@ void ShapePopulationBase::setLabelColor(double a_labelColor[])
         
         // Title of the sphere and caption of axis
         if(!m_widgetSphere.empty()) deleteSphereWidget(i);
-        if(!m_widgetTitleSphere.empty()) deleteTitleSphereWidget(i);
         if(m_displayColorMapByDirection[i] || m_displayVectorsByDirection[i])
         {
             this->creationSphereWidget(i);
-            this->creationTitleSphereWidget(i);
         }
 
         m_windowsList[i]->Render();
@@ -798,13 +792,10 @@ void ShapePopulationBase::displayColorMapByMagnitude(bool display)
             if(m_displayVectorsByDirection[m_selectedIndex[i]])
             {
                 this->creationSphereWidget(m_selectedIndex[i]);
-                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
-                this->creationTitleSphereWidget(m_selectedIndex[i]);
             }
             else
             {
                 if(!m_widgetSphere.empty()) this->deleteSphereWidget(m_selectedIndex[i]);
-                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
             }
 
         }
@@ -844,8 +835,6 @@ void ShapePopulationBase::displayColorMapByDirection(bool display)
 
             // Hide or show sphere
             this->creationSphereWidget(m_selectedIndex[i]);
-            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
-            this->creationTitleSphereWidget(m_selectedIndex[i]);
         }
     }
 }
@@ -1019,8 +1008,6 @@ void ShapePopulationBase::displayVectors(bool display)
             if(m_displayColorMapByDirection[m_selectedIndex[i]] || m_displayVectorsByDirection[m_selectedIndex[i]])
             {
                 this->creationSphereWidget(m_selectedIndex[i]);
-                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
-                this->creationTitleSphereWidget(m_selectedIndex[i]);
             }
         }
         else // delete of vectors
@@ -1031,12 +1018,7 @@ void ShapePopulationBase::displayVectors(bool display)
                 if(!m_widgetSphere.empty()) this->deleteSphereWidget(m_selectedIndex[i]);
 
             }
-            // Title
-            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
-            if(m_displayColorMapByDirection[m_selectedIndex[i]])
-            {
-                this->creationTitleSphereWidget(m_selectedIndex[i]);
-            }
+
         }
     }
 }
@@ -1083,13 +1065,10 @@ void ShapePopulationBase::displayVectorsByMagnitude(bool display)
             if(m_displayColorMapByDirection[m_selectedIndex[i]])
             {
                 this->creationSphereWidget(m_selectedIndex[i]);
-                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
-                this->creationTitleSphereWidget(m_selectedIndex[i]);
             }
             else
             {
                 if(!m_widgetSphere.empty()) this->deleteSphereWidget(m_selectedIndex[i]);
-                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
             }
         }
     }
@@ -1154,9 +1133,6 @@ void ShapePopulationBase::displayVectorsByDirection(bool display)
 
             // Show sphere
             this->creationSphereWidget(m_selectedIndex[i]);
-            // Title of this widget
-            if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(m_selectedIndex[i]);
-            this->creationTitleSphereWidget(m_selectedIndex[i]);
         }
     }
 }
@@ -1290,36 +1266,12 @@ void ShapePopulationBase::displaySphere(bool display)
             if(m_displayColorMapByDirection[i] || m_displayVectorsByDirection[i])
             {
                 creationSphereWidget(i);
-                if(!m_widgetTitleSphere.empty()) this->deleteTitleSphereWidget(i);
-                creationTitleSphereWidget(i);
             }
         }
         else
         {
             m_displaySphere = false;
             if(!m_widgetSphere.empty()) deleteSphereWidget(i);
-            if(!m_widgetTitleSphere.empty()) deleteTitleSphereWidget(i);
-        }
-    }
-}
-
-void ShapePopulationBase::displayTitles(bool display)
-{
-    for(unsigned int i = 0; i < m_windowsList.size() ; i++)
-    {
-        if(display)
-        {
-            m_displayTitles = true;
-            if(m_displayColorMapByDirection[i] || m_displayVectorsByDirection[i])
-            {
-                deleteTitleSphereWidget(i);
-                creationTitleSphereWidget(i);
-            }
-        }
-        else
-        {
-            m_displayTitles = false;
-            if(!m_widgetTitleSphere.empty()) deleteTitleSphereWidget(i);
         }
     }
 }
@@ -1517,53 +1469,11 @@ void ShapePopulationBase::deleteSphereWidget(int index)
 }
 
 
-void ShapePopulationBase::creationTitleSphereWidget(int index)
-{
-    if(m_displayTitles && m_displaySphere)
-    {
-        vtkRenderWindow *renderWindow = m_windowsList[index];
-
-        vtkRenderWindowInteractor *iren = renderWindow->GetInteractor();
-
-        // TITLE
-        vtkSmartPointer<vtkTextActor> actorTitleSphere = vtkSmartPointer<vtkTextActor>::New();
-        actorTitleSphere->GetTextProperty()->SetFontSize ( 14 );
-        if(m_displayColorMapByDirection[index] && !m_displayVectorsByDirection[index]) actorTitleSphere->SetInput ( "Color Map" );
-        else if(!m_displayColorMapByDirection[index] && m_displayVectorsByDirection[index]) actorTitleSphere->SetInput ( "Color of vectors" );
-        else if(m_displayColorMapByDirection[index] && m_displayVectorsByDirection[index]) actorTitleSphere->SetInput ( "Color Map and Color of vectors" );
-        actorTitleSphere->GetTextProperty()->SetColor ( m_labelColor );
-
-        vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();
-        widgetTitleSphere = m_widgetTitleSphere[index];
-//        widgetTitleSphere->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
-        widgetTitleSphere->SetOrientationMarker( actorTitleSphere );
-        widgetTitleSphere->SetInteractor( iren );
-        widgetTitleSphere->SetViewport( 0.05, 0.80, 0.8, 0.90 ); // size and position of the frame
-        widgetTitleSphere->SetEnabled( 1 );
-        widgetTitleSphere->InteractiveOff();
-
-        m_createTitleSphere[index] = true;
-    }
-}
-
-void ShapePopulationBase::deleteTitleSphereWidget(int index)
-{
-    if(m_createTitleSphere[index])
-    {
-        m_widgetTitleSphere[index]->SetEnabled( 0 );
-        m_widgetTitleSphere[index]->Delete();
-        vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();
-        m_widgetTitleSphere[index] = widgetTitleSphere;
-    }
-    m_createTitleSphere[index] = false;
-}
-
 void ShapePopulationBase::deleteAllWidgets()
 {
     for (unsigned int i = 0; i < m_windowsList.size(); i++)
     {
         if(!m_widgetSphere.empty())deleteSphereWidget(i);
-        if(!m_widgetTitleSphere.empty())deleteTitleSphereWidget(i);
     }
 }
 
@@ -1572,9 +1482,6 @@ void ShapePopulationBase::initializationAllWidgets()
     m_widgetSphere.clear();
     m_widgetAxisByDirection.clear();
     m_createSphere.clear();
-
-    m_widgetTitleSphere.clear();
-    m_createTitleSphere.clear();
 
     // initialization of all the widgets
     for (unsigned int i = 0; i < m_windowsList.size(); i++)
@@ -1586,10 +1493,6 @@ void ShapePopulationBase::initializationAllWidgets()
         m_widgetAxisByDirection.push_back(widgetAxisByDirection);
         m_createSphere.push_back(false);
 
-        vtkOrientationMarkerWidget* widgetTitleSphere = vtkOrientationMarkerWidget::New();
-
-        m_widgetTitleSphere.push_back(widgetTitleSphere);
-        m_createTitleSphere.push_back(false);
     }
 }
 

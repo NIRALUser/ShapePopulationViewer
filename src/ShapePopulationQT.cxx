@@ -55,11 +55,9 @@ ShapePopulationQT::ShapePopulationQT()
     this->checkBox_displayAttribute->setStyleSheet(QString::fromStdString(eyeStyleSheet));
     this->checkBox_displayColorbar->setStyleSheet(QString::fromStdString(eyeStyleSheet));
     this->checkBox_displaySphere->setStyleSheet(QString::fromStdString(eyeStyleSheet));
-    this->checkBox_displayTitles->setStyleSheet(QString::fromStdString(eyeStyleSheet));
 
     // ToolTip
     this->radioButton_displayColorMapByDirection->setToolTip("This color map has been created by \nassociating one color at one direction");
-    this->checkBox_displayTitles->setToolTip("Manage display of the titles of \nthe marks containing axes or spheres.\nThese titles indicate if the marker is used for \na color map or a color of vectors.");
     this->checkBox_displaySphere->setToolTip("Manage display of the marks \nof color by direction");
 
 
@@ -1225,7 +1223,6 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
 //            deleteAllWidgets();
 //            initializationAllWidgets();
             deleteSphereWidget(index);
-            deleteTitleSphereWidget(index);
             m_displayColorMapByDirection[index] = false;
             m_displayColorMapByMagnitude[index] = true;
             m_displayVectors[index] = false;
@@ -1624,11 +1621,6 @@ void ShapePopulationQT::on_checkBox_displaySphere_toggled(bool checked)
     this->RenderAll();
 }
 
-void ShapePopulationQT::on_checkBox_displayTitles_toggled(bool checked)
-{
-    this->displayTitles(checked);
-    this->RenderAll();
-}
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                        SYNCHRONISATION                                        * //

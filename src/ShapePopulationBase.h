@@ -76,12 +76,9 @@ class ShapePopulationBase
     bool m_displayAttribute;
     bool m_displayMeshName;
     bool m_displaySphere;
-    bool m_displayTitles;
     bool m_noUpdateVectorsByDirection;
     std::vector<bool> m_createSphere;
-    std::vector<bool> m_createTitleSphere;
     std::vector< vtkOrientationMarkerWidget* > m_widgetSphere;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetTitleSphere;
     std::vector< vtkOrientationMarkerWidget* > m_widgetAxisByDirection;
     std::vector< magnitudStruct * > m_magnitude;
     magnitudStruct* m_usedMagnitude;
@@ -125,14 +122,11 @@ class ShapePopulationBase
     void displayAttribute(bool display);
     void displayMeshName(bool display);
     void displaySphere(bool display);
-    void displayTitles(bool display);
 
     // AXIS WIDGETS and SPHERE WIDGETS
     vtkActor* creationSphereActor();
     void creationSphereWidget(int index);
     void deleteSphereWidget(int index);
-    void creationTitleSphereWidget(int index);
-    void deleteTitleSphereWidget(int index);
         // Delete axis and sphere widgets
     void deleteAllWidgets();
         // Initialization of all the widgets

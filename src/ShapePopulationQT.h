@@ -125,7 +125,6 @@ protected:
     void on_checkBox_displayAttribute_toggled(bool checked);
     void on_checkBox_displayMeshName_toggled(bool checked);
     void on_checkBox_displaySphere_toggled(bool checked);
-    void on_checkBox_displayTitles_toggled(bool checked);
 
     
     //SYNCHRO

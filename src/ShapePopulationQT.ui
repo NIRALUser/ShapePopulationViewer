@@ -1549,7 +1549,7 @@ p, li { white-space: pre-wrap; }
             <property name="minimumSize">
              <size>
               <width>140</width>
-              <height>120</height>
+              <height>80</height>
              </size>
             </property>
             <property name="autoFillBackground">
@@ -1566,13 +1566,13 @@ p, li { white-space: pre-wrap; }
               <number>10</number>
              </property>
              <property name="leftMargin">
-              <number>3</number>
+              <number>4</number>
              </property>
              <property name="topMargin">
               <number>5</number>
              </property>
              <property name="rightMargin">
-              <number>3</number>
+              <number>4</number>
              </property>
              <property name="bottomMargin">
               <number>5</number>
@@ -1581,7 +1581,7 @@ p, li { white-space: pre-wrap; }
               <widget class="QCheckBox" name="checkBox_displayColorbar">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>13</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -1596,7 +1596,7 @@ p, li { white-space: pre-wrap; }
               <widget class="QCheckBox" name="checkBox_displayMeshName">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>13</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -1611,7 +1611,7 @@ p, li { white-space: pre-wrap; }
               <widget class="QCheckBox" name="checkBox_displayAttribute">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>13</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -1626,26 +1626,11 @@ p, li { white-space: pre-wrap; }
               <widget class="QCheckBox" name="checkBox_displaySphere">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>13</pointsize>
                 </font>
                </property>
                <property name="text">
                 <string>Direction Reference</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="checkBox_displayTitles">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>Reference Names</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
