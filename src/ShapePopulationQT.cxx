@@ -1241,18 +1241,13 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                 {
                     if(selectedInteractor->GetControlKey() == 1)  // Ctrl pushed
                     {
-                        // Update the scale and density of vectors by direction to the first selected window position
-                        this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
-                        this->setVectorDensity(this->spinbox_arrowDens->value());
-                        this->setVectorScale((double)this->spinbox_vectorScale->value()/100);
-
                         for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
                         {
                             int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[i].c_str())->GetNumberOfComponents();
                             if(dimension == 3)
                             {
-                                m_axisColor[index]->sameColor = m_axisColor[0]->sameColor;
-                                m_axisColor[index]->complementaryColor = m_axisColor[0]->complementaryColor;
+                                m_axisColor[index]->sameColor = m_axisColor[m_selectedIndex[0]]->sameColor;
+                                m_axisColor[index]->complementaryColor = m_axisColor[m_selectedIndex[0]]->complementaryColor;
                                 m_axisColor[index]->XAxiscolor[0] = m_axisColor[m_selectedIndex[0]]->XAxiscolor[0];
                                 m_axisColor[index]->XAxiscolor[1] = m_axisColor[m_selectedIndex[0]]->XAxiscolor[1];
                                 m_axisColor[index]->XAxiscolor[2] = m_axisColor[m_selectedIndex[0]]->XAxiscolor[2];
@@ -1305,11 +1300,15 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                             m_displayVectorsByDirection[index] = m_displayVectorsByDirection[m_selectedIndex[0]];
                             this->displayVectors(false);
                         }
+                        // Update the scale and density of vectors by direction to the first selected window position
+                        this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
+                        this->setVectorDensity(this->spinbox_arrowDens->value());
+                        this->setVectorScale((double)this->spinbox_vectorScale->value()/100);
                     }
                 }
 
                 // Update the buttons selected
-                else if(m_selectedIndex.size() == 1)
+                else if(m_selectedIndex.size() == 1) // Ctrl not pushed
                 {
                     // Update the spin-boxes and the slider for the mesh opacity and the scale, and density of vectors
                     this->spinbox_meshOpacity->setValue(m_meshOpacity[index]);
@@ -1344,8 +1343,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                         }
                     }
                     // Update the dialog for customize the color map bu direction
-                    if(m_customizeColorMapByDirectionDialog->isVisible()) emit sig_axisColor_value(m_axisColor[index], true);
-                    else emit sig_axisColor_value(m_axisColor[index], false);
+                    emit sig_axisColor_value(m_axisColor[index], m_customizeColorMapByDirectionDialog->isVisible());
 
                     // Update the color map for the range
                     for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)

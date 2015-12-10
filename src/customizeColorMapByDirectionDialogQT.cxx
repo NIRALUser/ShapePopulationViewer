@@ -86,7 +86,6 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
 
         // color of axis and label
         double colorAxis[3];
-
         colorAxis[0] = (double)m_axisColor[i].red()/255;
         colorAxis[1] = (double)m_axisColor[i].green()/255;
         colorAxis[2] = (double)m_axisColor[i].blue()/255;
@@ -114,6 +113,7 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
         m_frameAxis[i]->setPalette( pal );
 
     }
+
 
     if(m_sameColor == true) ui->radioButton_sameColor->click();
     if(m_complementaryColor == true) ui->radioButton_complementaryColor->click();
@@ -201,6 +201,10 @@ void customizeColorMapByDirectionDialogQT::on_radioButton_complementaryColor_tog
             g = 255 - color.green();
             int b;
             b = 255 - color.blue();
+
+            m_axisColor[l].setRed(r);
+            m_axisColor[l].setGreen(g);
+            m_axisColor[l].setBlue(b);
 
             color.setRed(r);
             color.setBlue(b);
