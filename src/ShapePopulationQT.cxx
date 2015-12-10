@@ -1358,6 +1358,8 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
             }
         }
     }
+    this->RenderAll();
+
 }
 
 void ShapePopulationQT::SelectAll()
