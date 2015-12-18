@@ -10,6 +10,7 @@ set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Data)
 set(sphere DATA{${SOURCE_DIR}/sphereExpectedResult.vtk})
 set(rightCondyle DATA{${SOURCE_DIR}/rightCondyle.vtk})
 set(rightCondyleExpectedResult DATA{${SOURCE_DIR}/rightCondyleExpectedResult.vtk})
+set(rightCondyleExpectedResult2 DATA{${SOURCE_DIR}/rightCondyleExpectedResult2.vtk})
 set(rightCondyle2 DATA{${SOURCE_DIR}/rightCondyle_signedclosestpoint.vtk})
 
 # Include directories
@@ -152,6 +153,17 @@ ExternalData_add_test(
         NAME TestShapePopulationBase_computeCommonAttributes
         COMMAND $<TARGET_FILE:TestComputeCommonAttributes> ${rightCondyle} ${rightCondyle2} 
 )
+
+# Test 16 of displayColorMapByMagnitude and displayColorMapByDirection in the class ShapePopulationBase
+add_executable(TestDisplayColorMap mainTestDisplayColorMap.cxx testDisplayColorMap.cxx)
+target_link_libraries(TestDisplayColorMap ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_displayColorMap
+        COMMAND $<TARGET_FILE:TestDisplayColorMap> ${rightCondyle} ${rightCondyleExpectedResult2} 
+)
+
+
 
 # Test for the command --help
 add_test(
