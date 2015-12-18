@@ -108,6 +108,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestCreationSphereWidget> ${sphere} 
 )
 
+# Test 11 of displayColorbar in the class ShapePopulationBase
+add_executable(TestDisplayColorbar mainTestDisplayColorbar.cxx testDisplayColorbar.cxx)
+target_link_libraries(TestDisplayColorbar ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_displayColorbar
+        COMMAND $<TARGET_FILE:TestDisplayColorbar> ${rightCondyle} 
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
