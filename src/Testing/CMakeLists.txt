@@ -8,6 +8,7 @@ list(APPEND ExternalData_URL_TEMPLATES
 # Set the data
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Data)
 set(sphere DATA{${SOURCE_DIR}/sphereExpectedResult.vtk})
+set(rightCondyle DATA{${SOURCE_DIR}/rightCondyle.vtk})
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR})
@@ -22,6 +23,15 @@ ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_CreationSphereActor
         COMMAND $<TARGET_FILE:TestCreationSphereActor> ${sphere}
+)
+
+# Test 2 of ChangeView in the class ShapePopulationBase
+add_executable(TestChangeView mainTestChangeView.cxx testChangeView.cxx)
+target_link_libraries(TestChangeView ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_ChangeView
+        COMMAND $<TARGET_FILE:TestChangeView> ${rightCondyle}
 )
 
 # Test for the command --help
