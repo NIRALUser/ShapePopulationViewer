@@ -9,6 +9,8 @@ list(APPEND ExternalData_URL_TEMPLATES
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Data)
 set(sphere DATA{${SOURCE_DIR}/sphereExpectedResult.vtk})
 set(rightCondyle DATA{${SOURCE_DIR}/rightCondyle.vtk})
+set(rightCondyleExpectedResult DATA{${SOURCE_DIR}/rightCondyleExpectedResult.vtk})
+
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR})
@@ -59,6 +61,15 @@ ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_computeCommonRange
         COMMAND $<TARGET_FILE:TestComputeCommonRange> ${rightCondyle}
+)
+
+# Test 6 of UpdateColorMapByDirection in the class ShapePopulationBase
+add_executable(TestUpdateColorMapByDirection mainTestUpdateColorMapByDirection.cxx testUpdateColorMapByDirection.cxx)
+target_link_libraries(TestUpdateColorMapByDirection ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_UpdateColorMapByDirection
+        COMMAND $<TARGET_FILE:TestUpdateColorMapByDirection> ${rightCondyle} ${rightCondyleExpectedResult}
 )
 
 # Test for the command --help
