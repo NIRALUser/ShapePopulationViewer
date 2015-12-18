@@ -10,7 +10,7 @@ set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Data)
 set(sphere DATA{${SOURCE_DIR}/sphereExpectedResult.vtk})
 set(rightCondyle DATA{${SOURCE_DIR}/rightCondyle.vtk})
 set(rightCondyleExpectedResult DATA{${SOURCE_DIR}/rightCondyleExpectedResult.vtk})
-
+set(rightCondyle2 DATA{${SOURCE_DIR}/rightCondyle_signedclosestpoint.vtk})
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR})
@@ -142,6 +142,15 @@ ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayVectors
         COMMAND $<TARGET_FILE:TestDisplayVectors> ${rightCondyle} 
+)
+
+# Test 15 of computeCommonAttributes in the class ShapePopulationBase
+add_executable(TestComputeCommonAttributes mainTestComputeCommonAttributes.cxx testComputeCommonAttributes.cxx)
+target_link_libraries(TestComputeCommonAttributes ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_computeCommonAttributes
+        COMMAND $<TARGET_FILE:TestComputeCommonAttributes> ${rightCondyle} ${rightCondyle2} 
 )
 
 # Test for the command --help
