@@ -34,6 +34,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestChangeView> ${rightCondyle}
 )
 
+# Test 3 of setMeshOpacity in the class ShapePopulationBase
+add_executable(TestMeshOpacity mainTestMeshOpacity.cxx testMeshOpacity.cxx)
+target_link_libraries(TestMeshOpacity ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_setMeshOpacity
+        COMMAND $<TARGET_FILE:TestMeshOpacity> ${rightCondyle}
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
