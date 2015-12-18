@@ -52,6 +52,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestVectorScale> ${rightCondyle}
 )
 
+# Test 5 of computeCommonRange in the class ShapePopulationBase
+add_executable(TestComputeCommonRange mainTestComputeCommonRange.cxx testComputeCommonRange.cxx)
+target_link_libraries(TestComputeCommonRange ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_computeCommonRange
+        COMMAND $<TARGET_FILE:TestComputeCommonRange> ${rightCondyle}
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
