@@ -135,6 +135,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestDisplayMeshName> ${rightCondyle} 
 )
 
+# Test 14 of displayVectors in the class ShapePopulationBase
+add_executable(TestDisplayVectors mainTestDisplayVectors.cxx testDisplayVectors.cxx)
+target_link_libraries(TestDisplayVectors ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_displayVectors
+        COMMAND $<TARGET_FILE:TestDisplayVectors> ${rightCondyle} 
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
