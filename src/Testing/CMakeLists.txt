@@ -90,6 +90,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestLabelColor> ${rightCondyle} 
 )
 
+# Test 9 of setBackgroundUnselectedColor in the class ShapePopulationBase
+add_executable(TestBackgroundUnselectedColor mainTestBackgroundUnselectedColor.cxx testBackgroundUnselectedColor.cxx)
+target_link_libraries(TestBackgroundUnselectedColor ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_setBackgroundUnselectedColor
+        COMMAND $<TARGET_FILE:TestBackgroundUnselectedColor> ${rightCondyle} 
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
