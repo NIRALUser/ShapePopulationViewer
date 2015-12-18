@@ -72,6 +72,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestUpdateColorMapByDirection> ${rightCondyle} ${rightCondyleExpectedResult}
 )
 
+# Test 7 of setBackgroundSelectedColor in the class ShapePopulationBase
+add_executable(TestBackgroundSelectedColor mainTestBackgroundSelectedColor.cxx testBackgroundSelectedColor.cxx)
+target_link_libraries(TestBackgroundSelectedColor ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_setBackgroundSelectedColor
+        COMMAND $<TARGET_FILE:TestBackgroundSelectedColor> ${rightCondyle} 
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
