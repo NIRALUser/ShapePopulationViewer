@@ -99,6 +99,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestBackgroundUnselectedColor> ${rightCondyle} 
 )
 
+# Test 10 of creationSphereWidget in the class ShapePopulationBase
+add_executable(TestCreationSphereWidget mainTestCreationSphereWidget.cxx testCreationSphereWidget.cxx)
+target_link_libraries(TestCreationSphereWidget ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_creationSphereWidget
+        COMMAND $<TARGET_FILE:TestCreationSphereWidget> ${sphere} 
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
