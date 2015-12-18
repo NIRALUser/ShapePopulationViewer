@@ -43,6 +43,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestMeshOpacity> ${rightCondyle}
 )
 
+# Test 4 of setVectorScale in the class ShapePopulationBase
+add_executable(TestVectorScale mainTestVectorScale.cxx testVectorScale.cxx)
+target_link_libraries(TestVectorScale ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_setVectorScale
+        COMMAND $<TARGET_FILE:TestVectorScale> ${rightCondyle}
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
