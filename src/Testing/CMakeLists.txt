@@ -7,6 +7,7 @@ list(APPEND ExternalData_URL_TEMPLATES
 
 # Set the data
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Data)
+set(sphere DATA{${SOURCE_DIR}/sphereExpectedResult.vtk})
 
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR})
@@ -14,6 +15,14 @@ include_directories(${CMAKE_SOURCE_DIR})
 # Link directories
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
+# Test 1 of creationSphereActor in the class ShapePopulationBase
+add_executable(TestCreationSphereActor mainTestCreationSphere.cxx testCreationSphere.cxx)
+target_link_libraries(TestCreationSphereActor ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_CreationSphereActor
+        COMMAND $<TARGET_FILE:TestCreationSphereActor> ${sphere}
+)
 
 # Test for the command --help
 add_test(
