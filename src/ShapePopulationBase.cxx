@@ -552,12 +552,12 @@ void ShapePopulationBase::UpdateColorMapByDirection(const char * cmap,int index)
 
         vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
         polyData = mesh->GetPolyData();
-        vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
+//        vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
 
-        normalGenerator->SetInputData(polyData);
-        normalGenerator->Update();
+//        normalGenerator->SetInputData(polyData);
+//        normalGenerator->Update();
 
-        polyData = normalGenerator->GetOutput();
+//        polyData = normalGenerator->GetOutput();
 
         vtkDoubleArray* normalDataDouble = (vtkDoubleArray*)polyData->GetPointData()->GetArray(cmap);
 
@@ -623,6 +623,7 @@ void ShapePopulationBase::UpdateColorMapByDirection(const char * cmap,int index)
         }
         mesh->GetPolyData()->GetPointData()->AddArray(scalars);
     }
+
 }
 
 void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsigned int > a_windowIndex)
@@ -1190,7 +1191,7 @@ void ShapePopulationBase::displayColorbar(bool display)
     {
         vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         
-        // cornerAnnotation
+        // scalar bar
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
         scalarBar = (vtkScalarBarActor*)viewPropObject;
@@ -1292,12 +1293,12 @@ vtkActor* ShapePopulationBase::creationSphereActor()
 
     vtkSmartPointer<vtkPolyData> polyData = sphereSource->GetOutput();
 
-    vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
+//    vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
 
-    normalGenerator->SetInputData(polyData);
-    normalGenerator->Update();
+//    normalGenerator->SetInputData(polyData);
+//    normalGenerator->Update();
 
-    polyData = normalGenerator->GetOutput();
+//    polyData = normalGenerator->GetOutput();
 
     vtkDoubleArray* normalDataDouble = (vtkDoubleArray*)polyData->GetPointData()->GetArray("Normals");
 
@@ -1374,7 +1375,6 @@ vtkActor* ShapePopulationBase::creationSphereActor()
             if( RGB[k] < 0 ) RGB[k] = 0;
         }
         scalars->InsertTuple3(l, (unsigned char)RGB[0], (unsigned char)RGB[1], (unsigned char)RGB[2]);
-
     }
     polyData->GetPointData()->SetScalars(scalars);
 

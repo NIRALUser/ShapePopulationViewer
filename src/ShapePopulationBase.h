@@ -41,6 +41,8 @@
 
 class ShapePopulationBase
 {
+    friend class TestShapePopulationBase;
+
     public :
     
     ShapePopulationBase();
