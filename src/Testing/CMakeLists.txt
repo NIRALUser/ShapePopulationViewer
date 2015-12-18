@@ -117,6 +117,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestDisplayColorbar> ${rightCondyle} 
 )
 
+# Test 12 of displayAttribute in the class ShapePopulationBase
+add_executable(TestDisplayAttribute mainTestDisplayAttribute.cxx testDisplayAttribute.cxx)
+target_link_libraries(TestDisplayAttribute ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_displayAttribute
+        COMMAND $<TARGET_FILE:TestDisplayAttribute> ${rightCondyle} 
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
