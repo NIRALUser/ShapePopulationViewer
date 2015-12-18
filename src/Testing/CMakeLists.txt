@@ -126,6 +126,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestDisplayAttribute> ${rightCondyle} 
 )
 
+# Test 13 of displayMeshName in the class ShapePopulationBase
+add_executable(TestDisplayMeshName mainTestDisplayMeshName.cxx testDisplayMeshName.cxx)
+target_link_libraries(TestDisplayMeshName ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_displayMeshName
+        COMMAND $<TARGET_FILE:TestDisplayMeshName> ${rightCondyle} 
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
