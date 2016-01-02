@@ -181,7 +181,14 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestUpdateColorMapByMagnitude> ${rightCondyle}  
 )
 
-
+# Test 19 of the color mode of vectors in the class ShapePopulationBase
+add_executable(TestVectorsColorMode mainTestVectorsColorMode.cxx testVectorsColorMode.cxx)
+target_link_libraries(TestVectorsColorMode ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_VectorsColorMode
+        COMMAND $<TARGET_FILE:TestVectorsColorMode> ${rightCondyle}  
+)
 
 # Test for the command --help
 add_test(
