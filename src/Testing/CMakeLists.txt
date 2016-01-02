@@ -163,6 +163,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestDisplayColorMap> ${rightCondyle} ${rightCondyleExpectedResult2} 
 )
 
+# Test 17 of UpdateAttribute in the class ShapePopulationBase
+add_executable(TestUpdateAttribute mainTestUpdateAttribute.cxx testUpdateAttribute.cxx)
+target_link_libraries(TestUpdateAttribute ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_UpdateAttribute
+        COMMAND $<TARGET_FILE:TestUpdateAttribute> ${rightCondyle} ${rightCondyleExpectedResult2} 
+)
+
 
 
 # Test for the command --help
