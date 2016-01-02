@@ -108,7 +108,7 @@ class ShapePopulationBase
     void UpdateAttribute(const char *a_cmap, std::vector<unsigned int> a_windowIndex);
     void displayColorMapByMagnitude(bool display);
     void displayColorMapByDirection(bool display);
-    void UpdateColorMap(std::vector<unsigned int> a_windowIndex);
+    void UpdateColorMapByMagnitude(std::vector<unsigned int> a_windowIndex);
     
     //VECTORS
     void setMeshOpacity(double value);

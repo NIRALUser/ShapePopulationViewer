@@ -1064,7 +1064,7 @@ void ShapePopulationQT::CreateWidgets()
     spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
     spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
     m_noChange = false;
-    this->UpdateColorMap(m_selectedIndex);
+    this->UpdateColorMapByMagnitude(m_selectedIndex);
 //    this->updateColorbar_QT();
     this->updateArrowPosition();
     
@@ -1259,7 +1259,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                                 m_axisColor[index]->ZAxiscolor[2] = m_axisColor[m_selectedIndex[0]]->ZAxiscolor[2];
                                 deleteSphereWidget(index);
                                 this->UpdateColorMapByDirection(m_commonAttributes[i].c_str(),i);
-                                this->UpdateColorMap(m_selectedIndex);
+                                this->UpdateColorMapByMagnitude(m_selectedIndex);
                             }
                         }
 
@@ -1315,6 +1315,19 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                     this->spinbox_arrowDens->setValue(m_vectorDensity[index]);
                     this->spinbox_vectorScale->setValue(m_vectorScale[index]);
 
+                    // Update the dialog for customize the color map bu direction
+                    emit sig_axisColor_value(m_axisColor[index], m_customizeColorMapByDirectionDialog->isVisible());
+
+                    // Update the color map for the range
+                    for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
+                    {
+                        int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[i].c_str())->GetNumberOfComponents();
+                        if(dimension == 3)
+                        {
+                            this->UpdateColorMapByDirection(m_commonAttributes[i].c_str(),i);
+                        }
+                    }
+
                     // Update the button selected according the color map
                     if (m_displayColorMapByMagnitude[index])
                     {
@@ -1340,18 +1353,6 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
                         else if(m_displayVectorsByDirection[index])
                         {
                             radioButton_displayVectorsbyDirection->click();
-                        }
-                    }
-                    // Update the dialog for customize the color map bu direction
-                    emit sig_axisColor_value(m_axisColor[index], m_customizeColorMapByDirectionDialog->isVisible());
-
-                    // Update the color map for the range
-                    for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
-                    {
-                        int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[i].c_str())->GetNumberOfComponents();
-                        if(dimension == 3)
-                        {
-                            this->UpdateColorMapByDirection(m_commonAttributes[i].c_str(),i);
                         }
                     }
                 }
@@ -1388,7 +1389,7 @@ void ShapePopulationQT::SelectAll()
     // Update color with this attribute
     this->UpdateAttribute(cmap, m_selectedIndex);
     this->setVectorDensity(this->spinbox_arrowDens->value());
-    this->UpdateColorMap(m_selectedIndex);
+    this->UpdateColorMapByMagnitude(m_selectedIndex);
     
     // Render
     m_renderAllSelection = true;
@@ -1712,7 +1713,7 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
         m_noChange = false;
 
         // Display colormap
-        this->UpdateColorMap(m_selectedIndex);
+        this->UpdateColorMapByMagnitude(m_selectedIndex);
         this->updateArrowPosition();
 
         /* Options enabled or not for Vectors */
@@ -1794,7 +1795,7 @@ void ShapePopulationQT::updateColorbar_QT()
     }
     
     //Updating this "sameattributewindows" list colormap
-    this->UpdateColorMap(windowsIndex);
+    this->UpdateColorMapByMagnitude(windowsIndex);
     
     //Rendering those windows...
     for(unsigned int i = 0 ; i < windowsIndex.size() ; i++)
