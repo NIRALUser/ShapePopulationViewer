@@ -646,9 +646,9 @@ void ShapePopulationQT::slot_sameColor_valueChanged(bool checked)
                 UpdateColorMapByDirection(m_commonAttributes[j].c_str(),j);
             }
         }
-        for(unsigned int l = 0; l < m_windowsList.size(); l++)
+        for(unsigned int l = 0; l < m_selectedIndex.size(); l++)
         {
-            if(m_displayVectorsByDirection[l]) this->UpdateVectorsByDirection();
+            if(m_displayVectorsByDirection[m_selectedIndex[l]]) this->UpdateVectorsByDirection();
             m_windowsList[l]->Render();
         }
     }
@@ -676,9 +676,9 @@ void ShapePopulationQT::slot_complementaryColor_valueChanged(bool checked)
                 UpdateColorMapByDirection(m_commonAttributes[j].c_str(),j);
             }
         }
-        for(unsigned int l = 0; l < m_windowsList.size(); l++)
+        for(unsigned int l = 0; l < m_selectedIndex.size(); l++)
         {
-            if(m_displayVectorsByDirection[l]) this->UpdateVectorsByDirection();
+            if(m_displayVectorsByDirection[m_selectedIndex[l]]) this->UpdateVectorsByDirection();
             m_windowsList[l]->Render();
         }
     }
@@ -707,9 +707,9 @@ void ShapePopulationQT::slot_plusXAxis_valueChanged(QColor color)
             UpdateColorMapByDirection(m_commonAttributes[j].c_str(),j);
         }
     }
-    for(unsigned int l = 0; l < m_windowsList.size(); l++)
+    for(unsigned int l = 0; l < m_selectedIndex.size(); l++)
     {
-        if(m_displayVectorsByDirection[l]) this->UpdateVectorsByDirection();
+        if(m_displayVectorsByDirection[m_selectedIndex[l]]) this->UpdateVectorsByDirection();
         m_windowsList[l]->Render();
     }
 }
@@ -737,9 +737,9 @@ void ShapePopulationQT::slot_plusYAxis_valueChanged(QColor color)
             UpdateColorMapByDirection(m_commonAttributes[j].c_str(),j);
         }
     }
-    for(unsigned int l = 0; l < m_windowsList.size(); l++)
+    for(unsigned int l = 0; l < m_selectedIndex.size(); l++)
     {
-        if(m_displayVectorsByDirection[l]) this->UpdateVectorsByDirection();
+        if(m_displayVectorsByDirection[m_selectedIndex[l]]) this->UpdateVectorsByDirection();
         m_windowsList[l]->Render();
     }
 }
@@ -767,9 +767,9 @@ void ShapePopulationQT::slot_plusZAxis_valueChanged(QColor color)
             UpdateColorMapByDirection(m_commonAttributes[j].c_str(),j);
         }
     }
-    for(unsigned int l = 0; l < m_windowsList.size(); l++)
+    for(unsigned int l = 0; l < m_selectedIndex.size(); l++)
     {
-        if(m_displayVectorsByDirection[l]) this->UpdateVectorsByDirection();
+        if(m_displayVectorsByDirection[m_selectedIndex[l]]) this->UpdateVectorsByDirection();
         m_windowsList[l]->Render();
     }
 }

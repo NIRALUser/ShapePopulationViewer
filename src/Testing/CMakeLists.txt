@@ -190,6 +190,15 @@ ExternalData_add_test(
         COMMAND $<TARGET_FILE:TestVectorsColorMode> ${rightCondyle}  
 )
 
+# Test 20 of getSelectedIndex in the class ShapePopulationBase
+add_executable(TestSelectedIndex mainTestSelectedIndex.cxx testSelectedIndex.cxx)
+target_link_libraries(TestSelectedIndex ShapePopulationViewerLib)
+ExternalData_add_test(
+        MY_DATA
+        NAME TestShapePopulationBase_getSelectedIndex
+        COMMAND $<TARGET_FILE:TestSelectedIndex> ${rightCondyle}  
+)
+
 # Test for the command --help
 add_test(
         NAME PrintHelp
