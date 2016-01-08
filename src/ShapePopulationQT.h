@@ -8,6 +8,7 @@
 #include "cameraDialogQT.h"
 #include "backgroundDialogQT.h"
 #include "CSVloaderQT.h"
+#include "customizeColorMapByDirectionDialogQT.h"
 #include <iostream>
 #include <vtkInteractorStyleTrackballCamera.h>
 
@@ -51,7 +52,6 @@ protected:
     bool m_toolsDisplayed;
     bool m_updateOnPositionChanged;
     bool m_updateOnAttributeChanged;
-    bool m_linkCoordinate;
     bool m_noChange;
     bool m_firstDisplayVector;
     unsigned int m_numberOfMeshes;
@@ -64,6 +64,7 @@ protected:
     cameraDialogQT * m_cameraDialog;
     backgroundDialogQT * m_backgroundDialog;
     CSVloaderQT * m_CSVloaderDialog;
+    customizeColorMapByDirectionDialogQT* m_customizeColorMapByDirectionDialog;
 
     void CreateWidgets();
 
@@ -88,9 +89,6 @@ protected:
     // UPDATES & DISPLAY INFO
     void updateColorbar_QT();
     void UpdateColorMapByDirection_QT();
-    void UpdateColorMapByAbsoluteDirection_QT();
-    void computeRangeDirection_QT();
-    void computeNorm_QT();
     void updateAttribute_QT();
     void updateArrowPosition();
     void updateInfo_QT();
@@ -114,6 +112,7 @@ protected:
     void showBackgroundConfigWindow();
     void loadColorMap();
     void saveColorMap();
+    void showCustomizeColorMapByDirectionConfigWindow();
     
     //DISPLAY INFO RANGE
     void on_tabWidget_currentChanged(int index);
@@ -125,9 +124,7 @@ protected:
     void on_checkBox_displayColorbar_toggled(bool checked);
     void on_checkBox_displayAttribute_toggled(bool checked);
     void on_checkBox_displayMeshName_toggled(bool checked);
-    void on_checkBox_displayAxis_toggled(bool checked);
     void on_checkBox_displaySphere_toggled(bool checked);
-    void on_checkBox_displayTitles_toggled(bool checked);
 
     
     //SYNCHRO
@@ -151,6 +148,13 @@ protected:
     void slot_unselectedColor_valueChanged(QColor color);
     void slot_textColor_valueChanged(QColor color);
     
+    // CUSTOMIZE COLOR MAP BY DIRECTION
+    void slot_sameColor_valueChanged(bool checked);
+    void slot_complementaryColor_valueChanged(bool checked);
+    void slot_plusXAxis_valueChanged(QColor color);
+    void slot_plusYAxis_valueChanged(QColor color);
+    void slot_plusZAxis_valueChanged(QColor color);
+
     //CAMERA CONFIG
     void slot_position_x_valueChanged(double arg1);
     void slot_position_y_valueChanged(double arg1);
@@ -170,16 +174,8 @@ protected:
     void on_spinBox_VISU_min_valueChanged(double min);
     void on_spinBox_VISU_max_valueChanged(double max);
     void on_pushButton_VISU_resetRange_clicked();
-    void on_spinBox_VISU_min_AxisX_valueChanged(double newXmin);
-    void on_spinBox_VISU_max_AxisX_valueChanged(double newXmax);
-    void on_pushButton_VISU_resetRange_AxisX_clicked();
-    void on_spinBox_VISU_min_AxisY_valueChanged(double newYmin);
-    void on_spinBox_VISU_max_AxisY_valueChanged(double newYmax);
-    void on_pushButton_VISU_resetRange_AxisY_clicked();
-    void on_spinBox_VISU_min_AxisZ_valueChanged(double newZmin);
-    void on_spinBox_VISU_max_AxisZ_valueChanged(double newZmax);
-    void on_pushButton_VISU_resetRange_AxisZ_clicked();
-    void on_pushButton_VISU_link_coordinate_clicked();
+    void on_spinBox_VISU_max_Dir_valueChanged(double newXmax);
+    void on_pushButton_VISU_resetRange_Dir_clicked();
     // arrows of the gradient widget
     void on_spinBox_VISU_position_valueChanged(double arg1);
     void on_pushButton_VISU_delete_clicked();
@@ -188,7 +184,6 @@ protected:
     // color map
     void on_radioButton_displayColorMapByMagnitude_toggled(bool checked);
     void on_radioButton_displayColorMapByDirection_toggled(bool checked);
-    void on_checkBox_displayAbsoluteColorMapByDirection_toggled(bool checked);
 
     //slots for gradView signals
     void slot_gradArrow_moved(qreal newPos);
@@ -203,7 +198,6 @@ protected:
     void on_checkBox_displayVectors_toggled(bool checked);
     void on_radioButton_displayVectorsbyMagnitude_toggled(bool checked);
     void on_radioButton_displayVectorsbyDirection_toggled(bool checked);
-    void on_checkBox_displayVectorsByAbsoluteDirection_toggled(bool checked);
     
     //EXPORT
 #ifndef SPV_EXTENSION
@@ -218,9 +212,12 @@ protected:
     void showNoExportWindow();
     
     void UpdateCameraConfig();
+
 signals:
     void sig_updateCameraConfig(cameraConfigStruct cameraConfig);
-    
+    void sig_axisColor_value(axisColorStruct* axisColor, bool dialogOpen);
+    void sig_backgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen);
+    void sig_resetColor();
 };
 
 #endif

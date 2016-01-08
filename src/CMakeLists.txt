@@ -4,7 +4,6 @@ if(COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 NEW)
 endif()
 
-
 # --- INCLUDES ----------------------------------------------------------------------------
 find_package(SlicerExecutionModel REQUIRED)
 include(${SlicerExecutionModel_USE_FILE})
@@ -123,11 +122,10 @@ SEMMacroBuildCLI(
 
 
 # --- CTest -------------------------------------------------------------------------------
-set(BUILD_TESTING ON CACHE BOOL "Build, configure and copy testing files")
+#set(BUILD_TESTING ON CACHE BOOL "Build, configure and copy testing files")
 
 if( BUILD_TESTING )
-  include(CTest)
-#    add_subdirectory( Testing )
+  ADD_SUBDIRECTORY(Testing)
 endif()
 
 

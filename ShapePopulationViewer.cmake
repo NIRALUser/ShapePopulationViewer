@@ -23,7 +23,13 @@ if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
 endif()
 
 find_package(Qt4 REQUIRED)
+
 include(${QT_USE_FILE})
+if( BUILD_TESTING )
+  include(CTest)
+  include(ExternalData)
+endif()
+
 
 add_subdirectory(src)
 

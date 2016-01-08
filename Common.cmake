@@ -5,6 +5,7 @@ enable_language(CXX)
 #-----------------------------------------------------------------------------
 # Build option(s)
 #-----------------------------------------------------------------------------
+option(BUILD_TESTING "tests" ON)
 
 set(PRIMARY_PROJECT_NAME ${LOCAL_PROJECT_NAME})
 

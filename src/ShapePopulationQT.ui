@@ -26,7 +26,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>ShapePopulationViewer 1.3.3</string>
+   <string>ShapePopulationViewer 1.4.0</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ShapePopulationViewer.qrc">
@@ -471,356 +471,36 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="stackedWidget_ColorMapByDirection">
-                 <layout class="QGridLayout" name="gridLayout_9">
-                  <property name="leftMargin">
-                   <number>5</number>
+                 <widget class="QWidget" name="widget_VISU_rangeOptions_Dir" native="true">
+                  <property name="geometry">
+                   <rect>
+                    <x>0</x>
+                    <y>70</y>
+                    <width>301</width>
+                    <height>31</height>
+                   </rect>
                   </property>
-                  <property name="topMargin">
-                   <number>5</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>5</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="horizontalSpacing">
-                   <number>-1</number>
-                  </property>
-                  <property name="verticalSpacing">
-                   <number>0</number>
-                  </property>
-                  <item row="2" column="1" rowspan="3">
-                   <widget class="QWidget" name="widget_VISU_rangeOptions_AxisX" native="true">
-                    <layout class="QGridLayout" name="gridLayout_14">
-                     <property name="sizeConstraint">
-                      <enum>QLayout::SetDefaultConstraint</enum>
-                     </property>
-                     <property name="leftMargin">
-                      <number>5</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>3</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>5</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>3</number>
-                     </property>
-                     <item row="1" column="2">
-                      <widget class="QDoubleSpinBox" name="spinBox_VISU_max_AxisY">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>80</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="decimals">
-                        <number>5</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-999999999.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>999999999.000000000000000</double>
-                       </property>
-                       <property name="singleStep">
-                        <double>0.100000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QDoubleSpinBox" name="spinBox_VISU_min_AxisX">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>80</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="decimals">
-                        <number>5</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-999999999.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>999999999.000000000000000</double>
-                       </property>
-                       <property name="singleStep">
-                        <double>0.100000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QDoubleSpinBox" name="spinBox_VISU_min_AxisY">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>80</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="decimals">
-                        <number>5</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-999999999.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>999999999.000000000000000</double>
-                       </property>
-                       <property name="singleStep">
-                        <double>0.100000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="3">
-                      <widget class="QPushButton" name="pushButton_VISU_resetRange_AxisX">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>31</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>⟳</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="2">
-                      <widget class="QDoubleSpinBox" name="spinBox_VISU_max_AxisX">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>80</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="decimals">
-                        <number>5</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-999999999.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>999999999.000000000000000</double>
-                       </property>
-                       <property name="singleStep">
-                        <double>0.100000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="0">
-                      <widget class="QLabel" name="label_VISU_range_AxisZ">
-                       <property name="text">
-                        <string>Z : </string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="label_VISU_range_AxisX">
-                       <property name="text">
-                        <string>X : </string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="3">
-                      <widget class="QPushButton" name="pushButton_VISU_resetRange_AxisY">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>31</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>⟳</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QLabel" name="label_VISU_range_AxisY">
-                       <property name="text">
-                        <string>Y : </string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="3">
-                      <widget class="QPushButton" name="pushButton_VISU_resetRange_AxisZ">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>31</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>⟳</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="QDoubleSpinBox" name="spinBox_VISU_min_AxisZ">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>80</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="decimals">
-                        <number>5</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-999999999.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>999999999.000000000000000</double>
-                       </property>
-                       <property name="singleStep">
-                        <double>0.100000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="2">
-                      <widget class="QDoubleSpinBox" name="spinBox_VISU_max_AxisZ">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>80</width>
-                         <height>26</height>
-                        </size>
-                       </property>
-                       <property name="decimals">
-                        <number>5</number>
-                       </property>
-                       <property name="minimum">
-                        <double>-999999999.000000000000000</double>
-                       </property>
-                       <property name="maximum">
-                        <double>999999999.000000000000000</double>
-                       </property>
-                       <property name="singleStep">
-                        <double>0.100000000000000</double>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </widget>
-                  </item>
-                  <item row="3" column="0">
-                   <widget class="QPushButton" name="pushButton_VISU_link_coordinate">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>22</width>
-                      <height>22</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="label_VISU_range_2">
-                    <property name="text">
-                     <string>Range :</string>
-                    </property>
-                    <property name="alignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1" rowspan="2">
-                   <widget class="QWidget" name="widget_2" native="true">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>25</height>
-                     </size>
-                    </property>
-                    <widget class="QCheckBox" name="checkBox_displayAbsoluteColorMapByDirection">
-                     <property name="geometry">
-                      <rect>
-                       <x>140</x>
-                       <y>0</y>
-                       <width>81</width>
-                       <height>23</height>
-                      </rect>
-                     </property>
+                  <layout class="QGridLayout" name="gridLayout_14">
+                   <property name="sizeConstraint">
+                    <enum>QLayout::SetDefaultConstraint</enum>
+                   </property>
+                   <property name="leftMargin">
+                    <number>5</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>3</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>5</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>3</number>
+                   </property>
+                   <item row="1" column="2">
+                    <widget class="QDoubleSpinBox" name="spinBox_VISU_max_Dir">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -829,17 +509,96 @@
                      </property>
                      <property name="minimumSize">
                       <size>
-                       <width>0</width>
-                       <height>23</height>
+                       <width>80</width>
+                       <height>26</height>
+                      </size>
+                     </property>
+                     <property name="decimals">
+                      <number>5</number>
+                     </property>
+                     <property name="minimum">
+                      <double>-999999999.000000000000000</double>
+                     </property>
+                     <property name="maximum">
+                      <double>999999999.000000000000000</double>
+                     </property>
+                     <property name="singleStep">
+                      <double>1.000000000000000</double>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="3">
+                    <widget class="QPushButton" name="pushButton_VISU_resetRange_Dir">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>31</width>
+                       <height>26</height>
                       </size>
                      </property>
                      <property name="text">
-                      <string>Absolute</string>
+                      <string>⟳</string>
                      </property>
                     </widget>
-                   </widget>
-                  </item>
-                 </layout>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QDoubleSpinBox" name="spinBox_VISU_min_Dir">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>80</width>
+                       <height>26</height>
+                      </size>
+                     </property>
+                     <property name="decimals">
+                      <number>5</number>
+                     </property>
+                     <property name="minimum">
+                      <double>-999999999.000000000000000</double>
+                     </property>
+                     <property name="maximum">
+                      <double>999999999.000000000000000</double>
+                     </property>
+                     <property name="singleStep">
+                      <double>1.000000000000000</double>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_VISU_range_Dir">
+                     <property name="text">
+                      <string>Range :</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QPushButton" name="pushButton_customizeColorMapByDirection">
+                  <property name="geometry">
+                   <rect>
+                    <x>50</x>
+                    <y>20</y>
+                    <width>201</width>
+                    <height>41</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>Customize the color map</string>
+                  </property>
+                 </widget>
                 </widget>
                 <widget class="QWidget" name="stackedWidget_ColorMapByMagnitude">
                  <widget class="QWidget" name="widget_VISU_arrowOptions" native="true">
@@ -1321,13 +1080,6 @@
                  <property name="bottomMargin">
                   <number>3</number>
                  </property>
-                 <item row="0" column="1">
-                  <widget class="QRadioButton" name="radioButton_displayVectorsbyMagnitude">
-                   <property name="text">
-                    <string>Magnitude</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_displayColorVectors">
                    <property name="text">
@@ -1342,10 +1094,10 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="2">
-                  <widget class="QCheckBox" name="checkBox_displayVectorsByAbsoluteDirection">
+                 <item row="0" column="1">
+                  <widget class="QRadioButton" name="radioButton_displayVectorsbyMagnitude">
                    <property name="text">
-                    <string>Absolute</string>
+                    <string>Magnitude</string>
                    </property>
                   </widget>
                  </item>
@@ -1797,7 +1549,7 @@ p, li { white-space: pre-wrap; }
             <property name="minimumSize">
              <size>
               <width>140</width>
-              <height>120</height>
+              <height>80</height>
              </size>
             </property>
             <property name="autoFillBackground">
@@ -1814,13 +1566,13 @@ p, li { white-space: pre-wrap; }
               <number>10</number>
              </property>
              <property name="leftMargin">
-              <number>3</number>
+              <number>4</number>
              </property>
              <property name="topMargin">
               <number>5</number>
              </property>
              <property name="rightMargin">
-              <number>3</number>
+              <number>4</number>
              </property>
              <property name="bottomMargin">
               <number>5</number>
@@ -1829,7 +1581,7 @@ p, li { white-space: pre-wrap; }
               <widget class="QCheckBox" name="checkBox_displayColorbar">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>13</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -1844,7 +1596,7 @@ p, li { white-space: pre-wrap; }
               <widget class="QCheckBox" name="checkBox_displayMeshName">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>13</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -1859,7 +1611,7 @@ p, li { white-space: pre-wrap; }
               <widget class="QCheckBox" name="checkBox_displayAttribute">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>13</pointsize>
                 </font>
                </property>
                <property name="text">
@@ -1871,44 +1623,14 @@ p, li { white-space: pre-wrap; }
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="checkBox_displayAxis">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>Absolute Direction Ref</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
               <widget class="QCheckBox" name="checkBox_displaySphere">
                <property name="font">
                 <font>
-                 <pointsize>12</pointsize>
+                 <pointsize>13</pointsize>
                 </font>
                </property>
                <property name="text">
                 <string>Direction Reference</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="checkBox_displayTitles">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>Reference Names</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
