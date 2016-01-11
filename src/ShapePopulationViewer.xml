@@ -2,11 +2,11 @@
 <executable>
   <category>Shape Analysis</category>
   <title>ShapePopulationViewer</title>
-  <version>1.3.3</version>
+  <version>1.4.0</version>
   <description>
 ShapePopulationViewer is a software that allows you to dynamically interact with multiple surfaces at the same time. It is very useful for visualisation and comparison of 3D surfaces by also displaying their scalars attributes and allowing the user to simply modify the colormap gradient.
   </description>
-  <contributor>Alexis Girault, Michael Guarino, Joe Waggoner, Francois Budin</contributor>
+  <contributor>Alexis Girault, Michael Guarino, Joe Waggoner, Francois Budin, Laura Pascal</contributor>
 
   <parameters>
     <label>Input surfaces</label>
