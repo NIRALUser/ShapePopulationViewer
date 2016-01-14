@@ -218,7 +218,7 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     // SCALAR BAR
     vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
     scalarBar->SetLookupTable(mapper->GetLookupTable());
-    scalarBar->SetTitle("Title");
+//    scalarBar->SetTitle("Title");
     scalarBar->SetNumberOfLabels(5);
     scalarBar->SetMaximumWidthInPixels(60);
     
@@ -892,7 +892,7 @@ void ShapePopulationBase::UpdateColorMapByMagnitude(std::vector< unsigned int > 
         vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
         scalarBar = (vtkScalarBarActor*)viewPropObject;
         scalarBar->SetLookupTable( DistanceMapTFunc );
-        scalarBar->SetTitle(" ");
+//        scalarBar->SetTitle(" ");
     }
 }
 
