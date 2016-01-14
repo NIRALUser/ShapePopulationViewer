@@ -31,7 +31,6 @@
 #include <string.h>
 #include <vtkMath.h>
 #include <vtkDoubleArray.h>
-#include <array>
 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
