@@ -59,7 +59,7 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
         vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
         arrow->Update();
 
-        //translate the sphere
+        //translate and rotation of the arrows
         vtkSmartPointer<vtkTransform> translation = vtkSmartPointer<vtkTransform>::New();
 
         translation->Translate(arrowTranslate[i]);
@@ -76,7 +76,7 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
         transformFilter->SetTransform(translation);
         transformFilter->Update();
 
-        //mapper of the sphere
+        //mapper of the arrow
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 #if (VTK_MAJOR_VERSION < 6)
         mapper->SetInputConnection(transformFilter->GetOutputPort());
@@ -113,8 +113,6 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
         m_frameAxis[i]->setPalette( pal );
 
     }
-
-
     if(m_sameColor == true) ui->radioButton_sameColor->click();
     if(m_complementaryColor == true) ui->radioButton_complementaryColor->click();
 
@@ -141,11 +139,10 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
     widget = new QVTKWidget(ui->widget_AxisColor);
     widget->resize(500,350);
     widget->SetRenderWindow(renderWindow);
-//    interactor->EnableRenderOff();
+    widget->setDisabled(true);
 
     widget->show();
     interactor->Start();
-
 }
 
 void customizeColorMapByDirectionDialogQT::on_radioButton_sameColor_toggled(bool checked)
