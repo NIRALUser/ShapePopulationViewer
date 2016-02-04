@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Shape Analysis</category>
+  <category>Quantification</category>
   <title>ShapePopulationViewer</title>
   <version>1.4.0</version>
   <description>
