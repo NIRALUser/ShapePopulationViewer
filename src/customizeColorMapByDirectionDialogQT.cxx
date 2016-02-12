@@ -120,10 +120,6 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
     vtkRenderer * renderer = vtkRenderer::New();
     vtkRenderWindow *renderWindow = vtkRenderWindow::New();
     renderWindow->AddRenderer(renderer);
-    vtkRenderWindowInteractor *interactor = vtkRenderWindowInteractor::New();
-    interactor->SetRenderWindow(renderWindow);
-    vtkInteractorStyleTrackballCamera * interactorStyle = vtkInteractorStyleTrackballCamera::New();
-    interactor->SetInteractorStyle(interactorStyle);
 
     // Add the actors to the renderer
     for(int i = 0 ; i < 6; i++)
@@ -142,7 +138,6 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
     widget->setDisabled(true);
 
     widget->show();
-    interactor->Start();
 }
 
 void customizeColorMapByDirectionDialogQT::on_radioButton_sameColor_toggled(bool checked)
