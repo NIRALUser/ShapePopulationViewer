@@ -571,9 +571,9 @@ void ShapePopulationBase::UpdateColorMapByDirection(const char * cmap,int index)
             float magcoeff = vtkMath::Normalize(normal)/(magnitude->max);
 
             float RGB[3];
-            float r;
-            float g;
-            float b;
+            float r = 0;
+            float g = 0;
+            float b = 0;
 
             // Color the minus axis with the complementary
             if(m_axisColor[m_selectedIndex[i]]->complementaryColor)
@@ -1330,9 +1330,9 @@ vtkActor* ShapePopulationBase::creationSphereActor()
         float magcoeff = vtkMath::Normalize(normal)/(magnitude);
 
         float RGB[3];
-        float r;
-        float g;
-        float b;
+        float r = 0;
+        float g = 0;
+        float b = 0;
 
         // Color the minus axis with the complementary
         if(m_axisColor[m_selectedIndex[0]]->complementaryColor)
