@@ -1,8 +1,8 @@
 #include "customizeColorMapByDirectionDialogQT.h"
 #include "ui_customizeColorMapByDirectionDialogQT.h"
 
-customizeColorMapByDirectionDialogQT::customizeColorMapByDirectionDialogQT(QWidget *parent) :
-    QDialog(parent),
+customizeColorMapByDirectionDialogQT::customizeColorMapByDirectionDialogQT(QWidget *Qparent) :
+    QDialog(Qparent),
     ui(new Ui::customizeColorMapByDirectionDialogQT)
 {
     ui->setupUi(this);
