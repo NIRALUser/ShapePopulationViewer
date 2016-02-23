@@ -1,5 +1,5 @@
 #include "testDisplayColorMap.h"
-#include "QSharedPointer.h"
+#include <QSharedPointer>
 #include "ShapePopulationQT.h"
 
 TestShapePopulationBase::TestShapePopulationBase()

@@ -1,5 +1,5 @@
-#include "testBackgroundUnSelectedColor.h"
-#include "QSharedPointer.h"
+#include "testBackgroundUnselectedColor.h"
+#include <QSharedPointer>
 #include "ShapePopulationQT.h"
 
 TestShapePopulationBase::TestShapePopulationBase()
