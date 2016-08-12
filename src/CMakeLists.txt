@@ -67,8 +67,15 @@ if( VTK_VERSION_MAJOR EQUAL 6 )
 endif()
 
 
-find_package(VTK REQUIRED COMPONENTS ${Slicer_VTK_COMPONENTS} )
+find_package(VTK REQUIRED )
 include(${VTK_USE_FILE})
+string(FIND "${VTK_MODULES_ENABLED}" "GL2PS" index)
+
+if( ${index} EQUAL -1)
+  add_definitions("-DSPV_EXTENSION=1")
+endif()
+
+
 if( ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION )
     find_package(GenerateCLP REQUIRED)
     include(${GenerateCLP_USE_FILE})

@@ -34,18 +34,19 @@ if(NOT "${VTK_VERSION_MAJOR}" STREQUAL "5" AND NOT "${VTK_VERSION_MAJOR}" STREQU
   message(WARNING "Setting VTK_VERSION_MAJOR to '5' as an valid value was specified.")
 endif()
 
-set(USE_VTKv5 ON)
-set(USE_VTKv6 OFF)
-if(${VTK_VERSION_MAJOR} STREQUAL "6")
-  set(USE_VTKv5 OFF)
-  set(USE_VTKv6 ON)
-endif()
+# set(USE_VTKv5 ON)
+# set(USE_VTKv6 OFF)
+# if(${VTK_VERSION_MAJOR} STREQUAL "6")
+#   set(USE_VTKv5 OFF)
+#   set(USE_VTKv6 ON)
+# endif()
 
-if(USE_VTKv6)
-  set(${extProjName}_REQUIRED_VERSION "6.1")  #If a required version is necessary, then set this, else leave blank
-else()
-  set(${extProjName}_REQUIRED_VERSION "5.10")  #If a required version is necessary, then set this, else leave blank
-endif()
+set(${extProjName}_REQUIRED_VERSION "7.0")
+# if(USE_VTKv6)
+#   set(${extProjName}_REQUIRED_VERSION "6.1")  #If a required version is necessary, then set this, else leave blank
+# else()
+#   set(${extProjName}_REQUIRED_VERSION "5.10")  #If a required version is necessary, then set this, else leave blank
+# endif()
 
 # Sanity checks
 #if(DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR})
@@ -94,12 +95,12 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
       )
   endif()
 
-  if(USE_VTKv6)
+  # if(USE_VTKv6)
     list(APPEND EXTERNAL_PROJECT_OPTIONAL_ARGS
         -DVTK_Group_Qt:BOOL=ON
         -DModule_vtkTestingRendering:BOOL=ON
         )
-  endif()
+  # endif()
   list(APPEND EXTERNAL_PROJECT_OPTIONAL_ARGS
       #-DDESIRED_QT_VERSION:STRING=4 # Unused
       -DVTK_USE_QT:BOOL=ON
@@ -142,13 +143,13 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
       ${EXTERNAL_PROJECT_OPTIONAL_ARGS}
     )
   ### --- End Project specific additions
-if(USE_VTKv6)
-  set(${proj}_GIT_TAG "v6.1.0")
+# if(USE_VTKv6)
+  set(${proj}_GIT_TAG "v7.0.0")
   set(${proj}_REPOSITORY ${git_protocol}://vtk.org/VTK.git)
-else()
-  set(${proj}_REPOSITORY ${git_protocol}://github.com/BRAINSia/VTK.git)
-  set(${proj}_GIT_TAG "FixClangFailure_VTK5.10_release")
-endif()
+# else()
+#   set(${proj}_REPOSITORY ${git_protocol}://github.com/BRAINSia/VTK.git)
+#   set(${proj}_GIT_TAG "FixClangFailure_VTK5.10_release")
+# endif()
   ExternalProject_Add(${proj}
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_GIT_TAG}
@@ -171,22 +172,23 @@ endif()
     )
 
 
-  set(VTKPatchScript ${CMAKE_CURRENT_LIST_DIR}/External_VTK_patch.cmake)
-  ExternalProject_Add_Step(${proj} VTKPatch
-    COMMENT "get rid of obsolete C/CXX flags"
-    DEPENDEES download
-    DEPENDERS configure
-    COMMAND ${CMAKE_COMMAND}
-    -DVTKSource=<SOURCE_DIR>
-    -DUSE_VTKv6=${USE_VTKv6}
-    -P ${VTKPatchScript}
-    )
+  # set(VTKPatchScript ${CMAKE_CURRENT_LIST_DIR}/External_VTK_patch.cmake)
+  # ExternalProject_Add_Step(${proj} VTKPatch
+  #   COMMENT "get rid of obsolete C/CXX flags"
+  #   DEPENDEES download
+  #   DEPENDERS configure
+  #   COMMAND ${CMAKE_COMMAND}
+  #   -DVTKSource=<SOURCE_DIR>
+  #   -DUSE_VTKv6=${USE_VTKv6}
+  #   -P ${VTKPatchScript}
+  #   )
 
-if(USE_VTKv6)
-  set(${extProjName}_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/cmake/vtk-6.1)
-else()
-  set(${extProjName}_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/vtk-5.10)
-endif()
+  set(${extProjName}_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/cmake/vtk-7.0)
+# if(USE_VTKv6)
+#   set(${extProjName}_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/cmake/vtk-6.1)
+# else()
+#   set(${extProjName}_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/vtk-5.10)
+# endif()
 
 else()
   if(${USE_SYSTEM_${extProjName}})
