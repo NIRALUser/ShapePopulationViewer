@@ -9,7 +9,7 @@
 
 #include "testMeshOpacity.h"
 
-int main(int argc, char *argv[])
+int main(int, char *argv[])
 {
     TestShapePopulationBase testShapePopulationBase;
     bool test = testShapePopulationBase.testMeshOpacity( (std::string)argv[1] );

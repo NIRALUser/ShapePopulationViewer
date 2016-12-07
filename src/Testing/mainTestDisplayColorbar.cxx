@@ -9,7 +9,7 @@
 
 #include "testDisplayColorbar.h"
 
-int main(int argc, char *argv[])
+int main(int, char *argv[])
 {
     TestShapePopulationBase testShapePopulationBase;
 
