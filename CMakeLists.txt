@@ -63,10 +63,21 @@ endif()
 #                   Phase II: Build the ${LOCAL_PROJECT_NAME}, referencing the support
 #                             packages built in Phase I.
 #-----------------------------------------------------------------------------
-if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
-  set(${LOCAL_PROJECT_NAME}_SUPERBUILD OFF CACHE STRING "Build ${LOCAL_PROJECT_NAME} and the projects it depends on via SuperBuild.cmake.")
+
+set(_default ON)
+if(${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION)
+  set(_default OFF)
 endif()
-option(${LOCAL_PROJECT_NAME}_SUPERBUILD "Build ${LOCAL_PROJECT_NAME} and the projects it depends on via SuperBuild.cmake." ON)
+
+option(${LOCAL_PROJECT_NAME}_SUPERBUILD "Build ${LOCAL_PROJECT_NAME} and the projects it depends on via SuperBuild.cmake." ${_default})
+
+set(_msg "Checking if enabling Superbuild")
+message(STATUS ${_msg})
+if(${LOCAL_PROJECT_NAME}_SUPERBUILD)
+  message(STATUS "${_msg} - yes")
+else()
+  message(STATUS "${_msg} - no")
+endif()
 
 #-----------------------------------------------------------------------------
 # Superbuild script
