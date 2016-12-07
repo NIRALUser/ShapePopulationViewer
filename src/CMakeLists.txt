@@ -110,6 +110,9 @@ else()
 
     generateCLP(SPV_SRCS_CLP ShapePopulationViewer.xml )
     add_executable( Launcher Launcher/Launcher.cxx ${SPV_SRCS_CLP} )
+    if(NOT "${DEFAULT_SEM_TARGET_LIBRARIES}" STREQUAL "")
+      target_link_libraries(Launcher ${DEFAULT_SEM_TARGET_LIBRARIES})
+    endif()
     install(TARGETS Launcher DESTINATION ${SlicerExecutionModel_DEFAULT_CLI_INSTALL_RUNTIME_DESTINATION} )
 endif()
 
