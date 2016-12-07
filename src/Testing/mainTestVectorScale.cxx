@@ -8,7 +8,7 @@
 
 #include "testVectorScale.h"
 
-int main(int argc, char *argv[])
+int main(int, char *argv[])
 {
     TestShapePopulationBase testShapePopulationBase;
     bool test = testShapePopulationBase.testVectorScale( (std::string)argv[1] );
