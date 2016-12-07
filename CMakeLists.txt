@@ -27,6 +27,31 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake)
 ## two completely independant CMake build environments.
 
 #-----------------------------------------------------------------------------
+# Standalone vs Slicer extension option
+#
+
+# This option should be named after the project name, it corresponds to the
+# option set to ON when the project is build by the Slicer Extension build
+# system.
+
+set(_default OFF)
+set(_reason "${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION is ON")
+if(NOT DEFINED ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION AND DEFINED Slicer_DIR)
+  set(_default ON)
+  set(_reason "Slicer_DIR is SET")
+endif()
+
+option(${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION "Build as a Slicer Extension" ${_default})
+
+set(_msg "Checking if building as a Slicer extension")
+message(STATUS ${_msg})
+if(${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION)
+  message(STATUS "${_msg} - yes (${_reason})")
+else()
+  message(STATUS "${_msg} - no (${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION is OFF)")
+endif()
+
+#-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #                   Phase I:  ${LOCAL_PROJECT_NAME}_SUPERBUILD is set to ON, and the
 #                             supporting packages defined in "SuperBuild.cmake"
