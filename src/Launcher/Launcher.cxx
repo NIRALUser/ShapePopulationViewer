@@ -2,7 +2,6 @@
 #include "ShapePopulationViewerCLP.h"
 #include <string>
 
-
 int main( int argc , char* argv[] )
 {
   PARSE_ARGS;
@@ -14,10 +13,12 @@ int main( int argc , char* argv[] )
 #else
   std::string cmd = path + "/../hidden-cli-modules/ShapePopulationViewer" ;
 #endif
+  std::string filler("\"");
+  cmd =  filler +  cmd + filler;
   for( int i = 1 ; i < argc ; i++ )
   {
     cmd += " " ;
-    cmd += argv[ i ] ;
+    cmd += argv[i];
   }
   std::cout<< cmd << std::endl ;
   int val = system( cmd.c_str() ) ;
