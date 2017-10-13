@@ -8,7 +8,7 @@ ShapePopulationViewer is available as an extension of [3D Slicer](http://www.sli
 
 ## License
 
-See License.txt
+See [License.txt](https://github.com/NIRALUser/ShapePopulationViewer/blob/master/License.txt)
 
 ## More information
 
