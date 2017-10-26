@@ -3,8 +3,6 @@
 #-----------------------------------------------------------------------------
 if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
   ADD_DEFINITIONS(-DSPV_EXTENSION=1)
-  #VTK_VERSION_MAJOR is define but not a CACHE variable
-  set( VTK_VERSION_MAJOR ${VTK_VERSION_MAJOR} CACHE STRING "Choose the expected VTK major version to build Slicer (5 or 6).")
   set(EXTENSION_NAME ${LOCAL_PROJECT_NAME} )
   set(MODULE_NAME ${LOCAL_PROJECT_NAME} )
   set(EXTENSION_HOMEPAGE "https://www.nitrc.org/projects/shapepopviewer/")
@@ -18,7 +16,6 @@ if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
   unsetForSlicer( NAMES QT_QMAKE_EXECUTABLE SlicerExecutionModel_DIR ITK_DIR VTK_DIR CMAKE_C_COMPILER CMAKE_CXX_COMPILER CMAKE_CXX_FLAGS CMAKE_C_FLAGS ITK_LIBRARIES )
   find_package(Slicer REQUIRED)
   include(${Slicer_USE_FILE})
-#  resetForSlicer( NAMES VTK_DIR CMAKE_C_COMPILER CMAKE_CXX_COMPILER CMAKE_CXX_FLAGS CMAKE_C_FLAGS VTK_LIBRARIES VTK_VERSION_MAJOR  )
   resetForSlicer( NAMES CMAKE_C_COMPILER CMAKE_CXX_COMPILER CMAKE_CXX_FLAGS CMAKE_C_FLAGS )
 endif()
 

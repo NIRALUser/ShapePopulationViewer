@@ -8,65 +8,6 @@ endif()
 find_package(SlicerExecutionModel REQUIRED)
 include(${SlicerExecutionModel_USE_FILE})
 
-if( VTK_VERSION_MAJOR EQUAL 6 )
-  set(Slicer_VTK_COMPONENTS
-  vtkChartsCore
-  vtkCommonColor
-  vtkCommonComputationalGeometry
-  vtkCommonCore
-  vtkCommonDataModel
-  vtkCommonExecutionModel
-  vtkCommonMath
-  vtkCommonMisc
-  vtkCommonSystem
-  vtkCommonTransforms
-  vtkFiltersCore
-  vtkFiltersExtraction
-  vtkFiltersGeneral
-  vtkFiltersHybrid
-  vtkFiltersImaging
-  vtkFiltersModeling
-  vtkFiltersSources
-  vtkFiltersStatistics
-  vtkGUISupportQt
-  vtkIOCore
-  vtkIOGeometry
-  vtkIOImage
-  vtkIOInfovis
-  vtkIOLegacy
-  vtkIOXML
-  vtkIOXMLParser
-  vtkImagingColor
-  vtkImagingCore
-  vtkImagingFourier
-  vtkImagingGeneral
-  vtkImagingHybrid
-  vtkImagingSources
-  vtkInfovisCore
-  vtkInfovisLayout
-  vtkInteractionStyle
-  vtkInteractionWidgets
-  vtkRenderingAnnotation
-  vtkRenderingContext2D
-  vtkRenderingCore
-  vtkRenderingFreeType
-  vtkRenderingLabel
-  vtkRenderingOpenGL
-  vtkRenderingVolume
-  vtkViewsCore
-  vtkViewsInfovis
-  vtkViewsQt
-  vtkalglib
-  vtkfreetype
-  vtkftgl
-  vtkzlib
-  )
-  if( NOT ShapePopulationViewer_BUILD_SLICER_EXTENSION )
-    list( APPEND Slicer_VTK_COMPONENTS vtkIOExport )
-  endif()
-endif()
-
-
 find_package(VTK REQUIRED )
 include(${VTK_USE_FILE})
 string(FIND "${VTK_MODULES_ENABLED}" "GL2PS" index)
@@ -92,11 +33,7 @@ QT4_ADD_RESOURCES(QRCrcs ${QT_QRC_FILES})
 
 # --- LIBRARIES ---------------------------------------------------------------------------
 if(VTK_LIBRARIES)
-  if(${VTK_VERSION} VERSION_LESS "6")
-    set(ShapePopulationLIBS ${VTK_LIBRARIES} QVTK)
-  else()
-    set(ShapePopulationLIBS ${VTK_LIBRARIES})
-  endif()
+  set(ShapePopulationLIBS ${VTK_LIBRARIES})
 else()
   set(ShapePopulationLIBS vtkHybrid QVTK vtkViews ${QT_LIBRARIES})
 endif()

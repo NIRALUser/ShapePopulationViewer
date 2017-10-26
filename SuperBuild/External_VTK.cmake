@@ -24,34 +24,7 @@ ProjectDependancyPush(CACHED_proj ${proj})
 set(extProjName VTK) #The find_package known name
 set(proj        VTK) #This local name
 
-
-#Setting VTK_VERSION_MAJOR to its default value if it has not been set before
-set(VTK_VERSION_MAJOR 6 CACHE STRING "Choose the expected VTK major version to build Slicer (5 or 6).")
-# Set the possible values of VTK major version for cmake-gui
-set_property(CACHE VTK_VERSION_MAJOR PROPERTY STRINGS "5" "6")
-if(NOT "${VTK_VERSION_MAJOR}" STREQUAL "5" AND NOT "${VTK_VERSION_MAJOR}" STREQUAL "6")
-  set(VTK_VERSION_MAJOR 5 CACHE STRING "Choose the expected VTK major version to build Slicer (5 or 6)." FORCE)
-  message(WARNING "Setting VTK_VERSION_MAJOR to '5' as an valid value was specified.")
-endif()
-
-# set(USE_VTKv5 ON)
-# set(USE_VTKv6 OFF)
-# if(${VTK_VERSION_MAJOR} STREQUAL "6")
-#   set(USE_VTKv5 OFF)
-#   set(USE_VTKv6 ON)
-# endif()
-
 set(${extProjName}_REQUIRED_VERSION "7.0")
-# if(USE_VTKv6)
-#   set(${extProjName}_REQUIRED_VERSION "6.1")  #If a required version is necessary, then set this, else leave blank
-# else()
-#   set(${extProjName}_REQUIRED_VERSION "5.10")  #If a required version is necessary, then set this, else leave blank
-# endif()
-
-# Sanity checks
-#if(DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR})
-#  message(FATAL_ERROR "${extProjName}_DIR variable is defined but corresponds to non-existing directory (${${extProjName}_DIR})")
-#endif()
 
 # Set dependency list
 set(${proj}_DEPENDENCIES "")
@@ -143,13 +116,8 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
       ${EXTERNAL_PROJECT_OPTIONAL_ARGS}
     )
   ### --- End Project specific additions
-# if(USE_VTKv6)
   set(${proj}_GIT_TAG "v7.0.0")
   set(${proj}_REPOSITORY ${git_protocol}://vtk.org/VTK.git)
-# else()
-#   set(${proj}_REPOSITORY ${git_protocol}://github.com/BRAINSia/VTK.git)
-#   set(${proj}_GIT_TAG "FixClangFailure_VTK5.10_release")
-# endif()
   ExternalProject_Add(${proj}
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_GIT_TAG}
@@ -171,24 +139,7 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
       ${${proj}_DEPENDENCIES}
     )
 
-
-  # set(VTKPatchScript ${CMAKE_CURRENT_LIST_DIR}/External_VTK_patch.cmake)
-  # ExternalProject_Add_Step(${proj} VTKPatch
-  #   COMMENT "get rid of obsolete C/CXX flags"
-  #   DEPENDEES download
-  #   DEPENDERS configure
-  #   COMMAND ${CMAKE_COMMAND}
-  #   -DVTKSource=<SOURCE_DIR>
-  #   -DUSE_VTKv6=${USE_VTKv6}
-  #   -P ${VTKPatchScript}
-  #   )
-
   set(${extProjName}_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/cmake/vtk-7.0)
-# if(USE_VTKv6)
-#   set(${extProjName}_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/cmake/vtk-6.1)
-# else()
-#   set(${extProjName}_DIR ${CMAKE_BINARY_DIR}/${proj}-install/lib/vtk-5.10)
-# endif()
 
 else()
   if(${USE_SYSTEM_${extProjName}})
