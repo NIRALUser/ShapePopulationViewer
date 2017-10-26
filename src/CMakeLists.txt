@@ -75,12 +75,6 @@ if( ${index} EQUAL -1)
   add_definitions("-DSPV_EXTENSION=1")
 endif()
 
-
-if( ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION )
-    find_package(GenerateCLP REQUIRED)
-    include(${GenerateCLP_USE_FILE})
-endif()
-
 # --- SRCS --------------------------------------------------------------------------------
 file(GLOB CXX_FILES *.cxx)
 file(GLOB UI_FILES *.ui)
@@ -102,30 +96,19 @@ else()
 endif()
 
 # --- SEMMacro ----------------------------------------------------------------------------
-
-if( NOT ${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION )
-    set(INSTALL_RUNTIME_DEST bin)
-else()
-    set(INSTALL_RUNTIME_DEST ${SlicerExecutionModel_DEFAULT_CLI_INSTALL_RUNTIME_DESTINATION}/../hidden-cli-modules)
-
-    generateCLP(SPV_SRCS_CLP ShapePopulationViewer.xml )
-    add_executable( Launcher Launcher/Launcher.cxx ${SPV_SRCS_CLP} )
-    if(NOT "${DEFAULT_SEM_TARGET_LIBRARIES}" STREQUAL "")
-      target_link_libraries(Launcher ${DEFAULT_SEM_TARGET_LIBRARIES})
-      if(SlicerExecutionModel_DEFAULT_CLI_EXECUTABLE_LINK_FLAGS)
-        set_target_properties(Launcher PROPERTIES LINK_FLAGS ${SlicerExecutionModel_DEFAULT_CLI_EXECUTABLE_LINK_FLAGS})
-      endif()
-    endif()
-    install(TARGETS Launcher DESTINATION ${SlicerExecutionModel_DEFAULT_CLI_INSTALL_RUNTIME_DESTINATION} )
-endif()
-
 SEMMacroBuildCLI(
-    NAME ${LOCAL_PROJECT_NAME}
-    EXECUTABLE_ONLY
-    ADDITIONAL_SRCS ${CXX_FILES} ${UISrcs} ${MOCSrcs} ${QRCrcs}
-    TARGET_LIBRARIES ${ShapePopulationLIBS}
-    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-)
+  NAME ${LOCAL_PROJECT_NAME}
+  EXECUTABLE_ONLY
+  ADDITIONAL_SRCS
+    ${CXX_FILES}
+    ${UISrcs}
+    ${MOCSrcs}
+    ${QRCrcs}
+  TARGET_LIBRARIES ${ShapePopulationLIBS}
+  INCLUDE_DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+  )
 
 
 # --- CTest -------------------------------------------------------------------------------
