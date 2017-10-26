@@ -29,4 +29,4 @@ Find the tool on [NITRC](http://www.nitrc.org/projects/shapepopviewer)
 
 ## License
 
-See [License.txt](License.txt)
+See [LICENSE](LICENSE)
