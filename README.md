@@ -4,9 +4,9 @@ ShapePopulationViewer
 ## What is it?
 
 ShapePopulationViewer is a software that allows you to dynamically interact with
-multiple  surfaces at the same time. It is very useful for visualisation and
-comparison of 3D surfaces by also displaying their scalars or vectors attributes
-stored in the points, and allowing the user to simply modify the colormap.
+multiple  surfaces at the same time. It is very useful for visualization and
+comparison of 3D surfaces by also displaying their scalar or vector attributes
+stored in the points, and allowing the user to easily modify the colormap.
 
 ShapePopulationViewer is available as a [3D Slicer](http://www.slicer.org) extension.
 
