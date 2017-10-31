@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 2.8.3)
 
 # Add external data from midas
 list(APPEND ExternalData_URL_TEMPLATES
