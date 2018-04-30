@@ -132,7 +132,7 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
     renderer->SetBackground(m_backgroundColor);
     renderer->ResetCamera();
 
-    widget = new QVTKWidget(ui->widget_AxisColor);
+    widget = new VTKWidgetType(ui->widget_AxisColor);
     widget->resize(500,350);
     widget->SetRenderWindow(renderWindow);
     widget->setDisabled(true);

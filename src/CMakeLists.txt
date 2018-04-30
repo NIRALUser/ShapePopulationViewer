@@ -13,14 +13,23 @@ if( ${index} EQUAL -1)
   add_definitions("-DSPV_EXTENSION=1")
 endif()
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationBase.h.in ${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationBase.h)
+
 # --- SRCS --------------------------------------------------------------------------------
 file(GLOB CXX_FILES *.cxx)
 file(GLOB UI_FILES *.ui)
 file(GLOB QT_WRAP *QT.h)
 file(GLOB QT_QRC_FILES *.qrc)
-QT4_WRAP_UI(UISrcs ${UI_FILES})
-QT4_WRAP_CPP(MOCSrcs ${QT_WRAP})
-QT4_ADD_RESOURCES(QRCrcs ${QT_QRC_FILES})
+
+if(ShapePopulationViewer_QT_VERSION VERSION_EQUAL "4")
+  QT4_WRAP_UI(UISrcs ${UI_FILES})
+  QT4_WRAP_CPP(MOCSrcs ${QT_WRAP})
+  QT4_ADD_RESOURCES(QRCrcs ${QT_QRC_FILES})
+else()
+  QT5_WRAP_UI(UISrcs ${UI_FILES})
+  QT5_WRAP_CPP(MOCSrcs ${QT_WRAP})
+  QT5_ADD_RESOURCES(QRCrcs ${QT_QRC_FILES})
+endif()
 
 # --- LIBRARIES ---------------------------------------------------------------------------
 if(VTK_LIBRARIES)

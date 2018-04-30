@@ -124,7 +124,11 @@ ShapePopulationQT::ShapePopulationQT()
     QStandardItemModel * model = new QStandardItemModel(0,2,this);
     tableView->setModel(model);
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+#else
     tableView->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
+#endif
     tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     
     //Display
@@ -941,7 +945,7 @@ void ShapePopulationQT::CreateWidgets()
     /* QT WIDGETS */
     for (int i = m_numberOfMeshes; i < m_fileList.size(); i++)
     {
-        QVTKWidget *meshWidget = new QVTKWidget(this->scrollAreaWidgetContents);
+        VTKWidgetType *meshWidget = new VTKWidgetType(this->scrollAreaWidgetContents);
         m_widgetList.push_back(meshWidget);
         meshWidget->GetRenderWindow()->AddRenderer(m_windowsList.at(i)->GetRenderers()->GetFirstRenderer());
         meshWidget->GetInteractor()->AddObserver(vtkCommand::LeftButtonPressEvent, this, &ShapePopulationQT::ClickEvent);

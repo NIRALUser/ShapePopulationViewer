@@ -14,7 +14,11 @@
 
 // QT
 #include <QMainWindow>
+#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+#include <QVTKOpenGLWidget.h>
+#else
 #include <QVTKWidget.h>
+#endif
 #include <QFileDialog>              //Open directory/files
 #include <QFileInfo>                //Use Files
 #include <QKeyEvent>                //KeyPressEvent
@@ -22,6 +26,7 @@
 #include <QColorDialog>             //ColorPicker
 #include <vtkDelimitedTextReader.h> //CSVloader
 #include <QUrl>                     //DropFiles
+#include <QMimeData>
 
 #include <vtkOrientationMarkerWidget.h>
 
@@ -60,7 +65,12 @@ protected:
     QString m_exportDirectory;
     QString m_pathSphere;
     QFileInfoList m_fileList;
-    std::vector<QVTKWidget *> m_widgetList;
+#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+    typedef QVTKOpenGLWidget VTKWidgetType;
+#else
+    typedef QVTKWidget VTKWidgetType;
+#endif
+    std::vector<VTKWidgetType *> m_widgetList;
     cameraDialogQT * m_cameraDialog;
     backgroundDialogQT * m_backgroundDialog;
     CSVloaderQT * m_CSVloaderDialog;
