@@ -1,6 +1,9 @@
 #ifndef CUSTOMIZECOLORMAPBYDIRECTIONDIALOGQT_H
 #define CUSTOMIZECOLORMAPBYDIRECTIONDIALOGQT_H
 
+#include "ShapePopulationBase.h"
+#include "axisColorStruct.h"
+
 #include <QDialog>
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
@@ -20,13 +23,13 @@
 #include <vtkTextProperty.h>
 #include <vtkTextActor.h>
 #include <iostream>
+#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+#include <QVTKOpenGLWidget.h>
+#else
 #include <QVTKWidget.h>
+#endif
 #include <QColorDialog>
 #include <QFrame>
-
-#include "ShapePopulationBase.h"
-#include "axisColorStruct.h"
-
 
 namespace Ui {
 class customizeColorMapByDirectionDialogQT;
@@ -44,7 +47,12 @@ public:
 protected:
     std::vector< vtkSmartPointer<vtkActor> > m_arrowActors;
     std::vector< vtkSmartPointer<vtkTextActor> > m_labelActors;
-    QVTKWidget * widget;
+#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+    typedef QVTKOpenGLWidget VTKWidgetType;
+#else
+    typedef QVTKWidget VTKWidgetType;
+#endif
+    VTKWidgetType * widget;
     bool m_sameColor;
     bool m_complementaryColor;
     std::vector< QFrame* > m_frameAxis;

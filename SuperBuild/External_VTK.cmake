@@ -75,7 +75,7 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
         )
   # endif()
   list(APPEND EXTERNAL_PROJECT_OPTIONAL_ARGS
-      #-DDESIRED_QT_VERSION:STRING=4 # Unused
+      -DVTK_QT_VERSION:STRING=${ShapePopulationViewer_QT_VERSION}
       -DVTK_USE_QT:BOOL=ON
       -DVTK_USE_QVTK_QTOPENGL:BOOL=ON
       -DVTK_USE_GUISUPPORT:BOOL=ON

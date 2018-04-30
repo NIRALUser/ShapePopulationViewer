@@ -38,6 +38,8 @@
 
 #include <set>
 
+#cmakedefine ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+
 class ShapePopulationBase
 {
     friend class TestShapePopulationBase;

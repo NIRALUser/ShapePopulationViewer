@@ -51,6 +51,25 @@ else()
 endif()
 
 #-----------------------------------------------------------------------------
+# Qt
+# 
+# If building as a Slicer extension, use Slicer's Qt Version
+# Otherwise, default to Qt4
+#-----------------------------------------------------------------------------
+
+set(_qt_version "4")
+
+if (${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION)
+  find_package(Slicer REQUIRED)
+  if (Slicer_REQUIRED_QT_VERSION VERSION_GREATER "4.9")
+    set(_qt_version "5")
+  endif()
+endif()
+
+SET(ShapePopulationViewer_QT_VERSION ${_qt_version} CACHE STRING "Version of Qt to use")
+SET_PROPERTY(CACHE ShapePopulationViewer_QT_VERSION PROPERTY STRINGS 4 5)
+
+#-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #                   Phase I:  ${LOCAL_PROJECT_NAME}_SUPERBUILD is set to ON, and the
 #                             supporting packages defined in "SuperBuild.cmake"

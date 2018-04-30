@@ -19,14 +19,21 @@ if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
   resetForSlicer( NAMES CMAKE_C_COMPILER CMAKE_CXX_COMPILER CMAKE_CXX_FLAGS CMAKE_C_FLAGS )
 endif()
 
-find_package(Qt4 REQUIRED)
+if(ShapePopulationViewer_QT_VERSION VERSION_EQUAL "4")
+  find_package(Qt4 REQUIRED)
+  include(${QT_USE_FILE})
+  set(ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET 0)
+else()
+  find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+  if (VTK_VERSION VERSION_GREATER "7" AND VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
+    set(ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET 1)
+  endif()
+endif()
 
-include(${QT_USE_FILE})
 if( BUILD_TESTING )
   include(CTest)
   include(ExternalData)
 endif()
-
 
 add_subdirectory(src)
 

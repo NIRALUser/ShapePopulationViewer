@@ -57,8 +57,12 @@ endif()
 # Superbuild option(s)
 #-----------------------------------------------------------------------------
 
-find_package(Qt4 REQUIRED)
-include(${QT_USE_FILE})
+if(ShapePopulationViewer_QT_VERSION VERSION_EQUAL "4")
+  find_package(Qt4 REQUIRED)
+  include(${QT_USE_FILE})
+else()
+  find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+endif()
 
 option(USE_SYSTEM_ITK "Build using an externally defined version of ITK" OFF)
 option(USE_SYSTEM_SlicerExecutionModel "Build using an externally defined version of SlicerExecutionModel"  OFF)
