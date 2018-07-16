@@ -19,13 +19,13 @@ class CSVloaderQT;
 class CSVloaderQT : public QDialog
 {
     Q_OBJECT
-    
+
 public:
     explicit CSVloaderQT(QWidget *Qparent = 0);
     ~CSVloaderQT();
 
     void displayTable(vtkSmartPointer<vtkTable> table, QDir directory);
-    
+
 private slots:
     void on_buttonBox_accepted();
 

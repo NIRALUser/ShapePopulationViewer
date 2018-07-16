@@ -17,7 +17,7 @@ class cameraDialogQT;
 class cameraDialogQT : public QDialog
 {
     Q_OBJECT
-    
+
 public:
     explicit cameraDialogQT(QWidget *Qparent = 0);
     ~cameraDialogQT();
@@ -27,7 +27,7 @@ public:
 
 public slots:
     void updateCameraConfig(cameraConfigStruct cam);
-    
+
 private slots:
     void on_pushButton_load_clicked();
     void on_pushButton_save_clicked();
