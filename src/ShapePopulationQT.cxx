@@ -1,3 +1,4 @@
+#include "QVTKInteractor.h"
 #include "ShapePopulationQT.h"
 
 
