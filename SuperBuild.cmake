@@ -5,7 +5,7 @@ set(verbose FALSE)
 if(WIN32)
  set( CMAKE_BUILD_TYPE "Release" CACHE STRING "CMAKE_BUILD_TYPE"  )
 endif()
- 
+
 #-----------------------------------------------------------------------------
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/Common.cmake)

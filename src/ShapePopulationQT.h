@@ -39,21 +39,21 @@
 class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, public ShapePopulationBase
 {
     Q_OBJECT
-    
+
 public:
-    
+
     ShapePopulationQT();
     ~ShapePopulationQT();
-    
+
     void loadVTKFilesCLP(QFileInfoList a_fileList);
     void loadCSVFileCLP(QFileInfo file);
     void loadVTKDirCLP(QDir vtkDir);
     void loadColorMapCLP(std::string a_filePath);
     void loadCameraCLP(std::string a_filePath);
-    
-    
+
+
 protected:
-    
+
     bool m_toolsDisplayed;
     bool m_updateOnPositionChanged;
     bool m_updateOnAttributeChanged;
@@ -78,37 +78,37 @@ protected:
 
     void CreateWidgets();
 
-    
+
     //SELECTION
     void ClickEvent(vtkObject* a_selectedObject, unsigned long notUseduLong, void* notUsedVoid);
     void SelectAll();
     void UnselectAll();
     void keyPressEvent(QKeyEvent * keyEvent);
-    
+
     //PLACING WIDGETS
     int getNumberOfColumns();
     int getNumberOfRows(unsigned int colNumber);
     void placeWidgetInArea(unsigned int colNumber);
     void resizeWidgetInArea();
     void resizeEvent(QResizeEvent* Qevent);
-    
+
     // DRAG & DROP FILES
     void dragEnterEvent(QDragEnterEvent *Qevent);
     void dropEvent(QDropEvent* Qevent);
-    
+
     // UPDATES & DISPLAY INFO
     void updateColorbar_QT();
     void UpdateColorMapByDirection_QT();
     void updateAttribute_QT();
     void updateArrowPosition();
     void updateInfo_QT();
-        
+
     protected slots:
-    
+
     //QUIT
     void slotExit();
     void on_pushButton_displayTools_clicked();
-    
+
     //FILE
     void openDirectory();
     void openFiles();
@@ -116,17 +116,17 @@ protected:
     void slot_itemsSelected(QFileInfoList fileList);
     void deleteAll();
     void deleteSelection();
-    
+
     //OPTIONS
     void showCameraConfigWindow();
     void showBackgroundConfigWindow();
     void loadColorMap();
     void saveColorMap();
     void showCustomizeColorMapByDirectionConfigWindow();
-    
+
     //DISPLAY INFO RANGE
     void on_tabWidget_currentChanged(int index);
-    
+
     //DISPLAY
     void on_radioButton_DISPLAY_all_toggled();
     void on_radioButton_DISPLAY_square_toggled();
@@ -136,13 +136,13 @@ protected:
     void on_checkBox_displayMeshName_toggled(bool checked);
     void on_checkBox_displaySphere_toggled(bool checked);
 
-    
+
     //SYNCHRO
     void on_radioButton_SYNC_realtime_toggled();
     void on_radioButton_SYNC_delayed_toggled();
     void on_pushButton_SYNC_all_clicked();
     void on_pushButton_SYNC_unselect_clicked();
-    
+
     //VIEW (Axis + Camera)
     void on_toolButton_VIEW_P_clicked();
     void on_toolButton_VIEW_A_clicked();
@@ -152,12 +152,12 @@ protected:
     void on_toolButton_VIEW_I_clicked();
     void on_pushButton_VIEW_reset_clicked();
     void on_comboBox_alignment_currentIndexChanged();
-    
+
     //BACKGROUND CONFIG
     void slot_selectedColor_valueChanged(QColor color);
     void slot_unselectedColor_valueChanged(QColor color);
     void slot_textColor_valueChanged(QColor color);
-    
+
     // CUSTOMIZE COLOR MAP BY DIRECTION
     void slot_sameColor_valueChanged(bool checked);
     void slot_complementaryColor_valueChanged(bool checked);
@@ -177,7 +177,7 @@ protected:
     void slot_viewup_vz_valueChanged(double arg1);
     void slot_scale_valueChanged(double arg1);
     void slot_newCameraConfig(cameraConfigStruct cam);
-    
+
     //COLORMAP
     void on_comboBox_VISU_attribute_currentIndexChanged();
     // range
@@ -200,7 +200,7 @@ protected:
     void slot_gradArrow_selected(qreal newPos);
     void slot_gradArrow_doubleClicked();
     void slot_no_gradArrow_selected();
-    
+
     //VECTORS
     void on_slider_meshOpacity_valueChanged(int value);
     void on_slider_vectorScale_valueChanged(int value);
@@ -208,7 +208,7 @@ protected:
     void on_checkBox_displayVectors_toggled(bool checked);
     void on_radioButton_displayVectorsbyMagnitude_toggled(bool checked);
     void on_radioButton_displayVectorsbyDirection_toggled(bool checked);
-    
+
     //EXPORT
 #ifndef SPV_EXTENSION
     void exportToPDF();
@@ -220,7 +220,7 @@ protected:
     void exportTo(int fileFormat);
 #endif
     void showNoExportWindow();
-    
+
     void UpdateCameraConfig();
 
 signals:

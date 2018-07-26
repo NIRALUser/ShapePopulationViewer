@@ -533,7 +533,7 @@ void gradientWidgetQT::newFocusColor(const QColor &col, int index)
 //f-//////////////////////////////////////////////////////////////////////////
 void gradientWidgetQT::paintEvent(QPaintEvent *)
 {
-   if(viewRect.size().isNull()  || 
+   if(viewRect.size().isNull()  ||
       viewRect.size().isEmpty() ||
       viewRect.topLeft() == viewRect.bottomRight())
    {

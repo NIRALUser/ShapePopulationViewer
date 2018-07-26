@@ -41,7 +41,7 @@ find_package(${extProjName} ${${extProjName}_REQUIRED_VERSION} COMPONENTS QtCore
 # project may depend on ${extProjName}, let's add an 'empty' one
 SlicerMacroEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 
-list(APPEND ${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARS 
+list(APPEND ${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARS
     QT_QMAKE_EXECUTABLE:PATH
     QT_MOC_EXECUTABLE:PATH
     QT_UIC_EXECUTABLE:PATH

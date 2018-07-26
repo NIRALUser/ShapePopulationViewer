@@ -10,11 +10,11 @@ class backgroundDialogQT;
 class backgroundDialogQT : public QDialog
 {
     Q_OBJECT
-    
+
 public:
     explicit backgroundDialogQT(QWidget *Qparent = 0);
     ~backgroundDialogQT();
-    
+
 private slots:
     void on_pushButton_pick_selected_clicked();
     void on_pushButton_pick_unselected_clicked();
