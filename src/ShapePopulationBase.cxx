@@ -1,5 +1,7 @@
 #include "ShapePopulationBase.h"
 
+// STD includes
+#include <vector>
 
 namespace spv_math
 {
