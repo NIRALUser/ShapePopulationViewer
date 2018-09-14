@@ -22,16 +22,6 @@ set(PRIMARY_PROJECT_NAME ${LOCAL_PROJECT_NAME})
 option(INSTALL_DEVELOPMENT_${LOCAL_PROJECT_NAME} "Install development support include and libraries for external packages." OFF)
 mark_as_advanced(INSTALL_DEVELOPMENT_${LOCAL_PROJECT_NAME})
 
-set(ITK_VERSION_MAJOR 4 CACHE STRING "Choose the expected ITK major version to build DTIPrep (3 or 4).")
-
-
-set(USE_ITKv3 OFF)
-set(USE_ITKv4 ON)
-if(${ITK_VERSION_MAJOR} STREQUAL "3")
-  set(USE_ITKv3 ON)
-  set(USE_ITKv4 OFF)
-endif()
-
 #-----------------------------------------------------------------------------
 # Sanity checks
 #------------------------------------------------------------------------------
