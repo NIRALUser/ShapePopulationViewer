@@ -30,15 +30,6 @@ include(PreventInBuildInstalls)
 include(SlicerExtensionsConfigureMacros)
 
 #-----------------------------------------------------------------------------
-# CMake Function(s) and Macro(s)
-#-----------------------------------------------------------------------------
-if(CMAKE_VERSION VERSION_LESS 2.8.3)
-  include(Pre283CMakeParseArguments)
-else()
-  include(CMakeParseArguments)
-endif()
-
-#-----------------------------------------------------------------------------
 # Platform check
 #-----------------------------------------------------------------------------
 set(PLATFORM_CHECK true)
