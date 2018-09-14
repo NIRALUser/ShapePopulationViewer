@@ -1,3 +1,13 @@
+#-----------------------------------------------------------------------------
+# Set a default build type if none was specified
+#-----------------------------------------------------------------------------
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
 include(CMakeDependentOption)
 #-----------------------------------------------------------------------------
 enable_language(C)
@@ -13,11 +23,7 @@ option(INSTALL_DEVELOPMENT_${LOCAL_PROJECT_NAME} "Install development support in
 mark_as_advanced(INSTALL_DEVELOPMENT_${LOCAL_PROJECT_NAME})
 
 set(ITK_VERSION_MAJOR 4 CACHE STRING "Choose the expected ITK major version to build DTIPrep (3 or 4).")
-# Set the possible values of ITK major version for cmake-gui
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-if(NOT ${ITK_VERSION_MAJOR} STREQUAL "3" AND NOT ${ITK_VERSION_MAJOR} STREQUAL "4")
-  message(FATAL_ERROR "ITK_VERSION_MAJOR should be either 3 or 4")
-endif()
+
 
 set(USE_ITKv3 OFF)
 set(USE_ITKv4 ON)
@@ -56,15 +62,6 @@ if(PLATFORM_CHECK)
   if (DARWIN_MAJOR_VERSION LESS "9")
     message(FATAL_ERROR "Only Mac OSX >= 10.5 are supported !")
   endif()
-endif()
-
-#-----------------------------------------------------------------------------
-# Set a default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Release' as none was specified.")
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 #-----------------------------------------------------------------------------
