@@ -34,22 +34,22 @@ class VTK_EXPORT vtkPVPostFilter : public vtkDataObjectAlgorithm
 public:
   static vtkPVPostFilter* New();
   vtkTypeMacro(vtkPVPostFilter,vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   // Description:
   // We need to override this method because the composite data pipeline
   // is not what we want. Instead we need the PVCompositeDataPipeline
   // so that we can figure out what we conversion(s) we need to do
-  vtkExecutive* CreateDefaultExecutive();
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   static std::string DefaultComponentName(int componentNumber, int componentCount);
 
   vtkPVPostFilter();
-  ~vtkPVPostFilter();
+  ~vtkPVPostFilter() VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation( int port, vtkInformation* info);
-  virtual int RequestDataObject(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int FillInputPortInformation( int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual int RequestDataObject(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) VTK_OVERRIDE;
 
 
   int DoAnyNeededConversions(vtkDataObject* output);
