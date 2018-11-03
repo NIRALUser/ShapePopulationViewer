@@ -51,6 +51,15 @@ ShapePopulationBase::ShapePopulationBase()
     m_createSphere.push_back(false);
 }
 
+ShapePopulationBase::~ShapePopulationBase()
+{
+  for (unsigned int i = 0; i < m_meshList.size(); i++)
+    {
+    delete m_meshList.at(i);
+    }
+  m_meshList.clear();
+}
+
 void ShapePopulationBase::setBackgroundSelectedColor(double a_selectedColor[])
 {
     m_selectedColor[0] = a_selectedColor[0];

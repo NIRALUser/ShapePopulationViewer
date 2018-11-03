@@ -48,7 +48,7 @@ class ShapePopulationBase
     public :
     
     ShapePopulationBase();
-    ~ShapePopulationBase(){} //delete the pointers in the lists
+    ~ShapePopulationBase();
     
     
     void KeyPressEventVTK(vtkObject* a_selectedObject, unsigned long, void*);

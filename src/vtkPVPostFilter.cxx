@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPointDataToCellData.h"
@@ -125,8 +126,8 @@ vtkStandardNewMacro(vtkPVPostFilter);
 //----------------------------------------------------------------------------
 vtkPVPostFilter::vtkPVPostFilter()
 {
-  vtkPVPostFilterExecutive* exec = vtkPVPostFilterExecutive::New();
-  this->SetExecutive(exec);
+  vtkNew<vtkPVPostFilterExecutive> exec;
+  this->SetExecutive(exec.GetPointer());
   //exec->FastDelete();
 
   this->SetNumberOfInputPorts(1);
