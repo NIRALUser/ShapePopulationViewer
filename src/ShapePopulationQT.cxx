@@ -199,7 +199,7 @@ void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
     CSVreader->SetFileName(file.absoluteFilePath().toStdString().c_str());
     CSVreader->SetHaveHeaders(true);
     CSVreader->Update();
-    vtkSmartPointer<vtkTable> table = CSVreader->GetOutput();
+    vtkTable* table = CSVreader->GetOutput();
 
     //Display in CSVloaderQT
     m_CSVloaderDialog->displayTable(table,file.absoluteDir());
@@ -310,7 +310,7 @@ void ShapePopulationQT::loadCSV()
     CSVreader->SetFileName(filename.toStdString().c_str());
     CSVreader->SetHaveHeaders(true);
     CSVreader->Update();
-    vtkSmartPointer<vtkTable> table = CSVreader->GetOutput();
+    vtkTable* table = CSVreader->GetOutput();
 
     //Display in CSVloaderQT
     m_CSVloaderDialog->displayTable(table,file.absoluteDir());
@@ -2135,7 +2135,7 @@ void ShapePopulationQT::updateInfo_QT()
 
         //Infos
         unsigned int index = m_selectedIndex[0];
-        vtkSmartPointer<vtkPolyData> selectedData = m_meshList[index]->GetPolyData();
+        vtkPolyData* selectedData = m_meshList[index]->GetPolyData();
 
         this->lineEdit_filename->setText(QString(m_meshList[index]->GetFileName().c_str()));
         this->lineEdit_dir->setText(QString(m_meshList[index]->GetFileDir().c_str()));

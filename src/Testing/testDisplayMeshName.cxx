@@ -20,7 +20,7 @@ bool TestShapePopulationBase::testDisplayMeshName(std::string filename)
 
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
         vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
         cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
@@ -37,7 +37,7 @@ bool TestShapePopulationBase::testDisplayMeshName(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
         vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
         cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
@@ -54,7 +54,7 @@ bool TestShapePopulationBase::testDisplayMeshName(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
         vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
         cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;

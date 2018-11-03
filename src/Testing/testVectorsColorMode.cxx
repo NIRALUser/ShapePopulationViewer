@@ -77,7 +77,7 @@ bool TestShapePopulationBase::testVectorsColorMode(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkGlyph3D> glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
+        vtkGlyph3D* glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
         int colorMode = glyph->GetColorMode();
         if(colorMode != 2) return 1;
     }
@@ -98,7 +98,7 @@ bool TestShapePopulationBase::testVectorsColorMode(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkGlyph3D> glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
+        vtkGlyph3D* glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
         int colorMode = glyph->GetColorMode();
         if(colorMode != 1) return 1;
     }
@@ -113,7 +113,7 @@ bool TestShapePopulationBase::testVectorsColorMode(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkGlyph3D> glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
+        vtkGlyph3D* glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
         int colorMode = glyph->GetColorMode();
         if(colorMode != 2) return 1;
     }
@@ -132,7 +132,7 @@ bool TestShapePopulationBase::testVectorsColorMode(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkGlyph3D> glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
+        vtkGlyph3D* glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
         int colorMode = glyph->GetColorMode();
         if(colorMode != 2) return 1;
     }
@@ -147,7 +147,7 @@ bool TestShapePopulationBase::testVectorsColorMode(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkGlyph3D> glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
+        vtkGlyph3D* glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
         int colorMode = glyph->GetColorMode();
         if(colorMode != 1) return 1;
     }
@@ -171,7 +171,7 @@ bool TestShapePopulationBase::testVectorsColorMode(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkGlyph3D> glyph = shapePopulationBase->m_glyphList[i];
+        vtkGlyph3D* glyph = shapePopulationBase->m_glyphList[i];
         int colorMode = glyph->GetColorMode();
         if( (std::find(shapePopulationBase->m_selectedIndex.begin(), shapePopulationBase->m_selectedIndex.end(), i)) != (shapePopulationBase->m_selectedIndex.end()) )
         {
@@ -200,7 +200,7 @@ bool TestShapePopulationBase::testVectorsColorMode(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkGlyph3D> glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
+        vtkGlyph3D* glyph = shapePopulationBase->m_glyphList[shapePopulationBase->m_selectedIndex[i]];
         int colorMode = glyph->GetColorMode();
         if(colorMode != 2) return 1;
     }
@@ -224,7 +224,7 @@ bool TestShapePopulationBase::testVectorsColorMode(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkGlyph3D> glyph = shapePopulationBase->m_glyphList[i];
+        vtkGlyph3D* glyph = shapePopulationBase->m_glyphList[i];
         int colorMode = glyph->GetColorMode();
         if( (std::find(shapePopulationBase->m_selectedIndex.begin(), shapePopulationBase->m_selectedIndex.end(), i)) != (shapePopulationBase->m_selectedIndex.end()) )
         {

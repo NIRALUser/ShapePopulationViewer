@@ -36,7 +36,7 @@ bool TestShapePopulationBase::testDisplayVectors(std::string filename)
     for(int i = 0; i < nbMesh; i++)
     {
         vtkRenderWindow * window = shapePopulationBase->m_windowsList[shapePopulationBase->m_selectedIndex[i]];
-        vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkActor* glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
         if(!glyphActor->GetVisibility()) return 1;
     }
 
@@ -51,7 +51,7 @@ bool TestShapePopulationBase::testDisplayVectors(std::string filename)
     for(int i = 0; i < nbMesh; i++)
     {
         vtkRenderWindow * window = shapePopulationBase->m_windowsList[shapePopulationBase->m_selectedIndex[i]];
-        vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkActor* glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
         if(glyphActor->GetVisibility()) return 1;
     }
 
@@ -70,7 +70,7 @@ bool TestShapePopulationBase::testDisplayVectors(std::string filename)
     for(int i = 0; i < nbMesh; i++)
     {
         vtkRenderWindow * window = shapePopulationBase->m_windowsList[i];
-        vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkActor* glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
         if( (std::find(shapePopulationBase->m_selectedIndex.begin(), shapePopulationBase->m_selectedIndex.end(), i)) != (shapePopulationBase->m_selectedIndex.end()) )
         {
             if(!glyphActor->GetVisibility()) return 1;
@@ -96,7 +96,7 @@ bool TestShapePopulationBase::testDisplayVectors(std::string filename)
     for(int i = 0; i < nbMesh; i++)
     {
         vtkRenderWindow * window = shapePopulationBase->m_windowsList[i];
-        vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkActor* glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
         if(!glyphActor->GetVisibility()) return 1;
     }
 
@@ -115,7 +115,7 @@ bool TestShapePopulationBase::testDisplayVectors(std::string filename)
     for(int i = 0; i < nbMesh; i++)
     {
         vtkRenderWindow * window = shapePopulationBase->m_windowsList[i];
-        vtkSmartPointer<vtkActor> glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
+        vtkActor* glyphActor = window->GetRenderers()->GetFirstRenderer()->GetActors()->GetLastActor();
         if( (std::find(shapePopulationBase->m_selectedIndex.begin(), shapePopulationBase->m_selectedIndex.end(), i)) != (shapePopulationBase->m_selectedIndex.end()) )
         {
             if(glyphActor->GetVisibility()) return 1;
