@@ -94,22 +94,19 @@ void ShapePopulationBase::setLabelColor(double a_labelColor[])
 
         //CornerAnnotation Update
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkCornerAnnotation* cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
         vtkSmartPointer<vtkTextProperty> cornerProperty = cornerAnnotation->GetTextProperty();
         cornerProperty->SetColor(m_labelColor);
 
         //CornerAnnotation Update
         viewPropObject = propCollection->GetItemAsObject(3);
-        cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
         cornerProperty = cornerAnnotation->GetTextProperty();
         cornerProperty->SetColor(m_labelColor);
 
         //ScalarBar Update
         viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         vtkSmartPointer<vtkTextProperty> labelProperty = scalarBar->GetLabelTextProperty();
         labelProperty->SetColor(m_labelColor);
 
@@ -209,7 +206,6 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 
     //ANNOTATIONS (attribute name)
     vtkSmartPointer<vtkCornerAnnotation> attributeName = vtkSmartPointer<vtkCornerAnnotation>::New();
-    attributeName = vtkSmartPointer<vtkCornerAnnotation>::New();
     attributeName->SetLinearFontScaleFactor(2);
     attributeName->SetNonlinearFontScaleFactor(1);
     attributeName->SetMaximumFontSize(15);
@@ -265,8 +261,7 @@ void ShapePopulationBase::ClickEvent(vtkObject* a_selectedObject, unsigned long,
      */
 
     //Get the interactor used
-    vtkSmartPointer<vtkRenderWindowInteractor> selectedInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    selectedInteractor = (vtkRenderWindowInteractor*)a_selectedObject;
+    vtkRenderWindowInteractor* selectedInteractor = vtkRenderWindowInteractor::SafeDownCast(a_selectedObject);
     vtkSmartPointer<vtkRenderWindow> selectedWindow = selectedInteractor->GetRenderWindow();
     unsigned int index = getSelectedIndex(selectedWindow);
 
@@ -373,8 +368,7 @@ void ShapePopulationBase::UnselectAll()
 
 void ShapePopulationBase::KeyPressEventVTK(vtkObject* a_selectedObject, unsigned long , void* )
 {
-    vtkSmartPointer<vtkRenderWindowInteractor> selectedInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    selectedInteractor = (vtkRenderWindowInteractor*)a_selectedObject;
+    vtkRenderWindowInteractor* selectedInteractor = vtkRenderWindowInteractor::SafeDownCast(a_selectedObject);
 
     //UNSELECTING - GetKeySym = Escape, GetKeyCode() = 27
     if(selectedInteractor->GetKeyCode() == (char)27 )
@@ -652,8 +646,7 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
 
         //CornerAnnotation Update
         vtkObject * viewPropObject = propCollection->GetItemAsObject(3);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkCornerAnnotation* cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
         cornerAnnotation->ClearAllTexts();
         cornerAnnotation->SetText(0,a_cmap);
     }
@@ -748,8 +741,7 @@ void ShapePopulationBase::UpdateAttribute(const char * a_cmap, std::vector< unsi
     {
         vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         if(m_displayColorMapByMagnitude[a_windowIndex[i]] || m_displayVectorsByMagnitude[a_windowIndex[i]])
         {
             if(m_displayColorbar) scalarBar->SetVisibility(1);
@@ -789,8 +781,7 @@ void ShapePopulationBase::displayColorMapByMagnitude(bool display)
             // Hide or show the scalar bar
             vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
             vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
             if(m_displayColorbar)
             {
                 scalarBar->SetVisibility(1);
@@ -834,8 +825,7 @@ void ShapePopulationBase::displayColorMapByDirection(bool display)
             // Hide or show the scalar bar
             vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
             vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
             if(!m_displayVectorsByMagnitude[m_selectedIndex[i]])
             {
                 scalarBar->SetVisibility(0);
@@ -891,8 +881,7 @@ void ShapePopulationBase::UpdateColorMapByMagnitude(std::vector< unsigned int > 
         //ScalarBar Mapper Update
         vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[a_windowIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         scalarBar->SetLookupTable( DistanceMapTFunc );
 //        scalarBar->SetTitle(" ");
     }
@@ -988,8 +977,7 @@ void ShapePopulationBase::displayVectors(bool display)
         // Hide or show the scalar bar
         vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         if(!m_displayVectors[m_selectedIndex[i]])
         {
             if(m_displayColorMapByDirection[m_selectedIndex[i]]) scalarBar->SetVisibility(0);
@@ -1065,8 +1053,7 @@ void ShapePopulationBase::displayVectorsByMagnitude(bool display)
             // Hide or show the scalar bar
             vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
             vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
             if(m_displayColorbar) scalarBar->SetVisibility(1);
 
             // Hide or show sphere and title of this widget
@@ -1127,8 +1114,7 @@ void ShapePopulationBase::displayVectorsByDirection(bool display)
             // Hide or show the scalar bar
             vtkSmartPointer<vtkPropCollection> propCollection =  m_windowsList[m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetViewProps();
             vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-            vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-            scalarBar = (vtkScalarBarActor*)viewPropObject;
+            vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
             if(m_displayColorMapByDirection[m_selectedIndex[i]])
             {
                 scalarBar->SetVisibility(0);
@@ -1199,8 +1185,7 @@ void ShapePopulationBase::displayColorbar(bool display)
 
         // scalar bar
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
 
         if(display)
         {
@@ -1223,8 +1208,7 @@ void ShapePopulationBase::displayAttribute(bool display)
 
         // cornerAnnotation
         vtkObject * viewPropObject = propCollection->GetItemAsObject(3);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkCornerAnnotation* cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
 
         if(display)
         {
@@ -1247,8 +1231,7 @@ void ShapePopulationBase::displayMeshName(bool display)
 
         // cornerAnnotation
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkCornerAnnotation* cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
 
         if(display)
         {

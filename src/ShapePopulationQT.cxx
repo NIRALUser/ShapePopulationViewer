@@ -1162,9 +1162,8 @@ void ShapePopulationQT::CreateWidgets()
 void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long notUseduLong, void* notUsedVoid)
 {
     //Get the interactor used
-    vtkSmartPointer<QVTKInteractor> selectedInteractor = vtkSmartPointer<QVTKInteractor>::New();
-    selectedInteractor = (QVTKInteractor*)a_selectedObject;
-    vtkSmartPointer<vtkRenderWindow> selectedWindow = selectedInteractor->GetRenderWindow();
+    QVTKInteractor* selectedInteractor = QVTKInteractor::SafeDownCast(a_selectedObject);
+    vtkRenderWindow* selectedWindow = selectedInteractor->GetRenderWindow();
     unsigned int index = getSelectedIndex(selectedWindow);
 
     //if the renderwindow already is in the renderselectedWindows...
