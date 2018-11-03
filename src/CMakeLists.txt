@@ -13,7 +13,10 @@ if( ${index} EQUAL -1)
   add_definitions("-DSPV_EXTENSION=1")
 endif()
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationBase.h.in ${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationBase.h)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationBase.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/ShapePopulationBase.h
+  )
 
 # --- SRCS --------------------------------------------------------------------------------
 file(GLOB CXX_FILES *.cxx)

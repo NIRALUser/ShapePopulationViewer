@@ -1,5 +1,7 @@
 #include "ShapePopulationBase.h"
 
+#include <vtkGenericOpenGLRenderWindow.h>
+
 // STD includes
 #include <iterator>
 
@@ -121,7 +123,7 @@ void ShapePopulationBase::setLabelColor(double a_labelColor[])
     }
 }
 
-void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
+vtkRenderWindow* ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 {
     //DATA
     ShapePopulationData * Mesh = new ShapePopulationData;
@@ -171,7 +173,11 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     //renderer->SetUseDepthPeeling(true);/*test opacity*/
 
     //WINDOW
+#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+    vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+#else
     vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+#endif
     renderWindow->AddRenderer(renderer);
     //renderWindow->SetAlphaBitPlanes(true);/*test opacity*/
     //renderWindow->SetMultiSamples(0);/*test opacity*/
@@ -179,7 +185,7 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 
     //INTERACTOR
     vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    interactor->SetRenderWindow(renderWindow);
+    renderWindow->SetInteractor(interactor);
 
     //ANNOTATIONS (file name)
     vtkSmartPointer<vtkCornerAnnotation> fileName = vtkSmartPointer<vtkCornerAnnotation>::New();
@@ -220,6 +226,8 @@ void ShapePopulationBase::CreateNewWindow(std::string a_filePath)
     if (m_displayMeshName == false) fileName->SetVisibility(0);
     if (m_displayAttribute == false) attributeName->SetVisibility(0);
     if (m_displayColorbar == false) scalarBar->SetVisibility(0);
+
+    return renderWindow;
 }
 
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
@@ -396,33 +404,14 @@ void ShapePopulationBase::RenderAll()
         m_windowsList[i]->Render();
     }
 }
+
 void ShapePopulationBase::RenderSelection()
 {
     if(m_selectedIndex.size()==0 || m_renderAllSelection == false) return;
 
-    int test_realtime = m_windowsList[m_selectedIndex[0]]->HasObserver(vtkCommand::RenderEvent);
-    int test_delayed = m_windowsList[m_selectedIndex[0]]->HasObserver(vtkCommand::ModifiedEvent);
-
-    for (unsigned int i = 0; i < m_selectedIndex.size();i++) //disable the renderWindows to callback RenderSelection again
-    {
-        m_windowsList[m_selectedIndex[i]]->RemoveAllObservers();
-    }
-
     for (unsigned int i = 0; i < m_selectedIndex.size();i++) //render all windows selected (one of them will be the event window)
     {
         m_windowsList[m_selectedIndex[i]]->Render();
-    }
-
-    for (unsigned int i = 0; i < m_selectedIndex.size();i++) //attribuate the observers back to the windows the way it used to be
-    {
-        if(test_realtime)
-        {
-            m_windowsList[m_selectedIndex[i]]->AddObserver(vtkCommand::RenderEvent, this, &ShapePopulationBase::RenderSelection);
-        }
-        else if (test_delayed)
-        {
-            m_windowsList[m_selectedIndex[i]]->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::RenderSelection);
-        }
     }
 
     //this->sendCameraConfig();
@@ -430,23 +419,22 @@ void ShapePopulationBase::RenderSelection()
 
 void ShapePopulationBase::RealTimeRenderSynchro(bool realtime)
 {
-    if(realtime)
+    // Remove observers
+    for (size_t idx = 0; idx < m_windowsListObserverTags.size(); ++idx)
+      {
+      vtkRenderWindow* renderWindow = m_windowsList[idx];
+      renderWindow->RemoveObserver(renderWindow->GetCommand(m_windowsListObserverTags[idx]));
+      }
+
+    m_windowsListObserverTags.clear();
+
+    // Synchronize when rendering
+    for (unsigned int i = 0; i < m_windowsList.size(); i++)
     {
-        for (unsigned int i = 0; i < m_windowsList.size(); i++)
-        {
-            //syncronize when rendering
-            m_windowsList[i]->RemoveAllObservers();
-            m_windowsList[i]->AddObserver(vtkCommand::RenderEvent, this, &ShapePopulationBase::RenderSelection);
-        }
-    }
-    if(!realtime)
-    {
-        for (unsigned int i = 0; i < m_windowsList.size(); i++)
-        {
-            //syncronize when render modified
-            m_windowsList[i]->RemoveAllObservers();
-            m_windowsList[i]->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::RenderSelection);
-        }
+        m_windowsListObserverTags.push_back(
+              m_windowsList[i]->AddObserver(
+                realtime ? vtkCommand::RenderEvent : vtkCommand::ModifiedEvent,
+                this, &ShapePopulationBase::RenderSelection));
     }
 }
 

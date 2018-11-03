@@ -1,6 +1,10 @@
 #include "customizeColorMapByDirectionDialogQT.h"
 #include "ui_customizeColorMapByDirectionDialogQT.h"
 
+#include "ShapePopulationBase.h"
+
+#include <vtkGenericOpenGLRenderWindow.h>
+
 customizeColorMapByDirectionDialogQT::customizeColorMapByDirectionDialogQT(QWidget *Qparent) :
     QDialog(Qparent),
     ui(new Ui::customizeColorMapByDirectionDialogQT)
@@ -110,7 +114,12 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
 
     /// VISUALIZATION
     vtkRenderer * renderer = vtkRenderer::New();
+#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+    vtkGenericOpenGLRenderWindow *renderWindow = vtkGenericOpenGLRenderWindow::New();
+#else
     vtkRenderWindow *renderWindow = vtkRenderWindow::New();
+#endif
+
     renderWindow->AddRenderer(renderer);
 
     // Add the actors to the renderer

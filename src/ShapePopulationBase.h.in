@@ -39,6 +39,7 @@
 #include <set>
 
 #cmakedefine ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+#cmakedefine ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
 
 class ShapePopulationBase
 {
@@ -60,6 +61,7 @@ class ShapePopulationBase
     std::vector<ShapePopulationData *> m_meshList;
     std::vector< vtkSmartPointer<vtkGlyph3D> > m_glyphList;
     std::vector< vtkSmartPointer<vtkRenderWindow> > m_windowsList;
+    std::vector< unsigned long > m_windowsListObserverTags;
     std::vector< unsigned int > m_selectedIndex;
     vtkSmartPointer<vtkCamera> m_headcam;
     cameraConfigStruct m_headcamConfig;
@@ -87,7 +89,7 @@ class ShapePopulationBase
     magnitudStruct* m_usedMagnitude;
     std::vector< axisColorStruct* > m_axisColor;
 
-    void CreateNewWindow(std::string a_filePath);
+    vtkRenderWindow* CreateNewWindow(std::string a_filePath);
     
     //SELECTION
     unsigned int getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow);

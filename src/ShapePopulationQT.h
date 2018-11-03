@@ -15,9 +15,13 @@
 // QT
 #include <QMainWindow>
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
-#include <QVTKOpenGLWidget.h>
+# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
+#  include <QVTKOpenGLNativeWidget.h>
+# else
+#  include <QVTKOpenGLWidget.h>
+# endif
 #else
-#include <QVTKWidget.h>
+# include <QVTKWidget.h>
 #endif
 #include <QFileDialog>              //Open directory/files
 #include <QFileInfo>                //Use Files
@@ -66,7 +70,11 @@ protected:
     QString m_pathSphere;
     QFileInfoList m_fileList;
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
+    typedef QVTKOpenGLNativeWidget VTKWidgetType;
+# else
     typedef QVTKOpenGLWidget VTKWidgetType;
+# endif
 #else
     typedef QVTKWidget VTKWidgetType;
 #endif

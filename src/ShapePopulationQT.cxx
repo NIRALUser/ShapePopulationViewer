@@ -933,22 +933,19 @@ void ShapePopulationQT::CreateWidgets()
 {
     this->scrollArea->setVisible(false);
 
-    /* VTK WINDOWS */
     for (int i = m_numberOfMeshes; i < m_fileList.size(); i++)
     {
+        /* VTK WINDOW */
         //get filepath and fileNames
         QByteArray path = m_fileList[i].absoluteFilePath().toLatin1();
         const char *filePath = path.data();
+        vtkRenderWindow* renderWindow = CreateNewWindow(filePath);
+        renderWindow->SetInteractor(NULL);
 
-        CreateNewWindow(filePath);
-    }
-
-    /* QT WIDGETS */
-    for (int i = m_numberOfMeshes; i < m_fileList.size(); i++)
-    {
+        /* QT WIDGET */
         VTKWidgetType *meshWidget = new VTKWidgetType(this->scrollAreaWidgetContents);
         m_widgetList.push_back(meshWidget);
-        meshWidget->GetRenderWindow()->AddRenderer(m_windowsList.at(i)->GetRenderers()->GetFirstRenderer());
+        meshWidget->SetRenderWindow(renderWindow);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::LeftButtonPressEvent, this, &ShapePopulationQT::ClickEvent);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::KeyPressEvent, this, &ShapePopulationBase::KeyPressEventVTK);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::CameraChangedEventVTK);
