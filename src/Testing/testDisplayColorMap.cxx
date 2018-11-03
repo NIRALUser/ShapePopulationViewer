@@ -33,7 +33,7 @@ bool TestShapePopulationBase::testDisplayColorMap(std::string filename, std::str
         shapePopulationBase->m_displayColorMapByDirection.push_back(false);
         shapePopulationBase->m_displayVectorsByDirection.push_back(false);
         shapePopulationBase->m_selectedIndex.push_back(i);
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
         shapePopulationBase->m_meshList[i]->GetPolyData()->GetPointData()->SetActiveScalars(strs_mag.str().c_str());
 
         // UPDATE THE COLOR MAP BY DIRECTION

@@ -14,8 +14,8 @@ bool TestShapePopulationBase::testBackgroundUnselectedColor(std::string filename
     shapePopulationBase->m_selectedIndex.clear();
     shapePopulationBase->m_selectedIndex.push_back(0);
     shapePopulationBase->m_windowsList.clear();
-    shapePopulationBase->CreateNewWindow(filename);
-    shapePopulationBase->CreateNewWindow(filename);
+    shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
+    shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
 
     std::vector< double* > unselectedColor;
     /// Test1.

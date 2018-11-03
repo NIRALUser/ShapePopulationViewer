@@ -89,7 +89,9 @@ class ShapePopulationBase
     magnitudStruct* m_usedMagnitude;
     std::vector< axisColorStruct* > m_axisColor;
 
-    vtkRenderWindow* CreateNewWindow(std::string a_filePath);
+    // Setting \a testing to true means a \a vtkRenderWindow is created
+    // instead of \a vtkGenericOpenGLRenderWindow.
+    vtkRenderWindow* CreateNewWindow(std::string a_filePath, bool testing = false);
     
     //SELECTION
     unsigned int getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow);

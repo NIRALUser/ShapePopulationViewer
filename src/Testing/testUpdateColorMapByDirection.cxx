@@ -26,7 +26,7 @@ bool TestShapePopulationBase::testUpdateColorMapByDirection(std::string filename
     for(int i = 0; i < nbTest; i++)
     {
         shapePopulationBase->m_selectedIndex.push_back(i);
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
     }
 
     /// TEST BY CHANGING THE COLOR OF THE MAIN AXIS ///

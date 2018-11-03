@@ -123,7 +123,7 @@ void ShapePopulationBase::setLabelColor(double a_labelColor[])
     }
 }
 
-vtkRenderWindow* ShapePopulationBase::CreateNewWindow(std::string a_filePath)
+vtkRenderWindow* ShapePopulationBase::CreateNewWindow(std::string a_filePath, bool testing)
 {
     //DATA
     ShapePopulationData * Mesh = new ShapePopulationData;
@@ -174,8 +174,17 @@ vtkRenderWindow* ShapePopulationBase::CreateNewWindow(std::string a_filePath)
 
     //WINDOW
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
-    vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+    vtkSmartPointer<vtkRenderWindow> renderWindow;
+    if (!testing)
+      {
+      renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+      }
+    else
+      {
+      renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+      }
 #else
+    (void)testing;
     vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
 #endif
     renderWindow->AddRenderer(renderer);

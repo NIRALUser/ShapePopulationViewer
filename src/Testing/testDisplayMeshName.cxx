@@ -15,7 +15,7 @@ bool TestShapePopulationBase::testDisplayMeshName(std::string filename)
     shapePopulationBase->m_windowsList.clear();
     for(int i = 0; i < nbMesh; i++)
     {
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
     }
 
     for(int i = 0; i < nbMesh; i++)

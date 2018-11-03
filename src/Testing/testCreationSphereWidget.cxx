@@ -15,7 +15,7 @@ bool TestShapePopulationBase::testCreationSphereWidget(std::string filename)
     shapePopulationBase->m_windowsList.clear();
     for(int i = 0; i < nbTest; i++)
     {
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
     }
 
     shapePopulationBase->initializationAllWidgets();

@@ -11,7 +11,7 @@ bool TestShapePopulationBase::testMeshOpacity(std::string filename)
 {
     QSharedPointer<ShapePopulationBase> shapePopulationBase = QSharedPointer<ShapePopulationBase>( new ShapePopulationBase );
     shapePopulationBase->m_windowsList.clear();
-    shapePopulationBase->CreateNewWindow(filename);
+    shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
 
 
     shapePopulationBase->m_selectedIndex.clear();

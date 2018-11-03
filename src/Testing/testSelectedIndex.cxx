@@ -21,7 +21,7 @@ bool TestShapePopulationBase::testSelectedIndex(std::string filename)
     for(int i = 0; i < nbMesh; i++)
     {
         shapePopulationBase->m_selectedIndex.push_back(i);
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
     }
 
     for(int i = 0; i < nbMesh; i++)

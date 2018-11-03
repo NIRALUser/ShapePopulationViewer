@@ -14,7 +14,7 @@ bool TestShapePopulationBase::testComputeCommonAttributes(std::string filename1,
     shapePopulationBase->m_windowsList.clear();
 
     // Data 1.
-    shapePopulationBase->CreateNewWindow(filename1);
+    shapePopulationBase->CreateNewWindow(filename1, /* testing = */ true);
     std::vector< const char* > attributes1;
     attributes1.push_back("AbsoluteMagNormDirDistance");
     attributes1.push_back("AbsolutePointToPointDistance");
@@ -38,7 +38,7 @@ bool TestShapePopulationBase::testComputeCommonAttributes(std::string filename1,
     }
 
     // Data 2.
-    shapePopulationBase->CreateNewWindow(filename2);
+    shapePopulationBase->CreateNewWindow(filename2, /* testing = */ true);
     std::vector< const char* > attributes2;
     attributes2.push_back("Color_Map_Phi");
     attributes2.push_back("Color_Map_Theta");

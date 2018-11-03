@@ -15,7 +15,7 @@ bool TestShapePopulationBase::testDisplayColorbar(std::string filename)
     shapePopulationBase->m_windowsList.clear();
     for(int i = 0; i < nbMesh; i++)
     {
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
         shapePopulationBase->m_displayColorMapByMagnitude.push_back(true);
         shapePopulationBase->m_displayVectorsByMagnitude.push_back(true);
     }
