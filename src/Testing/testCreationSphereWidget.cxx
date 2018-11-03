@@ -74,12 +74,10 @@ bool TestShapePopulationBase::testCreationSphereWidget(std::string filename)
         shapePopulationBase->creationSphereWidget(i);
 
         // Test if the result obtained is correct:
-              // AXIS
-        vtkOrientationMarkerWidget* widgetAxisByDirection = vtkOrientationMarkerWidget::New();
-        widgetAxisByDirection = shapePopulationBase->m_widgetAxisByDirection[i];
+        // AXIS
+        vtkOrientationMarkerWidget* widgetAxisByDirection = shapePopulationBase->m_widgetAxisByDirection[i];
         vtkProp* prop = widgetAxisByDirection->GetOrientationMarker();
-        vtkAxesActor* axis = vtkAxesActor::New();
-        axis = (vtkAxesActor*)prop;
+        vtkAxesActor* axis = vtkAxesActor::SafeDownCast(prop);
 
         double *Xcolor = axis->GetXAxisShaftProperty()->GetColor();
         if(shapePopulationBase->m_axisColor[i]->XAxiscolor[0] != (int)(Xcolor[0]*255) || shapePopulationBase->m_axisColor[i]->XAxiscolor[1] != (int)(Xcolor[1]*255) || shapePopulationBase->m_axisColor[i]->XAxiscolor[2] != (int)(Xcolor[2]*255))
@@ -112,29 +110,23 @@ bool TestShapePopulationBase::testCreationSphereWidget(std::string filename)
             return 1;
         }
 
-            // SPHERE
-        vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
-        widgetSphere = shapePopulationBase->m_widgetSphere[i];
+        // SPHERE
+        vtkOrientationMarkerWidget* widgetSphere = shapePopulationBase->m_widgetSphere[i];
         vtkProp* propSphere = widgetSphere->GetOrientationMarker();
-        vtkActor* actorSphere = vtkActor::New();
-        actorSphere = (vtkActor*)propSphere;
+        vtkActor* actorSphere = vtkActor::SafeDownCast(propSphere);
 
         // Test if the result obtained is correct
-        vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-        polyData = (vtkPolyData* )actorSphere->GetMapper()->GetInput();
+        vtkPolyData* polyData = vtkPolyData::SafeDownCast(actorSphere->GetMapper()->GetInput());
         vtkIdType numPts1 = polyData->GetNumberOfPoints();
-        vtkDoubleArray* map1 = vtkDoubleArray::New();
-        map1 = (vtkDoubleArray*)polyData->GetPointData()->GetArray("ColorByDirection");
+        vtkDataArray* map1 = polyData->GetPointData()->GetArray("ColorByDirection");
         int nb1 = polyData->GetPointData()->GetArray("ColorByDirection")->GetNumberOfComponents();
 
         vtkSmartPointer<vtkPolyDataReader> meshReader = vtkSmartPointer<vtkPolyDataReader>::New();
         meshReader->SetFileName(filename.c_str());
         meshReader->Update();
-        vtkSmartPointer<vtkPolyData> SpherePolyData = vtkSmartPointer<vtkPolyData>::New();
-        SpherePolyData = meshReader->GetOutput();
+        vtkPolyData* SpherePolyData = meshReader->GetOutput();
         vtkIdType numPts2 = SpherePolyData->GetNumberOfPoints();
-        vtkDoubleArray* map2 = vtkDoubleArray::New();
-        map2 = (vtkDoubleArray*)SpherePolyData->GetPointData()->GetArray(colormap[i]);
+        vtkDataArray* map2 = SpherePolyData->GetPointData()->GetArray(colormap[i]);
         int nb2 = SpherePolyData->GetPointData()->GetArray(colormap[i])->GetNumberOfComponents();
 
         if(numPts1 != numPts2) return 1;

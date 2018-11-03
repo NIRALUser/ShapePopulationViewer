@@ -521,8 +521,7 @@ void ShapePopulationBase::UpdateColorMapByDirection(const char * cmap,int index)
         scalars->SetName(strs.str().c_str());
 
 
-        vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-        polyData = mesh->GetPolyData();
+        vtkPolyData* polyData = mesh->GetPolyData();
 //        vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
 
 //        normalGenerator->SetInputData(polyData);
@@ -530,7 +529,7 @@ void ShapePopulationBase::UpdateColorMapByDirection(const char * cmap,int index)
 
 //        polyData = normalGenerator->GetOutput();
 
-        vtkDoubleArray* normalDataDouble = (vtkDoubleArray*)polyData->GetPointData()->GetArray(cmap);
+        vtkDataArray* normalDataDouble = polyData->GetPointData()->GetArray(cmap);
 
         magnitudStruct* magnitude = m_magnitude[index];
         for(int l = 0; l  < numPts; l++)
@@ -1260,7 +1259,7 @@ vtkActor* ShapePopulationBase::creationSphereActor()
 
 //    polyData = normalGenerator->GetOutput();
 
-    vtkDoubleArray* normalDataDouble = (vtkDoubleArray*)polyData->GetPointData()->GetArray("Normals");
+    vtkDataArray* normalDataDouble = polyData->GetPointData()->GetArray("Normals");
 
     // Color map by direction
     vtkIdType numPts = polyData->GetNumberOfPoints();
@@ -1457,8 +1456,7 @@ void ShapePopulationBase::initializationAllWidgets()
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 void ShapePopulationBase::ChangeView(int R, int A, int S,int x_ViewUp,int y_ViewUp,int z_ViewUp)
 {
-    vtkSmartPointer<vtkRenderer> firstRenderer = vtkSmartPointer<vtkRenderer>::New();
-    firstRenderer = m_windowsList[m_selectedIndex[0]]->GetRenderers()->GetFirstRenderer();
+    vtkRenderer* firstRenderer = m_windowsList[m_selectedIndex[0]]->GetRenderers()->GetFirstRenderer();
     firstRenderer->ResetCamera();
 
     double *coords  = firstRenderer->GetActiveCamera()->GetFocalPoint();

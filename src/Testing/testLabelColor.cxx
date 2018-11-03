@@ -41,8 +41,7 @@ bool TestShapePopulationBase::testLabelColor(std::string filename)
 
         double meshNameColor[3];
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkCornerAnnotation* cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
         vtkTextProperty* cornerProperty = cornerAnnotation->GetTextProperty();
         cornerProperty->GetColor(meshNameColor);
         if(meshNameColor[0] != labelColor[i][0] || meshNameColor[1] != labelColor[i][1] || meshNameColor[2] != labelColor[i][2])
@@ -52,8 +51,7 @@ bool TestShapePopulationBase::testLabelColor(std::string filename)
 
         double attributeNameColor[3];
         viewPropObject = propCollection->GetItemAsObject(3);
-        cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
         cornerProperty = cornerAnnotation->GetTextProperty();
         cornerProperty->GetColor(attributeNameColor);
         if(attributeNameColor[0] != labelColor[i][0] || attributeNameColor[1] != labelColor[i][1] || attributeNameColor[2] != labelColor[i][2])
@@ -63,8 +61,7 @@ bool TestShapePopulationBase::testLabelColor(std::string filename)
 
         double scalarColor[3];
         viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         vtkTextProperty* labelProperty = scalarBar->GetLabelTextProperty();
         labelProperty->GetColor(scalarColor);
         if(scalarColor[0] != labelColor[i][0] || scalarColor[1] != labelColor[i][1] || scalarColor[2] != labelColor[i][2])

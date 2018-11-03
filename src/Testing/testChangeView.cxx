@@ -37,8 +37,7 @@ bool TestShapePopulationBase::testChangeView(std::string filename)
         shapePopulationBase->ChangeView(view[i][0],view[i][1],view[i][2],view[i][3],view[i][4],view[i][5]);
 
         // Test if the result obtained is correct
-        vtkSmartPointer<vtkRenderer> firstRenderer = vtkSmartPointer<vtkRenderer>::New();
-        firstRenderer = shapePopulationBase->m_windowsList[0]->GetRenderers()->GetFirstRenderer();
+        vtkRenderer* firstRenderer = shapePopulationBase->m_windowsList[0]->GetRenderers()->GetFirstRenderer();
         double* coords = firstRenderer->GetActiveCamera()->GetFocalPoint();
         double distance = firstRenderer->GetActiveCamera()->GetDistance();
         double* viewUp = firstRenderer->GetActiveCamera()->GetViewUp();

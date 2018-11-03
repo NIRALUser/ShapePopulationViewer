@@ -235,17 +235,14 @@ bool TestShapePopulationBase::checkingColorMap(int nbMesh, std::string filenameE
     {
         const char* cmap = m_meshList[i]->GetPolyData()->GetPointData()->GetScalars()->GetName();
 
-        vtkSmartPointer<vtkPolyData> polyData1 = vtkSmartPointer<vtkPolyData>::New();
-        polyData1 = m_meshList[i]->GetPolyData();
+        vtkPolyData* polyData1 = m_meshList[i]->GetPolyData();
         vtkIdType numPts1 = polyData1->GetNumberOfPoints();
-        vtkDoubleArray* map1 = vtkDoubleArray::New();
-        map1 = (vtkDoubleArray*)polyData1->GetPointData()->GetArray(cmap);
+        vtkDataArray* map1 = polyData1->GetPointData()->GetArray(cmap);
         int nb1 = polyData1->GetPointData()->GetArray(cmap)->GetNumberOfComponents();
 
         vtkSmartPointer<vtkPolyDataReader> meshReader = vtkSmartPointer<vtkPolyDataReader>::New();
-        vtkSmartPointer<vtkPolyData> polyData2 = vtkSmartPointer<vtkPolyData>::New();
         vtkIdType numPts2;
-        vtkDoubleArray* map2 = vtkDoubleArray::New();
+        vtkDataArray* map2 = 0;
         int nb2;
 
         if( (std::find(m_selectedIndex.begin(), m_selectedIndex.end(), i)) != (m_selectedIndex.end()) )
@@ -255,9 +252,9 @@ bool TestShapePopulationBase::checkingColorMap(int nbMesh, std::string filenameE
             // Recover of data to make a comparison
             meshReader->SetFileName(filenameExpectedResult.c_str());
             meshReader->Update();
-            polyData2 = meshReader->GetOutput();
+            vtkPolyData* polyData2 = meshReader->GetOutput();
             numPts2 = polyData2->GetNumberOfPoints();
-            map2 = (vtkDoubleArray*)polyData2->GetPointData()->GetArray(cmap_selectedMesches);
+            map2 = polyData2->GetPointData()->GetArray(cmap_selectedMesches);
             nb2 = polyData2->GetPointData()->GetArray(cmap_selectedMesches)->GetNumberOfComponents();
         }
         else
@@ -267,9 +264,9 @@ bool TestShapePopulationBase::checkingColorMap(int nbMesh, std::string filenameE
             // Recover of data to make a comparison
             meshReader->SetFileName(filenameExpectedResult.c_str());
             meshReader->Update();
-            polyData2 = meshReader->GetOutput();
+            vtkPolyData* polyData2 = meshReader->GetOutput();
             numPts2 = polyData2->GetNumberOfPoints();
-            map2 = (vtkDoubleArray*)polyData2->GetPointData()->GetArray(cmap_unSelectedMesches);
+            map2 = polyData2->GetPointData()->GetArray(cmap_unSelectedMesches);
             nb2 = polyData2->GetPointData()->GetArray(cmap_unSelectedMesches)->GetNumberOfComponents();
         }
         if( numPts1 != numPts2 ) return 1;
