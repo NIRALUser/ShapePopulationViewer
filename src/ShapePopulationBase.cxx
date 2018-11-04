@@ -1378,8 +1378,7 @@ void ShapePopulationBase::creationSphereWidget(int index)
         vtkSmartPointer<vtkActor> actorSphere;
         actorSphere.TakeReference(creationSphereActor());
 
-        vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
-        widgetSphere = m_widgetSphere[index];
+        vtkOrientationMarkerWidget* widgetSphere = m_widgetSphere[index];
 //        widgetSphere->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetSphere->SetOrientationMarker( actorSphere );
         widgetSphere->SetInteractor( iren );
@@ -1412,8 +1411,7 @@ void ShapePopulationBase::creationSphereWidget(int index)
         actorAxisByDirection->GetZAxisShaftProperty()->SetColor(Zcoef[0],Zcoef[1],Zcoef[2]);
         actorAxisByDirection->GetZAxisTipProperty()->SetColor(Zcoef[0],Zcoef[1],Zcoef[2]);
 
-        vtkOrientationMarkerWidget* widgetAxisByDirection = vtkOrientationMarkerWidget::New();
-        widgetAxisByDirection = m_widgetAxisByDirection[index];
+        vtkOrientationMarkerWidget* widgetAxisByDirection = m_widgetAxisByDirection[index];
 //        widgetAxisByDirection->SetOutlineColor( 1, 1, 1 ); // color for the frame around the axes
         widgetAxisByDirection->SetOrientationMarker( actorAxisByDirection );
         widgetAxisByDirection->SetInteractor( iren );
@@ -1429,14 +1427,17 @@ void ShapePopulationBase::deleteSphereWidget(int index)
 {
     if(m_createSphere[index])
     {
-        m_widgetSphere[index]->SetEnabled( 0 );
-        m_widgetSphere[index]->Delete();
-        m_widgetAxisByDirection[index]->SetEnabled( 0 );
-        m_widgetAxisByDirection[index]->Delete();
-        vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
-        m_widgetSphere[index] = widgetSphere;
-        vtkOrientationMarkerWidget* widgetAxisByDirection = vtkOrientationMarkerWidget::New();
-        m_widgetAxisByDirection[index] = widgetAxisByDirection;
+        if (m_widgetSphere[index].GetPointer())
+        {
+            m_widgetSphere[index]->SetEnabled( 0 );
+        }
+        m_widgetSphere[index] = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+
+        if (m_widgetAxisByDirection[index].GetPointer())
+        {
+            m_widgetAxisByDirection[index]->SetEnabled( 0 );
+        }
+        m_widgetAxisByDirection[index] = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
     }
     m_createSphere[index] = false;
 }
@@ -1459,11 +1460,8 @@ void ShapePopulationBase::initializationAllWidgets()
     // initialization of all the widgets
     for (unsigned int i = 0; i < m_windowsList.size(); i++)
     {
-        vtkOrientationMarkerWidget* widgetSphere = vtkOrientationMarkerWidget::New();
-        vtkOrientationMarkerWidget* widgetAxisByDirection = vtkOrientationMarkerWidget::New();
-
-        m_widgetSphere.push_back(widgetSphere);
-        m_widgetAxisByDirection.push_back(widgetAxisByDirection);
+        m_widgetSphere.push_back(vtkSmartPointer<vtkOrientationMarkerWidget>::New());
+        m_widgetAxisByDirection.push_back(vtkSmartPointer<vtkOrientationMarkerWidget>::New());
         m_createSphere.push_back(false);
 
     }

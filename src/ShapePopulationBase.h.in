@@ -83,8 +83,8 @@ class ShapePopulationBase
     bool m_displaySphere;
     bool m_noUpdateVectorsByDirection;
     std::vector<bool> m_createSphere;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetSphere;
-    std::vector< vtkOrientationMarkerWidget* > m_widgetAxisByDirection;
+    std::vector< vtkSmartPointer<vtkOrientationMarkerWidget> > m_widgetSphere;
+    std::vector< vtkSmartPointer<vtkOrientationMarkerWidget> > m_widgetAxisByDirection;
     std::vector< magnitudStruct * > m_magnitude;
     magnitudStruct* m_usedMagnitude;
     std::vector< axisColorStruct* > m_axisColor;
