@@ -113,11 +113,11 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
     if(m_complementaryColor == true) ui->radioButton_complementaryColor->click();
 
     /// VISUALIZATION
-    vtkRenderer * renderer = vtkRenderer::New();
+    vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
-    vtkGenericOpenGLRenderWindow *renderWindow = vtkGenericOpenGLRenderWindow::New();
+    vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 #else
-    vtkRenderWindow *renderWindow = vtkRenderWindow::New();
+    vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
 #endif
 
     renderWindow->AddRenderer(renderer);
