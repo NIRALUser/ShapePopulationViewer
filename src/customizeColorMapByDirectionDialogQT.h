@@ -2,7 +2,7 @@
 #define CUSTOMIZECOLORMAPBYDIRECTIONDIALOGQT_H
 
 #include "ShapePopulationBase.h"
-#include "axisColorStruct.h"
+#include "ShapePopulationStruct.h"
 
 #include <QDialog>
 #include <vtkSmartPointer.h>

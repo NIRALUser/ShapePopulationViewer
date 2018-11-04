@@ -4,10 +4,7 @@
 #include <vtkVersion.h>
 
 #include "ShapePopulationData.h"
-#include "colorBarStruct.h"
-#include "cameraConfigStruct.h"
-#include "magnitudStruct.h"
-#include "axisColorStruct.h"
+#include "ShapePopulationStruct.h"
 
 #include <vtkCamera.h>                      //Camera
 #include <vtkPolyDataMapper.h>              //Mapper
