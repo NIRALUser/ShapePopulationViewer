@@ -72,8 +72,7 @@ bool TestShapePopulationBase::testUpdateColorMapByMagnitude(std::string filename
         actors->InitTraversal();
         vtkMapper* mapper = actors->GetNextActor()->GetMapper();
         vtkScalarsToColors* scalarsToColors = mapper->GetLookupTable();
-        vtkSmartPointer<vtkColorTransferFunction> DistanceMapTFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
-        DistanceMapTFunc = (vtkColorTransferFunction *)scalarsToColors;
+        vtkColorTransferFunction* DistanceMapTFunc = vtkColorTransferFunction::SafeDownCast(scalarsToColors);
         double range = fabs(shapePopulationBase->m_usedColorBar->range[1] - shapePopulationBase->m_usedColorBar->range[0]);
         for (unsigned int j = 0; j < shapePopulationBase->m_usedColorBar->colorPointList.size(); j++)
         {
