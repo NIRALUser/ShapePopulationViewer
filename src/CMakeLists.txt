@@ -20,6 +20,7 @@ set(CXX_FILES
   gradientWidgetQT.cxx
   ShapePopulationBase.cxx
   ShapePopulationData.cxx
+  ShapePopulationMainWindowQT.cxx
   ShapePopulationQT.cxx
   ShapePopulationViewer.cxx
   vtkPVPostFilter.cxx
@@ -31,6 +32,7 @@ set(UI_FILES
   cameraDialogQT.ui
   CSVloaderQT.ui
   customizeColorMapByDirectionDialogQT.ui
+  ShapePopulationMainWindowQT.ui
   ShapePopulationQT.ui
   )
 
@@ -40,6 +42,7 @@ set(QT_WRAP
   CSVloaderQT.h
   customizeColorMapByDirectionDialogQT.h
   gradientWidgetQT.h
+  ShapePopulationMainWindowQT.h
   ShapePopulationQT.h
   )
 

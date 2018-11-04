@@ -2,7 +2,7 @@
 #include "ShapePopulationQT.h"
 
 
-ShapePopulationQT::ShapePopulationQT()
+ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
 {
     this->setupUi(this);
 
@@ -20,6 +20,23 @@ ShapePopulationQT::ShapePopulationQT()
     m_backgroundDialog = new backgroundDialogQT(this);
     m_CSVloaderDialog = new CSVloaderQT(this);
     m_customizeColorMapByDirectionDialog = new customizeColorMapByDirectionDialogQT(this);
+    m_exportActions = new QActionGroup(this);
+    m_exportActions->setExclusive(false);
+    foreach(QAction* action, QList<QAction*>()
+            << actionTo_PDF << actionTo_PS << actionTo_EPS << actionTo_TEX << actionTo_SVG)
+    {
+        m_exportActions->addAction(action);
+#ifdef SPV_EXTENSION
+        action->setText(action->text() + QString(" (Not Available)"));
+#endif
+    }
+    m_optionsActions = new QActionGroup(this);
+    m_optionsActions->setExclusive(false);
+    foreach(QAction* action, QList<QAction*>()
+            << actionCameraConfig << actionBackgroundConfig << actionLoad_Colorbar << actionSave_Colorbar)
+    {
+        m_optionsActions->addAction(action);
+    }
 
 
     // GUI disable
@@ -27,16 +44,10 @@ ShapePopulationQT::ShapePopulationQT()
     stackedWidget_ColorMapByDirection->hide();
     toolBox->setDisabled(true);
     this->gradientWidget_VISU->disable();
-    menuOptions->setDisabled(true);
+    m_optionsActions->setDisabled(true);
     actionDelete->setDisabled(true);
     actionDelete_All->setDisabled(true);
-    menuExport->setDisabled(true);
-
-#ifdef SPV_EXTENSION
-    menuExport->clear();
-    menuExport->addAction("PDF");
-    connect(menuExport->actions().at(0),SIGNAL(triggered()),this,SLOT(showNoExportWindow()));
-#endif
+    m_exportActions->setDisabled(true);
 
     //Pushbuttons color
     pushButton_VISU_add->setStyleSheet("color: rgb(0, 200, 0)");
@@ -67,7 +78,6 @@ ShapePopulationQT::ShapePopulationQT()
     frame_DISPLAY->setPalette( backgroundColor );
 
     //Menu signals
-    connect(actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
     connect(actionOpen_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
     connect(actionOpen_VTK_Files,SIGNAL(triggered()),this,SLOT(openFiles()));
     connect(actionLoad_CSV,SIGNAL(triggered()),this,SLOT(loadCSV()));
@@ -85,6 +95,8 @@ ShapePopulationQT::ShapePopulationQT()
     connect(actionTo_EPS,SIGNAL(triggered()),this,SLOT(exportToEPS()));
     connect(actionTo_TEX,SIGNAL(triggered()),this,SLOT(exportToTEX()));
     connect(actionTo_SVG,SIGNAL(triggered()),this,SLOT(exportToSVG()));
+#else
+    connect(m_exportActions,SIGNAL(triggered(QAction*)),this,SLOT(showNoExportWindow()));
 #endif
     //gradView Signals
     connect(gradientWidget_VISU,SIGNAL(arrowMovedSignal(qreal)), this, SLOT(slot_gradArrow_moved(qreal)));
@@ -135,10 +147,6 @@ ShapePopulationQT::ShapePopulationQT()
     //Display
     radioButton_DISPLAY_all->toggle();                          //Display All surfaces,
     radioButton_SYNC_realtime->toggle();
-
-    #if __APPLE__
-    Ui_ShapePopulationQT::menuBar->setNativeMenuBar(false);
-    #endif
 }
 
 
@@ -148,12 +156,6 @@ ShapePopulationQT::~ShapePopulationQT()
     delete m_backgroundDialog;
     delete m_CSVloaderDialog;
     delete m_customizeColorMapByDirectionDialog;
-}
-
-void ShapePopulationQT::slotExit()
-{
-    this->deleteAll();
-    qApp->exit();
 }
 
 void ShapePopulationQT::on_pushButton_displayTools_clicked()
@@ -346,8 +348,8 @@ void ShapePopulationQT::deleteAll()
     gradientWidget_VISU->disable();
     actionDelete_All->setDisabled(true);
     actionDelete->setDisabled(true);
-    menuExport->setDisabled(true);
-    menuOptions->setDisabled(true);
+    m_exportActions->setDisabled(true);
+    m_optionsActions->setDisabled(true);
 
     //Initialize Menu actions
     actionOpen_Directory->setText("Open Directory");
@@ -1124,10 +1126,10 @@ void ShapePopulationQT::CreateWidgets()
     /* */
 
     this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
-    this->menuOptions->setEnabled(true);
+    this->m_optionsActions->setEnabled(true);
     this->actionDelete->setEnabled(true);
     this->actionDelete_All->setEnabled(true);
-    this->menuExport->setEnabled(true);
+    this->m_exportActions->setEnabled(true);
     this->actionOpen_Directory->setText("Add Directory");
     this->actionOpen_VTK_Files->setText("Add VTK/VTP files");
     this->actionLoad_CSV->setText("Add CSV file");
@@ -1172,12 +1174,11 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
     /* VTK SELECTION */
     ShapePopulationBase::ClickEvent(a_selectedObject,notUseduLong,notUsedVoid);
 
-
     if(m_selectedIndex.size() == 0)
     {
         /* DISABLE GUI ACTIONS */
         this->actionDelete->setDisabled(true);
-        this->menuExport->setDisabled(true);
+        this->m_exportActions->setDisabled(true);
         this->groupBox_VIEW->setDisabled(true);
         this->groupBox_VISU->setDisabled(true);
         this->gradientWidget_VISU->disable();
@@ -1187,7 +1188,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
     {
         /* ENABLE GUI ACTIONS */
         this->actionDelete->setEnabled(true);
-        this->menuExport->setEnabled(true);
+        this->m_exportActions->setEnabled(true);
         this->groupBox_VIEW->setEnabled(true);
         this->groupBox_VISU->setEnabled(true);
 
@@ -1374,7 +1375,7 @@ void ShapePopulationQT::SelectAll()
 
     /* ENABLE GUI ACTIONS */
     this->actionDelete->setEnabled(true);
-    this->menuExport->setEnabled(true);
+    this->m_exportActions->setEnabled(true);
     this->groupBox_VIEW->setEnabled(true);
     this->groupBox_VISU->setEnabled(true);
     this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
@@ -1411,7 +1412,7 @@ void ShapePopulationQT::UnselectAll()
 
     /* DISABLE GUI ACTIONS */
     this->actionDelete->setDisabled(true);
-    this->menuExport->setDisabled(true);
+    this->m_exportActions->setDisabled(true);
     this->groupBox_VIEW->setDisabled(true);
     this->groupBox_VISU->setDisabled(true);
     this->gradientWidget_VISU->disable();
@@ -1511,7 +1512,7 @@ void ShapePopulationQT::on_tabWidget_currentChanged(int index)
 void ShapePopulationQT::resizeEvent(QResizeEvent *Qevent)
 {
     //Resizing Windows
-    QMainWindow::resizeEvent(Qevent);
+    QWidget::resizeEvent(Qevent);
 
     //According to the View Options
     if (this->radioButton_DISPLAY_square->isChecked() == true )//view square meshes

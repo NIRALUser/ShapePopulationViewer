@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QFileInfo>
 
-#include "ShapePopulationQT.h"
+#include "ShapePopulationMainWindowQT.h"
 #include "ShapePopulationViewerCLP.h"
 
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
@@ -15,7 +15,7 @@
 #include <iostream>
 #include <stdio.h>
 
-void fileDoesNotExist(std::string file, ShapePopulationQT *windowPointer)
+void fileDoesNotExist(std::string file, QWidget *windowPointer)
 {
     std::ostringstream strs;
     strs << file << std::endl
@@ -23,7 +23,7 @@ void fileDoesNotExist(std::string file, ShapePopulationQT *windowPointer)
     QMessageBox::critical(windowPointer,"File/Directory not found",QString(strs.str().c_str()), QMessageBox::Ok);
 }
 
-void wrongFileFormat(std::string file, std::string format, ShapePopulationQT *windowPointer)
+void wrongFileFormat(std::string file, std::string format, QWidget *windowPointer)
 {
     std::ostringstream strs;
     strs << file << std::endl
@@ -70,9 +70,11 @@ int main( int argc, char** argv )
     // QT SOFTWARE
     QApplication app( argc, argv );
     Q_INIT_RESOURCE(ShapePopulationViewer);
-    ShapePopulationQT window;
+    ShapePopulationMainWindowQT window;
     window.show();
     window.raise();
+
+    ShapePopulationQT* shapePopulation =  window.shapePopulation();
 
     // CLP
     if(!vtkFiles.empty())
@@ -93,8 +95,8 @@ int main( int argc, char** argv )
         }
         if(load == true)
         {
-            window.loadVTKFilesCLP(fileList);
-            checkConfigurationFiles(cameraConfig, colormapConfig, &window);
+            shapePopulation->loadVTKFilesCLP(fileList);
+            checkConfigurationFiles(cameraConfig, colormapConfig, shapePopulation);
         }
     }
     if(!vtkDirectory.empty())
@@ -103,8 +105,8 @@ int main( int argc, char** argv )
         if(!vtkDir.exists()) fileDoesNotExist(vtkDirectory, &window);
         else
         {
-            window.loadVTKDirCLP(vtkDir);
-            checkConfigurationFiles(cameraConfig, colormapConfig, &window);
+            shapePopulation->loadVTKDirCLP(vtkDir);
+            checkConfigurationFiles(cameraConfig, colormapConfig, shapePopulation);
         }
     }
     if(!CSVFile.empty())
@@ -115,8 +117,8 @@ int main( int argc, char** argv )
         else if(!CSVFileInfo.exists()) fileDoesNotExist(CSVFile, &window);                  // Control that the file exists
         else
         {
-            window.loadCSVFileCLP(CSVFileInfo);
-            checkConfigurationFiles(cameraConfig, colormapConfig, &window);
+            shapePopulation->loadCSVFileCLP(CSVFileInfo);
+            checkConfigurationFiles(cameraConfig, colormapConfig, shapePopulation);
         }
     }
     return app.exec();
