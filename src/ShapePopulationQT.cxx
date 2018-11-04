@@ -1589,7 +1589,7 @@ void ShapePopulationQT::on_radioButton_DISPLAY_square_toggled()
     resizeWidgetInArea();
 }
 
-void ShapePopulationQT::on_spinBox_DISPLAY_columns_valueChanged()
+void ShapePopulationQT::on_spinBox_DISPLAY_columns_valueChanged(int)
 {
     if(m_numberOfMeshes == 0) return;
     this->scrollArea->setVisible(false);
@@ -1676,7 +1676,7 @@ void ShapePopulationQT::on_toolButton_VIEW_S_clicked() {ChangeView(0,0,1,0,1,0);
 
 void ShapePopulationQT::on_toolButton_VIEW_I_clicked() {ChangeView(0,0,-1,0,1,0);}
 
-void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged()
+void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged(int)
 {
     // Get Attribute in ComboBox
     int alignment = this->comboBox_alignment->currentIndex();
@@ -1691,7 +1691,7 @@ void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged()
 // *                                     ATTRIBUTES COLORMAP                                       * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
-void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
+void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged(int)
 {
     if(m_selectedIndex.size() == 0 || m_updateOnAttributeChanged == false) return;
 
