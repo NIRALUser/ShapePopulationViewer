@@ -4,6 +4,14 @@
 #include "ShapePopulationQT.h"
 #include "ShapePopulationViewerCLP.h"
 
+#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
+#  include <QVTKOpenGLNativeWidget.h>
+# else
+#  include <QVTKOpenGLWidget.h>
+# endif
+#endif
+
 #include <iostream>
 #include <stdio.h>
 
@@ -48,6 +56,16 @@ void checkConfigurationFiles(std::string cameraConfig, std::string colormapConfi
 int main( int argc, char** argv )
 {
     PARSE_ARGS;
+
+    // Set default surface format.
+#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
+    QSurfaceFormat format = QVTKOpenGLNativeWidget::defaultFormat();
+# else
+    QSurfaceFormat format = QVTKOpenGLWidget::defaultFormat();
+# endif
+    QSurfaceFormat::setDefaultFormat(format);
+#endif
 
     // QT SOFTWARE
     QApplication app( argc, argv );
@@ -102,7 +120,5 @@ int main( int argc, char** argv )
         }
     }
     return app.exec();
-
-    return 0;
 }
 

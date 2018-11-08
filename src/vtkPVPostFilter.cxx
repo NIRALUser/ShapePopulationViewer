@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPointDataToCellData.h"
@@ -125,8 +126,8 @@ vtkStandardNewMacro(vtkPVPostFilter);
 //----------------------------------------------------------------------------
 vtkPVPostFilter::vtkPVPostFilter()
 {
-  vtkPVPostFilterExecutive* exec = vtkPVPostFilterExecutive::New();
-  this->SetExecutive(exec);
+  vtkNew<vtkPVPostFilterExecutive> exec;
+  this->SetExecutive(exec.GetPointer());
   //exec->FastDelete();
 
   this->SetNumberOfInputPorts(1);
@@ -213,11 +214,7 @@ int vtkPVPostFilter::RequestDataObject(
       if (!output || !output->IsA(input->GetClassName()))
         {
         vtkDataObject* newOutput = input->NewInstance();
-        #if (VTK_MAJOR_VERSION < 6)
-        newOutput->SetPipelineInformation(info);
-        #else
         info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
-        #endif
         newOutput->Delete();
         }
       }
@@ -396,11 +393,7 @@ void vtkPVPostFilter::CellDataToPointData(vtkDataSet* output)
   clone->ShallowCopy(output);
 
   vtkCellDataToPointData *converter = vtkCellDataToPointData::New();
-  #if (VTK_MAJOR_VERSION < 6)
-  converter->SetInput(clone);
-  #else
   converter->SetInputData(clone);
-  #endif
   converter->PassCellDataOn();
   converter->Update();
   output->ShallowCopy(converter->GetOutputDataObject(0));
@@ -415,11 +408,7 @@ void vtkPVPostFilter::PointDataToCellData(vtkDataSet* output)
   clone->ShallowCopy(output);
 
   vtkPointDataToCellData *converter = vtkPointDataToCellData::New();
-  #if (VTK_MAJOR_VERSION < 6)
-  converter->SetInput(clone);
-  #else
   converter->SetInputData(clone);
-  #endif
   converter->PassPointDataOn();
   converter->Update();
   output->ShallowCopy(converter->GetOutputDataObject(0));

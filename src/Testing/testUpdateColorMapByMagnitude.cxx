@@ -16,7 +16,7 @@ bool TestShapePopulationBase::testUpdateColorMapByMagnitude(std::string filename
     for(int i = 0; i < nbMesh; i++)
     {
         shapePopulationBase->m_selectedIndex.push_back(i);
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
         shapePopulationBase->m_meshList[i]->GetPolyData()->GetPointData()->SetActiveScalars(cmap);
     }
 
@@ -70,10 +70,9 @@ bool TestShapePopulationBase::testUpdateColorMapByMagnitude(std::string filename
     {
         vtkActorCollection * actors = shapePopulationBase->m_windowsList[shapePopulationBase->m_selectedIndex[i]]->GetRenderers()->GetFirstRenderer()->GetActors();
         actors->InitTraversal();
-        vtkSmartPointer<vtkMapper> mapper = actors->GetNextActor()->GetMapper();
+        vtkMapper* mapper = actors->GetNextActor()->GetMapper();
         vtkScalarsToColors* scalarsToColors = mapper->GetLookupTable();
-        vtkSmartPointer<vtkColorTransferFunction> DistanceMapTFunc = vtkSmartPointer<vtkColorTransferFunction>::New();
-        DistanceMapTFunc = (vtkColorTransferFunction *)scalarsToColors;
+        vtkColorTransferFunction* DistanceMapTFunc = vtkColorTransferFunction::SafeDownCast(scalarsToColors);
         double range = fabs(shapePopulationBase->m_usedColorBar->range[1] - shapePopulationBase->m_usedColorBar->range[0]);
         for (unsigned int j = 0; j < shapePopulationBase->m_usedColorBar->colorPointList.size(); j++)
         {

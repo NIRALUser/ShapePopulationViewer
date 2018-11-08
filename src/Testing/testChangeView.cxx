@@ -11,7 +11,7 @@ bool TestShapePopulationBase::testChangeView(std::string filename)
 {
     QSharedPointer<ShapePopulationBase> shapePopulationBase = QSharedPointer<ShapePopulationBase>( new ShapePopulationBase );
     shapePopulationBase->m_windowsList.clear();
-    shapePopulationBase->CreateNewWindow(filename);
+    shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
 
     shapePopulationBase->m_selectedIndex.clear();
     shapePopulationBase->m_selectedIndex.push_back(0);
@@ -37,8 +37,7 @@ bool TestShapePopulationBase::testChangeView(std::string filename)
         shapePopulationBase->ChangeView(view[i][0],view[i][1],view[i][2],view[i][3],view[i][4],view[i][5]);
 
         // Test if the result obtained is correct
-        vtkSmartPointer<vtkRenderer> firstRenderer = vtkSmartPointer<vtkRenderer>::New();
-        firstRenderer = shapePopulationBase->m_windowsList[0]->GetRenderers()->GetFirstRenderer();
+        vtkRenderer* firstRenderer = shapePopulationBase->m_windowsList[0]->GetRenderers()->GetFirstRenderer();
         double* coords = firstRenderer->GetActiveCamera()->GetFocalPoint();
         double distance = firstRenderer->GetActiveCamera()->GetDistance();
         double* viewUp = firstRenderer->GetActiveCamera()->GetViewUp();

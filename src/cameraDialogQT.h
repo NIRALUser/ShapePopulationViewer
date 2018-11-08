@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <sstream>
 
-#include "cameraConfigStruct.h"
+#include "ShapePopulationStruct.h"
 
 namespace Ui {
 class cameraDialogQT;

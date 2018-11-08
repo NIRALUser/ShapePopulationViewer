@@ -15,17 +15,16 @@ bool TestShapePopulationBase::testDisplayColorbar(std::string filename)
     shapePopulationBase->m_windowsList.clear();
     for(int i = 0; i < nbMesh; i++)
     {
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
         shapePopulationBase->m_displayColorMapByMagnitude.push_back(true);
         shapePopulationBase->m_displayVectorsByMagnitude.push_back(true);
     }
 
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         if(!scalarBar->GetVisibility()) return 1;
     }
 
@@ -41,10 +40,9 @@ bool TestShapePopulationBase::testDisplayColorbar(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         if(scalarBar->GetVisibility()) return 1;
     }
 
@@ -66,10 +64,9 @@ bool TestShapePopulationBase::testDisplayColorbar(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         if(scalarBar->GetVisibility()) return 1;
     }
 
@@ -90,10 +87,9 @@ bool TestShapePopulationBase::testDisplayColorbar(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         if(!scalarBar->GetVisibility()) return 1;
     }
     /// TEST 4.
@@ -108,10 +104,9 @@ bool TestShapePopulationBase::testDisplayColorbar(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         if(scalarBar->GetVisibility()) return 1;
     }
 
@@ -132,10 +127,9 @@ bool TestShapePopulationBase::testDisplayColorbar(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
         if(!scalarBar->GetVisibility()) return 1;
     }
 

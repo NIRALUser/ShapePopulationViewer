@@ -199,7 +199,7 @@ void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
     CSVreader->SetFileName(file.absoluteFilePath().toStdString().c_str());
     CSVreader->SetHaveHeaders(true);
     CSVreader->Update();
-    vtkSmartPointer<vtkTable> table = CSVreader->GetOutput();
+    vtkTable* table = CSVreader->GetOutput();
 
     //Display in CSVloaderQT
     m_CSVloaderDialog->displayTable(table,file.absoluteDir());
@@ -310,7 +310,7 @@ void ShapePopulationQT::loadCSV()
     CSVreader->SetFileName(filename.toStdString().c_str());
     CSVreader->SetHaveHeaders(true);
     CSVreader->Update();
-    vtkSmartPointer<vtkTable> table = CSVreader->GetOutput();
+    vtkTable* table = CSVreader->GetOutput();
 
     //Display in CSVloaderQT
     m_CSVloaderDialog->displayTable(table,file.absoluteDir());
@@ -933,22 +933,19 @@ void ShapePopulationQT::CreateWidgets()
 {
     this->scrollArea->setVisible(false);
 
-    /* VTK WINDOWS */
     for (int i = m_numberOfMeshes; i < m_fileList.size(); i++)
     {
+        /* VTK WINDOW */
         //get filepath and fileNames
         QByteArray path = m_fileList[i].absoluteFilePath().toLatin1();
         const char *filePath = path.data();
+        vtkRenderWindow* renderWindow = CreateNewWindow(filePath);
+        renderWindow->SetInteractor(NULL);
 
-        CreateNewWindow(filePath);
-    }
-
-    /* QT WIDGETS */
-    for (int i = m_numberOfMeshes; i < m_fileList.size(); i++)
-    {
+        /* QT WIDGET */
         VTKWidgetType *meshWidget = new VTKWidgetType(this->scrollAreaWidgetContents);
         m_widgetList.push_back(meshWidget);
-        meshWidget->GetRenderWindow()->AddRenderer(m_windowsList.at(i)->GetRenderers()->GetFirstRenderer());
+        meshWidget->SetRenderWindow(renderWindow);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::LeftButtonPressEvent, this, &ShapePopulationQT::ClickEvent);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::KeyPressEvent, this, &ShapePopulationBase::KeyPressEventVTK);
         meshWidget->GetInteractor()->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::CameraChangedEventVTK);
@@ -1162,9 +1159,8 @@ void ShapePopulationQT::CreateWidgets()
 void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long notUseduLong, void* notUsedVoid)
 {
     //Get the interactor used
-    vtkSmartPointer<QVTKInteractor> selectedInteractor = vtkSmartPointer<QVTKInteractor>::New();
-    selectedInteractor = (QVTKInteractor*)a_selectedObject;
-    vtkSmartPointer<vtkRenderWindow> selectedWindow = selectedInteractor->GetRenderWindow();
+    QVTKInteractor* selectedInteractor = QVTKInteractor::SafeDownCast(a_selectedObject);
+    vtkRenderWindow* selectedWindow = selectedInteractor->GetRenderWindow();
     unsigned int index = getSelectedIndex(selectedWindow);
 
     //if the renderwindow already is in the renderselectedWindows...
@@ -1593,7 +1589,7 @@ void ShapePopulationQT::on_radioButton_DISPLAY_square_toggled()
     resizeWidgetInArea();
 }
 
-void ShapePopulationQT::on_spinBox_DISPLAY_columns_valueChanged()
+void ShapePopulationQT::on_spinBox_DISPLAY_columns_valueChanged(int)
 {
     if(m_numberOfMeshes == 0) return;
     this->scrollArea->setVisible(false);
@@ -1680,7 +1676,7 @@ void ShapePopulationQT::on_toolButton_VIEW_S_clicked() {ChangeView(0,0,1,0,1,0);
 
 void ShapePopulationQT::on_toolButton_VIEW_I_clicked() {ChangeView(0,0,-1,0,1,0);}
 
-void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged()
+void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged(int)
 {
     // Get Attribute in ComboBox
     int alignment = this->comboBox_alignment->currentIndex();
@@ -1695,7 +1691,7 @@ void ShapePopulationQT::on_comboBox_alignment_currentIndexChanged()
 // *                                     ATTRIBUTES COLORMAP                                       * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
-void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged()
+void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged(int)
 {
     if(m_selectedIndex.size() == 0 || m_updateOnAttributeChanged == false) return;
 
@@ -2139,7 +2135,7 @@ void ShapePopulationQT::updateInfo_QT()
 
         //Infos
         unsigned int index = m_selectedIndex[0];
-        vtkSmartPointer<vtkPolyData> selectedData = m_meshList[index]->GetPolyData();
+        vtkPolyData* selectedData = m_meshList[index]->GetPolyData();
 
         this->lineEdit_filename->setText(QString(m_meshList[index]->GetFileName().c_str()));
         this->lineEdit_dir->setText(QString(m_meshList[index]->GetFileDir().c_str()));

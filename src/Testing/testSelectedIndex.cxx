@@ -21,13 +21,12 @@ bool TestShapePopulationBase::testSelectedIndex(std::string filename)
     for(int i = 0; i < nbMesh; i++)
     {
         shapePopulationBase->m_selectedIndex.push_back(i);
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
     }
 
-    vtkSmartPointer<vtkRenderWindow> selectedWindow = vtkSmartPointer<vtkRenderWindow>::New();
     for(int i = 0; i < nbMesh; i++)
     {
-        selectedWindow = shapePopulationBase->m_windowsList[shapePopulationBase->m_selectedIndex[i]];
+        vtkRenderWindow* selectedWindow = shapePopulationBase->m_windowsList[shapePopulationBase->m_selectedIndex[i]];
 
         // Call of the function that must be test
         unsigned int index = shapePopulationBase->getSelectedIndex(selectedWindow);

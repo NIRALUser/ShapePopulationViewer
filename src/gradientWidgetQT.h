@@ -32,10 +32,8 @@
 #include <QMessageBox>
 #include <sstream>
 
-// solution includes
 #include "gradientArrow.h"
-#include "colorPointStruct.h"
-
+#include "ShapePopulationStruct.h"
 
 class gradientWidgetQT : public QWidget
 {

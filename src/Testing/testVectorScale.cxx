@@ -16,7 +16,7 @@ bool TestShapePopulationBase::testVectorScale(std::string filename)
     shapePopulationBase->m_vectorScale.push_back(0);
     shapePopulationBase->m_displayVectorsByDirection.push_back(false);
     shapePopulationBase->m_windowsList.clear();
-    shapePopulationBase->CreateNewWindow(filename);
+    shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
 
     // Call of the function that must be test
     shapePopulationBase->setVectorScale(50);

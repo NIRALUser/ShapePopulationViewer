@@ -1,6 +1,10 @@
 #include "customizeColorMapByDirectionDialogQT.h"
 #include "ui_customizeColorMapByDirectionDialogQT.h"
 
+#include "ShapePopulationBase.h"
+
+#include <vtkGenericOpenGLRenderWindow.h>
+
 customizeColorMapByDirectionDialogQT::customizeColorMapByDirectionDialogQT(QWidget *Qparent) :
     QDialog(Qparent),
     ui(new Ui::customizeColorMapByDirectionDialogQT)
@@ -68,21 +72,13 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
         translation->Scale(0.35, 0.35, 0.35);
 
         vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-#if (VTK_MAJOR_VERSION < 6)
-        transformFilter->SetInputConnection(arrow->GetProducerPort());
-#else
         transformFilter->SetInputData(arrow->GetOutput());
-#endif
         transformFilter->SetTransform(translation);
         transformFilter->Update();
 
         //mapper of the arrow
         vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-#if (VTK_MAJOR_VERSION < 6)
-        mapper->SetInputConnection(transformFilter->GetOutputPort());
-#else
         mapper->SetInputData(transformFilter->GetOutput());
-#endif
 
         // color of axis and label
         double colorAxis[3];
@@ -117,8 +113,13 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
     if(m_complementaryColor == true) ui->radioButton_complementaryColor->click();
 
     /// VISUALIZATION
-    vtkRenderer * renderer = vtkRenderer::New();
-    vtkRenderWindow *renderWindow = vtkRenderWindow::New();
+    vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
+#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+    vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+#else
+    vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+#endif
+
     renderWindow->AddRenderer(renderer);
 
     // Add the actors to the renderer

@@ -15,15 +15,14 @@ bool TestShapePopulationBase::testDisplayMeshName(std::string filename)
     shapePopulationBase->m_windowsList.clear();
     for(int i = 0; i < nbMesh; i++)
     {
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
     }
 
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkCornerAnnotation* cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
         if(!cornerAnnotation->GetVisibility()) return 1;
     }
 
@@ -37,10 +36,9 @@ bool TestShapePopulationBase::testDisplayMeshName(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkCornerAnnotation* cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
         if(cornerAnnotation->GetVisibility()) return 1;
     }
 
@@ -54,10 +52,9 @@ bool TestShapePopulationBase::testDisplayMeshName(std::string filename)
     // Test if the result obtained is correct:
     for(int i = 0; i < nbMesh; i++)
     {
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[i]->GetRenderers()->GetFirstRenderer()->GetViewProps();
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        vtkCornerAnnotation* cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
         if(!cornerAnnotation->GetVisibility()) return 1;
     }
 

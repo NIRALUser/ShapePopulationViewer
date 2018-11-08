@@ -14,7 +14,7 @@ bool TestShapePopulationBase::testLabelColor(std::string filename)
     shapePopulationBase->m_selectedIndex.clear();
     shapePopulationBase->m_selectedIndex.push_back(0);
     shapePopulationBase->m_windowsList.clear();
-    shapePopulationBase->CreateNewWindow(filename);
+    shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
 
     shapePopulationBase->m_displayColorMapByDirection.push_back(false);
     shapePopulationBase->m_displayVectorsByDirection.push_back(false);
@@ -37,13 +37,12 @@ bool TestShapePopulationBase::testLabelColor(std::string filename)
         shapePopulationBase->setLabelColor(labelColor[i]);
 
         // Test if the result obtained is correct:
-        vtkSmartPointer<vtkPropCollection> propCollection =  shapePopulationBase->m_windowsList[0]->GetRenderers()->GetFirstRenderer()->GetViewProps();
+        vtkPropCollection* propCollection =  shapePopulationBase->m_windowsList[0]->GetRenderers()->GetFirstRenderer()->GetViewProps();
 
         double meshNameColor[3];
         vtkObject * viewPropObject = propCollection->GetItemAsObject(2);
-        vtkSmartPointer<vtkCornerAnnotation> cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
-        vtkSmartPointer<vtkTextProperty> cornerProperty = cornerAnnotation->GetTextProperty();
+        vtkCornerAnnotation* cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
+        vtkTextProperty* cornerProperty = cornerAnnotation->GetTextProperty();
         cornerProperty->GetColor(meshNameColor);
         if(meshNameColor[0] != labelColor[i][0] || meshNameColor[1] != labelColor[i][1] || meshNameColor[2] != labelColor[i][2])
         {
@@ -52,8 +51,7 @@ bool TestShapePopulationBase::testLabelColor(std::string filename)
 
         double attributeNameColor[3];
         viewPropObject = propCollection->GetItemAsObject(3);
-        cornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
-        cornerAnnotation = (vtkCornerAnnotation*) viewPropObject;
+        cornerAnnotation = vtkCornerAnnotation::SafeDownCast(viewPropObject);
         cornerProperty = cornerAnnotation->GetTextProperty();
         cornerProperty->GetColor(attributeNameColor);
         if(attributeNameColor[0] != labelColor[i][0] || attributeNameColor[1] != labelColor[i][1] || attributeNameColor[2] != labelColor[i][2])
@@ -63,9 +61,8 @@ bool TestShapePopulationBase::testLabelColor(std::string filename)
 
         double scalarColor[3];
         viewPropObject = propCollection->GetItemAsObject(4);
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
-        scalarBar = (vtkScalarBarActor*)viewPropObject;
-        vtkSmartPointer<vtkTextProperty> labelProperty = scalarBar->GetLabelTextProperty();
+        vtkScalarBarActor* scalarBar = vtkScalarBarActor::SafeDownCast(viewPropObject);
+        vtkTextProperty* labelProperty = scalarBar->GetLabelTextProperty();
         labelProperty->GetColor(scalarColor);
         if(scalarColor[0] != labelColor[i][0] || scalarColor[1] != labelColor[i][1] || scalarColor[2] != labelColor[i][2])
         {

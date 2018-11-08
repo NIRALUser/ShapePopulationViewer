@@ -57,8 +57,7 @@ bool TestShapePopulationBase::testCreationSphereActor(std::string filename)
     vtkSmartPointer<vtkPolyDataReader> meshReader = vtkSmartPointer<vtkPolyDataReader>::New();
     meshReader->SetFileName(filename.c_str());
     meshReader->Update();
-    vtkSmartPointer<vtkPolyData> SpherePolyData = vtkSmartPointer<vtkPolyData>::New();
-    SpherePolyData = meshReader->GetOutput();
+    vtkPolyData* SpherePolyData = meshReader->GetOutput();
 
     for( int i = 0; i < nbTest; i++)
     {
@@ -70,17 +69,14 @@ bool TestShapePopulationBase::testCreationSphereActor(std::string filename)
         actorSphere.TakeReference(shapePopulationBase->creationSphereActor());
 
         // Test if the result obtained is correct
-        vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-        polyData = (vtkPolyData* )actorSphere->GetMapper()->GetInput();
+        vtkPolyData* polyData = vtkPolyData::SafeDownCast(actorSphere->GetMapper()->GetInput());
         vtkIdType numPts1 = polyData->GetNumberOfPoints();
-        vtkDoubleArray* map1 = vtkDoubleArray::New();
-        map1 = (vtkDoubleArray*)polyData->GetPointData()->GetArray("ColorByDirection");
+        vtkDataArray* map1 = polyData->GetPointData()->GetArray("ColorByDirection");
         int nb1 = polyData->GetPointData()->GetArray("ColorByDirection")->GetNumberOfComponents();
 
 
         vtkIdType numPts2 = SpherePolyData->GetNumberOfPoints();
-        vtkDoubleArray* map2 = vtkDoubleArray::New();
-        map2 = (vtkDoubleArray*)SpherePolyData->GetPointData()->GetArray(colormap[i]);
+        vtkDataArray* map2 = SpherePolyData->GetPointData()->GetArray(colormap[i]);
         int nb2 = SpherePolyData->GetPointData()->GetArray(colormap[i])->GetNumberOfComponents();
 
         if(numPts1 != numPts2) return 1;

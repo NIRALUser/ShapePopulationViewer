@@ -26,7 +26,7 @@ bool TestShapePopulationBase::testUpdateColorMapByDirection(std::string filename
     for(int i = 0; i < nbTest; i++)
     {
         shapePopulationBase->m_selectedIndex.push_back(i);
-        shapePopulationBase->CreateNewWindow(filename);
+        shapePopulationBase->CreateNewWindow(filename, /* testing = */ true);
     }
 
     /// TEST BY CHANGING THE COLOR OF THE MAIN AXIS ///
@@ -118,29 +118,25 @@ bool TestShapePopulationBase::testUpdateColorMapByDirection(std::string filename
     shapePopulationBase->UpdateColorMapByDirection("PointToPointVector",0);
 
     // Test if the result obtained is correct:
-    vtkSmartPointer<vtkPolyData> polyData1 = vtkSmartPointer<vtkPolyData>::New();
-    polyData1 = shapePopulationBase->m_meshList[0]->GetPolyData();
+    vtkPolyData* polyData1 = shapePopulationBase->m_meshList[0]->GetPolyData();
     vtkIdType numPts1 = polyData1->GetNumberOfPoints();
-    vtkDoubleArray* map1 = vtkDoubleArray::New();
 
     // Recover of data to make a comparison
     vtkSmartPointer<vtkPolyDataReader> meshReader = vtkSmartPointer<vtkPolyDataReader>::New();
     meshReader->SetFileName(filenameExpectedResult.c_str());
     meshReader->Update();
-    vtkSmartPointer<vtkPolyData> polyData2 = vtkSmartPointer<vtkPolyData>::New();
-    polyData2 = meshReader->GetOutput();
+    vtkPolyData* polyData2 = meshReader->GetOutput();
     vtkIdType numPts2 = polyData2->GetNumberOfPoints();
-    vtkDoubleArray* map2 = vtkDoubleArray::New();
 
     if( numPts1 != numPts2 ) return 1;
 
     for( unsigned int i = 0; i < shapePopulationBase->m_selectedIndex.size(); i++)
     {
         polyData1 = shapePopulationBase->m_meshList[shapePopulationBase->m_selectedIndex[i]]->GetPolyData();
-        map1 = (vtkDoubleArray*)polyData1->GetPointData()->GetArray(strs_dir.str().c_str());
+        vtkDataArray* map1 = polyData1->GetPointData()->GetArray(strs_dir.str().c_str());
         int nb1 = polyData1->GetPointData()->GetArray(strs_dir.str().c_str())->GetNumberOfComponents();
 
-        map2 = (vtkDoubleArray*)polyData2->GetPointData()->GetArray(colormap[i]);
+        vtkDataArray* map2 = polyData2->GetPointData()->GetArray(colormap[i]);
         int nb2 = polyData2->GetPointData()->GetArray(colormap[i])->GetNumberOfComponents();
 
         if(nb1 != nb2) return 1;
@@ -193,11 +189,11 @@ bool TestShapePopulationBase::testUpdateColorMapByDirection(std::string filename
 
         // Test if the result obtained is correct:
         polyData1 = shapePopulationBase->m_meshList[3]->GetPolyData();
-        map1 = (vtkDoubleArray*)polyData1->GetPointData()->GetArray(strs_dir.str().c_str());
+        vtkDataArray* map1 = polyData1->GetPointData()->GetArray(strs_dir.str().c_str());
         int nb1 = polyData1->GetPointData()->GetArray(strs_dir.str().c_str())->GetNumberOfComponents();
 
-            // Recover of data to make a comparison
-        map2 = (vtkDoubleArray*)polyData2->GetPointData()->GetArray(colormap[i]);
+        // Recover of data to make a comparison
+        vtkDataArray* map2 = polyData2->GetPointData()->GetArray(colormap[i]);
         int nb2 = polyData2->GetPointData()->GetArray(colormap[i])->GetNumberOfComponents();
 
         if(nb1 != nb2) return 1;

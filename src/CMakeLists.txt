@@ -13,13 +13,47 @@ if( ${index} EQUAL -1)
   add_definitions("-DSPV_EXTENSION=1")
 endif()
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationBase.h.in ${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationBase.h)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationBase.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/ShapePopulationBase.h
+  )
 
 # --- SRCS --------------------------------------------------------------------------------
-file(GLOB CXX_FILES *.cxx)
-file(GLOB UI_FILES *.ui)
-file(GLOB QT_WRAP *QT.h)
-file(GLOB QT_QRC_FILES *.qrc)
+set(CXX_FILES
+  backgroundDialogQT.cxx
+  cameraDialogQT.cxx
+  CSVloaderQT.cxx
+  customizeColorMapByDirectionDialogQT.cxx
+  gradientArrow.cxx
+  gradientWidgetQT.cxx
+  ShapePopulationBase.cxx
+  ShapePopulationData.cxx
+  ShapePopulationQT.cxx
+  ShapePopulationViewer.cxx
+  vtkPVPostFilter.cxx
+  vtkPVPostFilterExecutive.cxx
+  )
+
+set(UI_FILES
+  backgroundDialogQT.ui
+  cameraDialogQT.ui
+  CSVloaderQT.ui
+  customizeColorMapByDirectionDialogQT.ui
+  ShapePopulationQT.ui
+  )
+
+set(QT_WRAP
+  backgroundDialogQT.h
+  cameraDialogQT.h
+  CSVloaderQT.h
+  customizeColorMapByDirectionDialogQT.h
+  gradientWidgetQT.h
+  ShapePopulationQT.h
+  )
+
+set(QT_QRC_FILES
+  ShapePopulationViewer.qrc
+  )
 
 if(ShapePopulationViewer_QT_VERSION VERSION_EQUAL "4")
   QT4_WRAP_UI(UISrcs ${UI_FILES})

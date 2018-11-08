@@ -15,9 +15,13 @@
 // QT
 #include <QMainWindow>
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
-#include <QVTKOpenGLWidget.h>
+# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
+#  include <QVTKOpenGLNativeWidget.h>
+# else
+#  include <QVTKOpenGLWidget.h>
+# endif
 #else
-#include <QVTKWidget.h>
+# include <QVTKWidget.h>
 #endif
 #include <QFileDialog>              //Open directory/files
 #include <QFileInfo>                //Use Files
@@ -66,7 +70,11 @@ protected:
     QString m_pathSphere;
     QFileInfoList m_fileList;
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
+    typedef QVTKOpenGLNativeWidget VTKWidgetType;
+# else
     typedef QVTKOpenGLWidget VTKWidgetType;
+# endif
 #else
     typedef QVTKWidget VTKWidgetType;
 #endif
@@ -130,7 +138,7 @@ protected:
     //DISPLAY
     void on_radioButton_DISPLAY_all_toggled();
     void on_radioButton_DISPLAY_square_toggled();
-    void on_spinBox_DISPLAY_columns_valueChanged();
+    void on_spinBox_DISPLAY_columns_valueChanged(int value = -1);
     void on_checkBox_displayColorbar_toggled(bool checked);
     void on_checkBox_displayAttribute_toggled(bool checked);
     void on_checkBox_displayMeshName_toggled(bool checked);
@@ -151,7 +159,7 @@ protected:
     void on_toolButton_VIEW_S_clicked();
     void on_toolButton_VIEW_I_clicked();
     void on_pushButton_VIEW_reset_clicked();
-    void on_comboBox_alignment_currentIndexChanged();
+    void on_comboBox_alignment_currentIndexChanged(int value = -1);
 
     //BACKGROUND CONFIG
     void slot_selectedColor_valueChanged(QColor color);
@@ -179,7 +187,7 @@ protected:
     void slot_newCameraConfig(cameraConfigStruct cam);
 
     //COLORMAP
-    void on_comboBox_VISU_attribute_currentIndexChanged();
+    void on_comboBox_VISU_attribute_currentIndexChanged(int value = -1);
     // range
     void on_spinBox_VISU_min_valueChanged(double min);
     void on_spinBox_VISU_max_valueChanged(double max);

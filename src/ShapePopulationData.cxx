@@ -43,11 +43,7 @@ void ShapePopulationData::ReadMesh(std::string a_filePath)
     if(polyData == NULL) return;
 
     vtkSmartPointer<vtkPolyDataNormals> normalGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
-#if (VTK_MAJOR_VERSION < 6)
-    normalGenerator->SetInput(polyData);
-#else
     normalGenerator->SetInputData(polyData);
-#endif
     normalGenerator->SplittingOff();
     normalGenerator->ComputePointNormalsOn();
     normalGenerator->ComputeCellNormalsOff();
