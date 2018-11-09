@@ -19,8 +19,6 @@ if(NOT USE_GIT_PROTOCOL_${CMAKE_PROJECT_NAME})
   set(git_protocol "http")
 endif()
 
-set(${PROJECT_NAME}_BUILD_DICOM_SUPPORT OFF)
-
 find_package(Git REQUIRED)
 
 #-----------------------------------------------------------------------------

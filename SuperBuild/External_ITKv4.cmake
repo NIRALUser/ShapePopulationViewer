@@ -39,9 +39,6 @@ endif()
 
 # Set dependency list
 set(${proj}_DEPENDENCIES "")
-if(${PROJECT_NAME}_BUILD_DICOM_SUPPORT)
-  list(APPEND ${proj}_DEPENDENCIES "")
-endif()
 
 # Include dependent projects if any
 SlicerMacroCheckExternalProjectDependency(${proj})
@@ -58,51 +55,6 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
       -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
   endif()
 
-  ### --- Project specific additions here
-  set(${proj}_DCMTK_ARGS)
-  if(${PROJECT_NAME}_BUILD_DICOM_SUPPORT)
-    set(${proj}_DCMTK_ARGS
-      -DITK_USE_SYSTEM_DCMTK:BOOL=ON
-      -DDCMTK_DIR:PATH=${DCMTK_DIR}
-      -DModule_ITKDCMTK:BOOL=ON
-      -DModule_ITKIODCMTK:BOOL=ON
-      )
-  endif()
-
-  if(${PROJECT_NAME}_BUILD_FFTWF_SUPPORT)
-    set(${proj}_FFTWF_ARGS
-      -DITK_USE_FFTWF:BOOL=ON
-      )
-  endif()
-  if(${PROJECT_NAME}_BUILD_FFTWD_SUPPORT)
-    set(${proj}_FFTWD_ARGS
-      -DITK_USE_FFTWD:BOOL=ON
-      )
-  endif()
-
-  set(${proj}_WRAP_ARGS)
-  #if(foo)
-    #set(${proj}_WRAP_ARGS
-    #  -DINSTALL_WRAP_ITK_COMPATIBILITY:BOOL=OFF
-    #  -DWRAP_float:BOOL=ON
-    #  -DWRAP_unsigned_char:BOOL=ON
-    #  -DWRAP_signed_short:BOOL=ON
-    #  -DWRAP_unsigned_short:BOOL=ON
-    #  -DWRAP_complex_float:BOOL=ON
-    #  -DWRAP_vector_float:BOOL=ON
-    #  -DWRAP_covariant_vector_float:BOOL=ON
-    #  -DWRAP_rgb_signed_short:BOOL=ON
-    #  -DWRAP_rgb_unsigned_char:BOOL=ON
-    #  -DWRAP_rgb_unsigned_short:BOOL=ON
-    #  -DWRAP_ITK_TCL:BOOL=OFF
-    #  -DWRAP_ITK_JAVA:BOOL=OFF
-    #  -DWRAP_ITK_PYTHON:BOOL=ON
-    #  -DPYTHON_EXECUTABLE:PATH=${${CMAKE_PROJECT_NAME}_PYTHON_EXECUTABLE}
-    #  -DPYTHON_INCLUDE_DIR:PATH=${${CMAKE_PROJECT_NAME}_PYTHON_INCLUDE}
-    #  -DPYTHON_LIBRARY:FILEPATH=${${CMAKE_PROJECT_NAME}_PYTHON_LIBRARY}
-    #  )
-  #endif()
-
   # HACK This code fixes a loony problem with HDF5 -- it doesn't
   #      link properly if -fopenmp is used.
   string(REPLACE "-fopenmp" "" ITK_CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
@@ -118,16 +70,11 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
       #-DITK_INSTALL_NO_DEVELOPMENT:BOOL=ON
       -DKWSYS_USE_MD5:BOOL=ON # Required by SlicerExecutionModel
       -DITK_WRAPPING:BOOL=OFF #${BUILD_SHARED_LIBS} ## HACK:  QUICK CHANGE
-      -DITK_USE_SYSTEM_DCMTK:BOOL=${${PROJECT_NAME}_BUILD_DICOM_SUPPORT}
+      -DITK_USE_SYSTEM_DCMTK:BOOL=OFF
       -DITK_USE_SYSTEM_TIFF:BOOL=OFF
       -DITK_USE_SYSTEM_JPEG:BOOL=OFF
       -DITK_USE_SYSTEM_ZLIB:BOOL=OFF
       -DITK_BUILD_DEFAULT_MODULES:BOOL=ON
-
-      ${${proj}_DCMTK_ARGS}
-      ${${proj}_WRAP_ARGS}
-      ${${proj}_FFTWF_ARGS}
-      ${${proj}_FFTWD_ARGS}
     )
   ### --- End Project specific additions
   set(${proj}_REPOSITORY ${git_protocol}://itk.org/ITK.git)

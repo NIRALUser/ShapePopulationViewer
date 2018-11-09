@@ -28,10 +28,6 @@ set(${extProjName}_REQUIRED_VERSION "7.0")
 
 # Set dependency list
 set(${proj}_DEPENDENCIES "")
-set(${PROJECT_NAME}_USE_PYTHONQT OFF)
-if (${PROJECT_NAME}_USE_PYTHONQT)
-  list(APPEND ${proj}_DEPENDENCIES python)
-endif()
 
 # Include dependent projects if any
 SlicerMacroCheckExternalProjectDependency(${proj})
@@ -50,24 +46,6 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
   endif()
 
   ### --- Project specific additions here
-  set(VTK_WRAP_TCL OFF)
-  set(VTK_WRAP_PYTHON OFF)
-
-  if (${PROJECT_NAME}_USE_PYTHONQT)
-    set(VTK_WRAP_PYTHON ON)
-  endif()
-
-  set(VTK_PYTHON_ARGS
-      -DPYTHON_EXECUTABLE:PATH=${PYTHON_EXECUTABLE}
-      -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
-      -DPYTHON_LIBRARIES:FILEPATH=${PYTHON_LIBRARIES}
-      )
-  if(${PROJECT_NAME}_USE_PYTHONQT)
-    list(APPEND VTK_PYTHON_ARGS
-      -DVTK_INSTALL_PYTHON_USING_CMAKE:BOOL=ON
-      )
-  endif()
-
   # if(USE_VTKv6)
     list(APPEND EXTERNAL_PROJECT_OPTIONAL_ARGS
         -DVTK_Group_Qt:BOOL=ON
@@ -107,12 +85,10 @@ if(NOT ( DEFINED "USE_SYSTEM_${extProjName}" AND "${USE_SYSTEM_${extProjName}}" 
       -DVTK_USE_GL2PS:BOOL=ON
       -DVTK_DEBUG_LEAKS:BOOL=${${PROJECT_NAME}_USE_VTK_DEBUG_LEAKS}
       -DVTK_LEGACY_REMOVE:BOOL=OFF
-      -DVTK_WRAP_TCL:BOOL=${VTK_WRAP_TCL}
+      -DVTK_WRAP_TCL:BOOL=OFF
       #-DVTK_USE_RPATH:BOOL=ON # Unused
-      ${VTK_TCL_ARGS}
-      -DVTK_WRAP_PYTHON:BOOL=${VTK_WRAP_PYTHON}
+      -DVTK_WRAP_PYTHON:BOOL=OFF
       -DVTK_INSTALL_LIB_DIR:PATH=${${PROJECT_NAME}_INSTALL_LIB_DIR}
-      ${VTK_PYTHON_ARGS}
       ${EXTERNAL_PROJECT_OPTIONAL_ARGS}
     )
   ### --- End Project specific additions
