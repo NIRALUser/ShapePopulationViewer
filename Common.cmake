@@ -67,16 +67,6 @@ SETIFEMPTY(CMAKE_INSTALL_ARCHIVE_DESTINATION lib)
 SETIFEMPTY(CMAKE_INSTALL_RUNTIME_DESTINATION bin)
 
 #-------------------------------------------------------------------------
-SETIFEMPTY(DTIPrepTools_CLI_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-SETIFEMPTY(DTIPrepTools_CLI_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
-SETIFEMPTY(DTIPrepTools_CLI_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-
-#-------------------------------------------------------------------------
-SETIFEMPTY(DTIPrepTools_CLI_INSTALL_LIBRARY_DESTINATION ${CMAKE_INSTALL_LIBRARY_DESTINATION})
-SETIFEMPTY(DTIPrepTools_CLI_INSTALL_ARCHIVE_DESTINATION ${CMAKE_INSTALL_ARCHIVE_DESTINATION})
-SETIFEMPTY(DTIPrepTools_CLI_INSTALL_RUNTIME_DESTINATION ${CMAKE_INSTALL_RUNTIME_DESTINATION})
-
-#-------------------------------------------------------------------------
 # Augment compiler flags
 #-------------------------------------------------------------------------
 include(ITKSetStandardCompilerFlags)
