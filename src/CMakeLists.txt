@@ -1,14 +1,6 @@
-# --- cmake -------------------------------------------------------------------------------
-cmake_minimum_required(VERSION 3.5)
 
 # --- INCLUDES ----------------------------------------------------------------------------
-find_package(SlicerExecutionModel REQUIRED)
-include(${SlicerExecutionModel_USE_FILE})
-
-find_package(VTK REQUIRED )
-include(${VTK_USE_FILE})
 string(FIND "${VTK_MODULES_ENABLED}" "GL2PS" index)
-
 if( ${index} EQUAL -1)
   add_definitions("-DSPV_EXTENSION=1")
 endif()
@@ -89,10 +81,6 @@ SEMMacroBuildCLI(
 
 
 # --- CTest -------------------------------------------------------------------------------
-#set(BUILD_TESTING ON CACHE BOOL "Build, configure and copy testing files")
-
 if( BUILD_TESTING )
   ADD_SUBDIRECTORY(Testing)
 endif()
-
-

@@ -1,88 +1,67 @@
-if( NOT EXTERNAL_SOURCE_DIRECTORY )
-  set( EXTERNAL_SOURCE_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/ExternalSources )
-endif()
-if( NOT EXTERNAL_BINARY_DIRECTORY )
-  set( EXTERNAL_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
-endif()
 
-# Make sure this file is included only once
-get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
-if(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED)
-  return()
-endif()
-set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
-
-# Include dependent projects if any
-set(extProjName SlicerExecutionModel) #The find_package known name
-set(proj ${extProjName})              #This local name
-
-#if(${USE_SYSTEM_${extProjName}})
-#  unset(${extProjName}_DIR CACHE)
-#endif()
-
-# Sanity checks
-if(DEFINED ${extProjName}_DIR AND NOT EXISTS ${${extProjName}_DIR})
-  message(FATAL_ERROR "${extProjName}_DIR variable is defined but corresponds to non-existing directory (${${extProjName}_DIR})")
-endif()
+set(proj SlicerExecutionModel)
 
 # Set dependency list
 set(${proj}_DEPENDENCIES ITK)
 
-SlicerMacroCheckExternalProjectDependency(${proj})
+# Include dependent projects if any
+ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
-if(NOT DEFINED ${extProjName}_DIR AND NOT ${USE_SYSTEM_${extProjName}})
+if(ShapePopulationViewer_USE_SYSTEM_${proj})
+  message(FATAL_ERROR "Enabling ShapePopulationViewer_USE_SYSTEM_${proj} is not supported !")
+endif()
 
-  # Set CMake OSX variable to pass down the external project
-  set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
-  if(APPLE)
-    list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
-      -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
-      -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
-  endif()
-  ### --- Project specific additions here
-  set(${proj}_CMAKE_OPTIONS
-      -DITK_DIR:PATH=${ITK_DIR}
+# Sanity checks
+if(DEFINED SlicerExecutionModel_DIR AND NOT EXISTS ${SlicerExecutionModel_DIR})
+  message(FATAL_ERROR "SlicerExecutionModel_DIR variable is defined but corresponds to nonexistent directory")
+endif()
+
+if(NOT DEFINED SlicerExecutionModel_DIR AND NOT ShapePopulationViewer_USE_SYSTEM_${proj})
+
+  ExternalProject_SetIfNotDefined(
+    ShapePopulationViewer_${proj}_GIT_REPOSITORY
+    "${EP_GIT_PROTOCOL}://github.com/Slicer/SlicerExecutionModel.git"
+    QUIET
     )
-  ### --- End Project specific additions
-  set(${proj}_REPOSITORY "${git_protocol}://github.com/Slicer/SlicerExecutionModel.git")
-  set(${proj}_GIT_TAG 18cdc5a9d489f381acd7666668efa8d57ef08e47)
+
+  ExternalProject_SetIfNotDefined(
+    ShapePopulationViewer_${proj}_GIT_TAG
+    "0dee798848bacf26d6d4c0fc5f5397d72c1a202b"
+    QUIET
+    )
+
+  set(EP_SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj})
+  set(EP_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
+
   ExternalProject_Add(${proj}
-    GIT_REPOSITORY ${${proj}_REPOSITORY}
-    GIT_TAG ${${proj}_GIT_TAG}
-    SOURCE_DIR ${EXTERNAL_SOURCE_DIRECTORY}/${proj}
-    BINARY_DIR ${EXTERNAL_BINARY_DIRECTORY}/${proj}-build
-    LOG_CONFIGURE 0  # Wrap configure in script to ignore log output from dashboards
-    LOG_BUILD     0  # Wrap build in script to to ignore log output from dashboards
-    LOG_TEST      0  # Wrap test in script to to ignore log output from dashboards
-    LOG_INSTALL   0  # Wrap install in script to to ignore log output from dashboards
-    ${cmakeversion_external_update} "${cmakeversion_external_update_value}"
-    CMAKE_GENERATOR ${gen}
-    CMAKE_ARGS
-      -Wno-dev
-      --no-warn-unused-cli
-      ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-      ${COMMON_EXTERNAL_PROJECT_ARGS}
-      -DBUILD_EXAMPLES:BOOL=OFF
+    ${${proj}_EP_ARGS}
+    GIT_REPOSITORY "${ShapePopulationViewer_${proj}_GIT_REPOSITORY}"
+    GIT_TAG "${ShapePopulationViewer_${proj}_GIT_TAG}"
+    SOURCE_DIR ${EP_SOURCE_DIR}
+    BINARY_DIR ${EP_BINARY_DIR}
+    CMAKE_CACHE_ARGS
+      # Compiler settings
+      -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+      -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+      -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+      -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} # Unused
+      -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+      -DCMAKE_CXX_STANDARD_REQUIRED:BOOL=${CMAKE_CXX_STANDARD_REQUIRED}
+      -DCMAKE_CXX_EXTENSIONS:BOOL=${CMAKE_CXX_EXTENSIONS}
+      # Options
       -DBUILD_TESTING:BOOL=OFF
-      ${${proj}_CMAKE_OPTIONS}
+      -DITK_DIR:PATH=${ITK_DIR}
     INSTALL_COMMAND ""
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
-  set(${extProjName}_DIR ${EXTERNAL_BINARY_DIRECTORY}/${proj}-build)
+
+  set(SlicerExecutionModel_DIR ${EP_BINARY_DIR})
+
 else()
-  if(${USE_SYSTEM_${extProjName}})
-    find_package(${extProjName} REQUIRED)
-    if(NOT ${extProjName}_DIR)
-      message(FATAL_ERROR "To use the system ${extProjName}, set ${extProjName}_DIR")
-    endif()
-    message("USING the system ${extProjName}, set ${extProjName}_DIR=${${extProjName}_DIR}")
-  endif()
-  # The project is provided using ${extProjName}_DIR, nevertheless since other
-  # project may depend on ${extProjName}v4, let's add an 'empty' one
-  SlicerMacroEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
+  ExternalProject_Add_Empty(${proj} DEPENDS ${${proj}_DEPENDENCIES})
 endif()
 
-list(APPEND ${CMAKE_PROJECT_NAME}_SUPERBUILD_EP_VARS ${extProjName}_DIR:PATH)
-
+mark_as_superbuild(
+  VARS SlicerExecutionModel_DIR:PATH
+  )
