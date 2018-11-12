@@ -22,9 +22,6 @@ option(BUILD_TESTING "tests" ON)
 
 set(PRIMARY_PROJECT_NAME ${LOCAL_PROJECT_NAME})
 
-option(INSTALL_DEVELOPMENT_${LOCAL_PROJECT_NAME} "Install development support include and libraries for external packages." OFF)
-mark_as_advanced(INSTALL_DEVELOPMENT_${LOCAL_PROJECT_NAME})
-
 #-----------------------------------------------------------------------------
 # Sanity checks
 #------------------------------------------------------------------------------
