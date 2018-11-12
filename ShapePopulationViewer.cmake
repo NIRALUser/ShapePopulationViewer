@@ -67,7 +67,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( BUILD_TESTING )
+if( ShapePopulationViewer_BUILD_TESTING )
   include(CTest)
   include(ExternalData)
 endif()

@@ -18,7 +18,10 @@ endif()
 #-----------------------------------------------------------------------------
 # Build option(s)
 #-----------------------------------------------------------------------------
-option(BUILD_TESTING "tests" ON)
+if(NOT DEFINED ShapePopulationViewer_BUILD_TESTING)
+  option(BUILD_TESTING "tests" ON)
+  set(ShapePopulationViewer_BUILD_TESTING ${BUILD_TESTING})
+endif()
 
 set(PRIMARY_PROJECT_NAME ${LOCAL_PROJECT_NAME})
 

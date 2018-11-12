@@ -132,6 +132,6 @@ SEMMacroBuildCLI(
 endif()
 
 # --- CTest -------------------------------------------------------------------------------
-if( BUILD_TESTING )
+if( ShapePopulationViewer_BUILD_TESTING )
   ADD_SUBDIRECTORY(Testing)
 endif()
