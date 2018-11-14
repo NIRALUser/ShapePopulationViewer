@@ -51,10 +51,9 @@ void ShapePopulationData::ReadMesh(std::string a_filePath)
 
     //Update the class members
     m_PolyData = normalGenerator->GetOutput();
-    m_FilePath = a_filePath;
-    size_t found = m_FilePath.find_last_of("/\\");
-    m_FileDir = m_FilePath.substr(0,found);
-    m_FileName = m_FilePath.substr(found+1);
+    size_t found = a_filePath.find_last_of("/\\");
+    m_FileDir = a_filePath.substr(0,found);
+    m_FileName = a_filePath.substr(found+1);
 
     int numAttributes = m_PolyData->GetPointData()->GetNumberOfArrays();
     for (int j = 0; j < numAttributes; j++)
