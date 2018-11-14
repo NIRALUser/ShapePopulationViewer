@@ -67,7 +67,6 @@ protected:
     QString m_colormapDirectory;
     QString m_exportDirectory;
     QString m_pathSphere;
-    QFileInfoList m_fileList;
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
 # ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
     typedef QVTKOpenGLNativeWidget VTKWidgetType;
@@ -83,7 +82,7 @@ protected:
     CSVloaderQT * m_CSVloaderDialog;
     customizeColorMapByDirectionDialogQT* m_customizeColorMapByDirectionDialog;
 
-    void CreateWidgets();
+    void CreateWidgets(const QFileInfoList& files);
 
 
     //SELECTION

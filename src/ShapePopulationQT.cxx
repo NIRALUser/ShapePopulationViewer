@@ -188,9 +188,7 @@ void ShapePopulationQT::on_pushButton_displayTools_clicked()
 
 void ShapePopulationQT::loadVTKFilesCLP(QFileInfoList a_fileList)
 {
-    //m_fileList.append(file);                      // Add to filelist
-    m_fileList.append(a_fileList);
-    if(!m_fileList.isEmpty()) this->CreateWidgets();    // Display widgets
+    this->CreateWidgets(a_fileList);
 }
 
 void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
@@ -210,21 +208,20 @@ void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
 void ShapePopulationQT::loadVTKDirCLP(QDir vtkDir)
 {
     //Add to fileList
-    m_fileList.append(vtkDir.entryInfoList());
+    QFileInfoList fileInfos;
 
-    // Control the files format
-    for (int i = 0; i < m_fileList.size(); i++)
+    //Control the files format
+    foreach(const QFileInfo& fileInfo, vtkDir.entryInfoList())
     {
-        QString QFilePath = m_fileList.at(i).canonicalFilePath();
-        if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp"))
+        QString filePath = fileInfo.canonicalFilePath();
+        if (filePath.endsWith(".vtk") || filePath.endsWith(".vtp"))
         {
-            m_fileList.removeAt(i);
-            i--;
+            fileInfos.append(fileInfo);
         }
     }
 
-    // Display widgets
-    if(!m_fileList.isEmpty()) this->CreateWidgets();
+    //Display widgets
+    this->CreateWidgets(fileInfos);
 }
 
 void ShapePopulationQT::loadColorMapCLP(std::string a_filePath)
@@ -246,29 +243,14 @@ void ShapePopulationQT::loadCameraCLP(std::string a_filePath)
 
 void ShapePopulationQT::openDirectory()
 {
-
     // get directory
     QString dir = QFileDialog::getExistingDirectory(this,tr("Open Directory"),m_lastDirectory,QFileDialog::ShowDirsOnly);
     if(dir.isEmpty() || !QDir(dir).exists()) return;
 
     // Add files in the fileList
     m_lastDirectory = dir;
-    QDir vtkDir(dir);
-    m_fileList.append(vtkDir.entryInfoList());
 
-    // Control the files format
-    for (int i = 0; i < m_fileList.size(); i++)
-    {
-        QString QFilePath = m_fileList.at(i).canonicalFilePath();
-        if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp"))
-        {
-            m_fileList.removeAt(i);
-            i--;
-        }
-    }
-
-    // Display widgets
-    if(!m_fileList.isEmpty()) this->CreateWidgets();
+    this->loadVTKDirCLP(QDir(m_lastDirectory));
 }
 
 
@@ -282,17 +264,17 @@ void ShapePopulationQT::openFiles()
 
     m_lastDirectory=QFileInfo(stringList.at(0)).path();
 
-    for(int i=0; i < stringList.size(); i++)
+    //Add to fileList
+    QFileInfoList fileInfos;
+
+    //Control the files format
+    foreach(const QString& filePath, stringList)
     {
-        if(QFileInfo(stringList.at(i)).exists())
-            this->m_fileList.append(QFileInfo(stringList.at(i)));
+        fileInfos.append(QFileInfo(filePath));
     }
 
-    // Display widgets
-    if(!m_fileList.isEmpty())
-    {
-        this->CreateWidgets();
-    }
+    //Display widgets
+    this->CreateWidgets(fileInfos);
 }
 
 
@@ -322,14 +304,8 @@ void ShapePopulationQT::loadCSV()
 
 void ShapePopulationQT::slot_itemsSelected(QFileInfoList fileList)
 {
-    // Add files from CSV loader
-    for (int i = 0; i < fileList.size(); i++)
-    {
-        m_fileList.append(fileList[i]);
-    }
-
     // Display widgets
-    if(!m_fileList.isEmpty()) this->CreateWidgets();
+    if(!fileList.isEmpty()) this->CreateWidgets(fileList);
 }
 
 void ShapePopulationQT::deleteAll()
@@ -357,7 +333,6 @@ void ShapePopulationQT::deleteAll()
     actionLoad_CSV->setText("Load CSV File");
 
     //Empty the meshes FileInfo List
-    m_fileList.clear();
     m_meshList.clear();
     m_glyphList.clear();
     m_selectedIndex.clear();
@@ -404,8 +379,6 @@ void ShapePopulationQT::deleteSelection()
             {
                 if( j == m_selectedIndex[i])
                 {
-                    m_fileList.removeAt(j);
-
                     delete m_meshList.at(j);
                     m_meshList.erase(m_meshList.begin()+j);
                     m_glyphList.erase(m_glyphList.begin()+j);
@@ -439,7 +412,7 @@ void ShapePopulationQT::deleteSelection()
             }
         }
 
-        m_numberOfMeshes = m_fileList.size();
+        m_numberOfMeshes = m_widgetList.size();
         spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
 
         m_noUpdateVectorsByDirection = true;
@@ -931,15 +904,19 @@ void ShapePopulationQT::showCustomizeColorMapByDirectionConfigWindow()
 // *                                       CREATE WIDGETS                                          * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
-void ShapePopulationQT::CreateWidgets()
+void ShapePopulationQT::CreateWidgets(const QFileInfoList& files)
 {
+    if (files.empty())
+    {
+        return;
+    }
     this->scrollArea->setVisible(false);
 
-    for (int i = m_numberOfMeshes; i < m_fileList.size(); i++)
+    for (int i = m_numberOfMeshes; i < files.size(); i++)
     {
         /* VTK WINDOW */
         //get filepath and fileNames
-        QByteArray path = m_fileList[i].absoluteFilePath().toLatin1();
+        QByteArray path = files[i].absoluteFilePath().toLatin1();
         const char *filePath = path.data();
         vtkRenderWindow* renderWindow = CreateNewWindow(filePath);
         renderWindow->SetInteractor(NULL);
@@ -1077,7 +1054,7 @@ void ShapePopulationQT::CreateWidgets()
     this->setVectorScale((double)this->spinbox_vectorScale->value()/100.0);
     this->setVectorDensity(this->spinbox_arrowDens->value());
 
-    m_numberOfMeshes = m_fileList.size();
+    m_numberOfMeshes = files.size();
     spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
 
     /* CHECK ALIGNMENT */
