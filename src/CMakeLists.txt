@@ -6,8 +6,8 @@ if( ${index} EQUAL -1)
 endif()
 
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationBase.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/ShapePopulationBase.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/ShapePopulationViewerConfig.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/ShapePopulationViewerConfig.h
   )
 
 # --- SRCS --------------------------------------------------------------------------------

@@ -1,0 +1,7 @@
+#ifndef SlicerShapePopulationViewerConfig_h
+#define SlicerShapePopulationViewerConfig_h
+
+#cmakedefine ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
+#cmakedefine ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
+
+#endif
