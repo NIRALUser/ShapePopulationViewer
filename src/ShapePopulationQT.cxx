@@ -1881,8 +1881,8 @@ void ShapePopulationQT::on_spinBox_VISU_min_valueChanged(double min)
         }
         m_usedColorBar->range[0] = min;
         this->updateColorbar_QT();
+        this->updateArrowPosition();
     }
-    this->updateArrowPosition();
 }
 
 void ShapePopulationQT::on_spinBox_VISU_max_valueChanged(double max)
