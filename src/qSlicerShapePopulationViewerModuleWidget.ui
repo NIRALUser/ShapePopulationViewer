@@ -60,11 +60,21 @@
     </widget>
    </item>
    <item>
-    <widget class="ctkCollapsibleButton" name="SettingsCTKCollapsibleButton" native="true">
-     <property name="text" stdset="0">
+    <widget class="ctkCollapsibleButton" name="SettingsCTKCollapsibleButton">
+     <property name="text">
       <string>Settings</string>
      </property>
      <layout class="QVBoxLayout" name="SettingsLayout">
+      <item>
+       <widget class="QCheckBox" name="ModelAutomaticLoadingCheckBox">
+        <property name="text">
+         <string>Automatically load models</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

@@ -48,6 +48,10 @@ public slots:
     void loadSelectedModel();
     void loadModel(vtkMRMLModelNode* modelNode);
 
+protected slots:
+    void onMRMLSceneNodeAddedEvent(vtkObject*,vtkObject*);
+    void onMRMLNodeModified(vtkObject*);
+
 protected:
     QScopedPointer<qSlicerShapePopulationViewerModuleWidgetPrivate> d_ptr;
 

@@ -112,6 +112,9 @@ void qSlicerShapePopulationViewerModuleWidget::enter()
     // Force redraw
     d->ShapePopulationWidget->setVisible(false);
     d->ShapePopulationWidget->setVisible(true);
+
+    this->qvtkConnect(this->mrmlScene(), vtkMRMLScene::NodeAddedEvent,
+                      this, SLOT(onMRMLSceneNodeAddedEvent(vtkObject*, vtkObject*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -135,6 +138,8 @@ void qSlicerShapePopulationViewerModuleWidget::exit()
     // Restore DataProbe visibility
     QWidget* dataProbeCollapsibleWidget = app->mainWindow()->findChild<QWidget*>("DataProbeCollapsibleWidget");
     dataProbeCollapsibleWidget->setVisible(d->WasDataProbeVisible);
+
+    this->qvtkDisconnectAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -206,4 +211,37 @@ void qSlicerShapePopulationViewerModuleWidget::loadModel(vtkMRMLModelNode* model
 {
     Q_D(qSlicerShapePopulationViewerModuleWidget);
     d->ShapePopulationWidget->loadModel(modelNode);
+}
+
+//-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::onMRMLSceneNodeAddedEvent(vtkObject *vtkNotUsed(caller), vtkObject *callData)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    vtkMRMLModelNode * modelNode = vtkMRMLModelNode::SafeDownCast(callData);
+    if (modelNode == NULL)
+        {
+        return;
+        }
+    if (!d->ModelAutomaticLoadingCheckBox->isChecked())
+    {
+        return;
+    }
+    qvtkConnect(modelNode, vtkCommand::ModifiedEvent, this, SLOT(onMRMLNodeModified(vtkObject*)));
+}
+
+//-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::onMRMLNodeModified(vtkObject *caller)
+{
+
+    vtkMRMLModelNode * modelNode = vtkMRMLModelNode::SafeDownCast(caller);
+    if (modelNode == NULL)
+    {
+        return;
+    }
+    if (modelNode->GetStorageNode() == NULL)
+    {
+        return;
+    }
+    this->loadModel(modelNode);
+    qvtkDisconnect(modelNode, vtkCommand::ModifiedEvent, this, SLOT(onMRMLNodeModified(vtkObject*)));
 }
