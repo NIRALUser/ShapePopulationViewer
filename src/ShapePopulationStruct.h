@@ -33,6 +33,15 @@ struct cameraConfigStruct
 
 struct colorPointStruct
 {
+    colorPointStruct()
+        : pos(0.), r(0.), g(0.), b(0.)
+    {
+    }
+    colorPointStruct(double _pos, double _r, double _g, double _b)
+        : pos(_pos), r(_r), g(_g), b(_b)
+    {
+    }
+
     double pos;
     double r;
     double g;

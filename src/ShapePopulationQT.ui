@@ -789,7 +789,7 @@
                    </item>
                   </layout>
                  </widget>
-                 <widget class="gradientWidgetQT" name="gradientWidget_VISU" native="true">
+                 <widget class="ShapePopulationGradientWidgetQT" name="gradientWidget_VISU" native="true">
                   <property name="geometry">
                    <rect>
                     <x>0</x>
@@ -1714,9 +1714,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>gradientWidgetQT</class>
+   <class>ShapePopulationGradientWidgetQT</class>
    <extends>QWidget</extends>
-   <header>gradientWidgetQT.h</header>
+   <header>ShapePopulationGradientWidgetQT.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

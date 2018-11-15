@@ -27,6 +27,7 @@ set(CXX_FILES
   ShapePopulationBase.cxx
   ShapePopulationColorMapIO.cxx
   ShapePopulationData.cxx
+  ShapePopulationGradientWidgetQT.cxx
   ShapePopulationMainWindowQT.cxx
   ShapePopulationQT.cxx
   vtkPVPostFilter.cxx
@@ -48,6 +49,7 @@ set(QT_WRAP
   CSVloaderQT.h
   customizeColorMapByDirectionDialogQT.h
   gradientWidgetQT.h
+  ShapePopulationGradientWidgetQT.h
   ShapePopulationMainWindowQT.h
   ShapePopulationQT.h
   )
@@ -59,7 +61,11 @@ set(QT_QRC_FILES
 # --- LIBRARIES ---------------------------------------------------------------------------
 if(ShapePopulationViewer_QT_VERSION VERSION_EQUAL "4")
   QT4_WRAP_UI(UISrcs ${UI_FILES})
-  QT4_WRAP_CPP(MOCSrcs ${QT_WRAP})
+  set(_moc_options)
+  if(ShapePopulationViewer_BUILD_SLICER_EXTENSION)
+    set(_moc_options OPTIONS -DShapePopulationViewer_BUILD_SLICER_EXTENSION)
+  endif()
+  QT4_WRAP_CPP(MOCSrcs ${QT_WRAP} ${_moc_options})
   QT4_ADD_RESOURCES(QRCrcs ${QT_QRC_FILES})
 else()
   QT5_WRAP_UI(UISrcs ${UI_FILES})
@@ -75,6 +81,7 @@ add_library(${LOCAL_PROJECT_NAME}Widget STATIC
 target_link_libraries(${LOCAL_PROJECT_NAME}Widget PUBLIC
   ${QT_LIBRARIES}
   ${VTK_LIBRARIES}
+  $<$<BOOL:${ShapePopulationViewer_BUILD_SLICER_EXTENSION}>:CTKVisualizationVTKWidgets>
   )
 
 if(ShapePopulationViewer_BUILD_SLICER_EXTENSION)
