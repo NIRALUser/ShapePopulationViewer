@@ -4,5 +4,6 @@
 #cmakedefine ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
 #cmakedefine ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
 #cmakedefine ShapePopulationViewer_BUILD_SLICER_EXTENSION
+#cmakedefine ShapePopulationViewer_HAS_EXPORT_SUPPORT
 
 #endif

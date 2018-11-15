@@ -30,7 +30,7 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
             << actionTo_PDF << actionTo_PS << actionTo_EPS << actionTo_TEX << actionTo_SVG)
     {
         m_exportActions->addAction(action);
-#ifdef SPV_EXTENSION
+#ifndef ShapePopulationViewer_HAS_EXPORT_SUPPORT
         action->setText(action->text() + QString(" (Not Available)"));
 #endif
     }
@@ -93,7 +93,7 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
     connect(pushButton_customizeColorMapByDirection,SIGNAL(clicked()),this,SLOT(showCustomizeColorMapByDirectionConfigWindow()));
     connect(actionLoad_Colorbar,SIGNAL(triggered()),this,SLOT(loadColorMap()));
     connect(actionSave_Colorbar,SIGNAL(triggered()),this,SLOT(saveColorMap()));
-#ifndef SPV_EXTENSION
+#ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
     connect(actionTo_PDF,SIGNAL(triggered()),this,SLOT(exportToPDF()));
     connect(actionTo_PS,SIGNAL(triggered()),this,SLOT(exportToPS()));
     connect(actionTo_EPS,SIGNAL(triggered()),this,SLOT(exportToEPS()));
@@ -2317,7 +2317,7 @@ void ShapePopulationQT::on_radioButton_displayVectorsbyDirection_toggled(bool ch
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                            EXPORT                                             * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-#ifndef SPV_EXTENSION
+#ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
 void ShapePopulationQT::exportToPS()
 {
     if (this->getExportDirectory() == 0) return;

@@ -1,8 +1,14 @@
 
 # --- INCLUDES ----------------------------------------------------------------------------
+set(_msg "Checking for export support")
+message(STATUS "${_msg}")
 string(FIND "${VTK_MODULES_ENABLED}" "GL2PS" index)
 if( ${index} EQUAL -1)
-  add_definitions("-DSPV_EXTENSION=1")
+  set(ShapePopulationViewer_HAS_EXPORT_SUPPORT 0)
+  message(STATUS "${_msg} - no (GL2PS VTK module not enabled)")
+else()
+  set(ShapePopulationViewer_HAS_EXPORT_SUPPORT 1)
+  message(STATUS "${_msg} - yes")
 endif()
 
 configure_file(

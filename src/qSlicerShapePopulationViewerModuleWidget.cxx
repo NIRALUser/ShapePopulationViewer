@@ -184,6 +184,26 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
         d->ActionsLayout->addWidget(button);
     }
 
+    // Export
+#ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
+    bool exportVisible = true;
+    foreach(QAction* action, QList<QAction*>()
+            << d->ShapePopulationWidget->actionTo_PDF
+            << d->ShapePopulationWidget->actionTo_SVG
+            << d->ShapePopulationWidget->actionTo_TEX
+            << d->ShapePopulationWidget->actionTo_PS
+            << d->ShapePopulationWidget->actionTo_EPS
+            )
+    {
+        QToolButton* button = new QToolButton();
+        button->setDefaultAction(action);
+        d->ExportLayout->addWidget(button);
+    }
+#else
+    bool exportVisible = false;
+#endif
+    d->ExportCTKCollapsibleButton->setVisible(exportVisible);
+
     // Settings
     foreach(QAction* action, QList<QAction*>()
             << d->ShapePopulationWidget->actionCameraConfig

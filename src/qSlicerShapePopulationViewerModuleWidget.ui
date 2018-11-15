@@ -60,6 +60,15 @@
     </widget>
    </item>
    <item>
+    <widget class="ctkCollapsibleButton" name="ExportCTKCollapsibleButton">
+     <property name="text">
+      <string>Export</string>
+     </property>
+     <layout class="QHBoxLayout" name="ExportLayout">
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="ctkCollapsibleButton" name="SettingsCTKCollapsibleButton">
      <property name="text">
       <string>Settings</string>

@@ -41,7 +41,7 @@ class QActionGroup;
 
 
 #include <QDebug>
-#ifndef SPV_EXTENSION
+#ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
 #include <vtkGL2PSExporter.h>
 #endif
 
@@ -220,7 +220,7 @@ protected:
     void on_radioButton_displayVectorsbyDirection_toggled(bool checked);
 
     //EXPORT
-#ifndef SPV_EXTENSION
+#ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
     void exportToPDF();
     void exportToPS();
     void exportToEPS();
