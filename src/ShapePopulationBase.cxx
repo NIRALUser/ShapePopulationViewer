@@ -438,7 +438,7 @@ void ShapePopulationBase::RenderSelection()
 void ShapePopulationBase::RealTimeRenderSynchro(bool realtime)
 {
     // Remove observers
-    for (size_t idx = 0; idx < m_windowsListObserverTags.size(); ++idx)
+    for (size_t idx = 0; idx < m_windowsList.size() && idx < m_windowsListObserverTags.size(); ++idx)
       {
       vtkRenderWindow* renderWindow = m_windowsList[idx];
       renderWindow->RemoveObserver(renderWindow->GetCommand(m_windowsListObserverTags[idx]));
