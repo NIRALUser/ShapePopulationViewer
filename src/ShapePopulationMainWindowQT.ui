@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ShapePopulationMainWindowQT</class>
+ <widget class="QMainWindow" name="ShapePopulationMainWindowQT">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1250</width>
+    <height>836</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>ShapePopulationViewer 1.4.0</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="ShapePopulationViewer.qrc">
+    <normaloff>:/resources/logo.png</normaloff>:/resources/logo.png</iconset>
+  </property>
+  <widget class="ShapePopulationQT" name="centralwidget" native="true">
+   <property name="acceptDrops">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1100</width>
+     <height>700</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1250</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export Selection</string>
+     </property>
+    </widget>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuOptions"/>
+   <action name="actionExit">
+    <property name="text">
+     <string>Exit</string>
+    </property>
+   </action>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ShapePopulationQT</class>
+   <extends>QWidget</extends>
+   <header>ShapePopulationQT.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="ShapePopulationViewer.qrc"/>
+ </resources>
+ <connections/>
+</ui>

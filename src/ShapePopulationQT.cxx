@@ -1,8 +1,12 @@
 #include "QVTKInteractor.h"
 #include "ShapePopulationQT.h"
 
+// MRML includes
+#ifdef ShapePopulationViewer_BUILD_SLICER_EXTENSION
+# include <vtkMRMLModelNode.h>
+#endif
 
-ShapePopulationQT::ShapePopulationQT()
+ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
 {
     this->setupUi(this);
 
@@ -20,6 +24,23 @@ ShapePopulationQT::ShapePopulationQT()
     m_backgroundDialog = new backgroundDialogQT(this);
     m_CSVloaderDialog = new CSVloaderQT(this);
     m_customizeColorMapByDirectionDialog = new customizeColorMapByDirectionDialogQT(this);
+    m_exportActions = new QActionGroup(this);
+    m_exportActions->setExclusive(false);
+    foreach(QAction* action, QList<QAction*>()
+            << actionTo_PDF << actionTo_PS << actionTo_EPS << actionTo_TEX << actionTo_SVG)
+    {
+        m_exportActions->addAction(action);
+#ifndef ShapePopulationViewer_HAS_EXPORT_SUPPORT
+        action->setText(action->text() + QString(" (Not Available)"));
+#endif
+    }
+    m_optionsActions = new QActionGroup(this);
+    m_optionsActions->setExclusive(false);
+    foreach(QAction* action, QList<QAction*>()
+            << actionCameraConfig << actionBackgroundConfig << actionLoad_Colorbar << actionSave_Colorbar)
+    {
+        m_optionsActions->addAction(action);
+    }
 
 
     // GUI disable
@@ -27,16 +48,10 @@ ShapePopulationQT::ShapePopulationQT()
     stackedWidget_ColorMapByDirection->hide();
     toolBox->setDisabled(true);
     this->gradientWidget_VISU->disable();
-    menuOptions->setDisabled(true);
+    m_optionsActions->setDisabled(true);
     actionDelete->setDisabled(true);
     actionDelete_All->setDisabled(true);
-    menuExport->setDisabled(true);
-
-#ifdef SPV_EXTENSION
-    menuExport->clear();
-    menuExport->addAction("PDF");
-    connect(menuExport->actions().at(0),SIGNAL(triggered()),this,SLOT(showNoExportWindow()));
-#endif
+    m_exportActions->setDisabled(true);
 
     //Pushbuttons color
     pushButton_VISU_add->setStyleSheet("color: rgb(0, 200, 0)");
@@ -67,7 +82,6 @@ ShapePopulationQT::ShapePopulationQT()
     frame_DISPLAY->setPalette( backgroundColor );
 
     //Menu signals
-    connect(actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
     connect(actionOpen_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
     connect(actionOpen_VTK_Files,SIGNAL(triggered()),this,SLOT(openFiles()));
     connect(actionLoad_CSV,SIGNAL(triggered()),this,SLOT(loadCSV()));
@@ -79,12 +93,14 @@ ShapePopulationQT::ShapePopulationQT()
     connect(pushButton_customizeColorMapByDirection,SIGNAL(clicked()),this,SLOT(showCustomizeColorMapByDirectionConfigWindow()));
     connect(actionLoad_Colorbar,SIGNAL(triggered()),this,SLOT(loadColorMap()));
     connect(actionSave_Colorbar,SIGNAL(triggered()),this,SLOT(saveColorMap()));
-#ifndef SPV_EXTENSION
+#ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
     connect(actionTo_PDF,SIGNAL(triggered()),this,SLOT(exportToPDF()));
     connect(actionTo_PS,SIGNAL(triggered()),this,SLOT(exportToPS()));
     connect(actionTo_EPS,SIGNAL(triggered()),this,SLOT(exportToEPS()));
     connect(actionTo_TEX,SIGNAL(triggered()),this,SLOT(exportToTEX()));
     connect(actionTo_SVG,SIGNAL(triggered()),this,SLOT(exportToSVG()));
+#else
+    connect(m_exportActions,SIGNAL(triggered(QAction*)),this,SLOT(showNoExportWindow()));
 #endif
     //gradView Signals
     connect(gradientWidget_VISU,SIGNAL(arrowMovedSignal(qreal)), this, SLOT(slot_gradArrow_moved(qreal)));
@@ -135,10 +151,6 @@ ShapePopulationQT::ShapePopulationQT()
     //Display
     radioButton_DISPLAY_all->toggle();                          //Display All surfaces,
     radioButton_SYNC_realtime->toggle();
-
-    #if __APPLE__
-    Ui_ShapePopulationQT::menuBar->setNativeMenuBar(false);
-    #endif
 }
 
 
@@ -148,12 +160,6 @@ ShapePopulationQT::~ShapePopulationQT()
     delete m_backgroundDialog;
     delete m_CSVloaderDialog;
     delete m_customizeColorMapByDirectionDialog;
-}
-
-void ShapePopulationQT::slotExit()
-{
-    this->deleteAll();
-    qApp->exit();
 }
 
 void ShapePopulationQT::on_pushButton_displayTools_clicked()
@@ -186,9 +192,25 @@ void ShapePopulationQT::on_pushButton_displayTools_clicked()
 
 void ShapePopulationQT::loadVTKFilesCLP(QFileInfoList a_fileList)
 {
-    //m_fileList.append(file);                      // Add to filelist
-    m_fileList.append(a_fileList);
-    if(!m_fileList.isEmpty()) this->CreateWidgets();    // Display widgets
+    this->CreateWidgets(a_fileList);
+}
+
+void ShapePopulationQT::loadModel(vtkMRMLModelNode* modelNode)
+{
+#ifdef ShapePopulationViewer_BUILD_SLICER_EXTENSION
+    if (modelNode == 0)
+    {
+        return;
+    }
+    QList<vtkRenderWindow*> renderWindows;
+
+    /* VTK WINDOW */
+    renderWindows << CreateNewWindow(modelNode->GetPolyData(), std::string(modelNode->GetName()));
+
+    CreateWidgets(renderWindows);
+#else
+    Q_ASSERT(modelNode);
+#endif
 }
 
 void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
@@ -208,21 +230,20 @@ void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
 void ShapePopulationQT::loadVTKDirCLP(QDir vtkDir)
 {
     //Add to fileList
-    m_fileList.append(vtkDir.entryInfoList());
+    QFileInfoList fileInfos;
 
-    // Control the files format
-    for (int i = 0; i < m_fileList.size(); i++)
+    //Control the files format
+    foreach(const QFileInfo& fileInfo, vtkDir.entryInfoList())
     {
-        QString QFilePath = m_fileList.at(i).canonicalFilePath();
-        if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp"))
+        QString filePath = fileInfo.canonicalFilePath();
+        if (filePath.endsWith(".vtk") || filePath.endsWith(".vtp"))
         {
-            m_fileList.removeAt(i);
-            i--;
+            fileInfos.append(fileInfo);
         }
     }
 
-    // Display widgets
-    if(!m_fileList.isEmpty()) this->CreateWidgets();
+    //Display widgets
+    this->CreateWidgets(fileInfos);
 }
 
 void ShapePopulationQT::loadColorMapCLP(std::string a_filePath)
@@ -244,29 +265,14 @@ void ShapePopulationQT::loadCameraCLP(std::string a_filePath)
 
 void ShapePopulationQT::openDirectory()
 {
-
     // get directory
     QString dir = QFileDialog::getExistingDirectory(this,tr("Open Directory"),m_lastDirectory,QFileDialog::ShowDirsOnly);
     if(dir.isEmpty() || !QDir(dir).exists()) return;
 
     // Add files in the fileList
     m_lastDirectory = dir;
-    QDir vtkDir(dir);
-    m_fileList.append(vtkDir.entryInfoList());
 
-    // Control the files format
-    for (int i = 0; i < m_fileList.size(); i++)
-    {
-        QString QFilePath = m_fileList.at(i).canonicalFilePath();
-        if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp"))
-        {
-            m_fileList.removeAt(i);
-            i--;
-        }
-    }
-
-    // Display widgets
-    if(!m_fileList.isEmpty()) this->CreateWidgets();
+    this->loadVTKDirCLP(QDir(m_lastDirectory));
 }
 
 
@@ -280,17 +286,17 @@ void ShapePopulationQT::openFiles()
 
     m_lastDirectory=QFileInfo(stringList.at(0)).path();
 
-    for(int i=0; i < stringList.size(); i++)
+    //Add to fileList
+    QFileInfoList fileInfos;
+
+    //Control the files format
+    foreach(const QString& filePath, stringList)
     {
-        if(QFileInfo(stringList.at(i)).exists())
-            this->m_fileList.append(QFileInfo(stringList.at(i)));
+        fileInfos.append(QFileInfo(filePath));
     }
 
-    // Display widgets
-    if(!m_fileList.isEmpty())
-    {
-        this->CreateWidgets();
-    }
+    //Display widgets
+    this->CreateWidgets(fileInfos);
 }
 
 
@@ -320,14 +326,8 @@ void ShapePopulationQT::loadCSV()
 
 void ShapePopulationQT::slot_itemsSelected(QFileInfoList fileList)
 {
-    // Add files from CSV loader
-    for (int i = 0; i < fileList.size(); i++)
-    {
-        m_fileList.append(fileList[i]);
-    }
-
     // Display widgets
-    if(!m_fileList.isEmpty()) this->CreateWidgets();
+    if(!fileList.isEmpty()) this->CreateWidgets(fileList);
 }
 
 void ShapePopulationQT::deleteAll()
@@ -346,8 +346,8 @@ void ShapePopulationQT::deleteAll()
     gradientWidget_VISU->disable();
     actionDelete_All->setDisabled(true);
     actionDelete->setDisabled(true);
-    menuExport->setDisabled(true);
-    menuOptions->setDisabled(true);
+    m_exportActions->setDisabled(true);
+    m_optionsActions->setDisabled(true);
 
     //Initialize Menu actions
     actionOpen_Directory->setText("Open Directory");
@@ -355,7 +355,6 @@ void ShapePopulationQT::deleteAll()
     actionLoad_CSV->setText("Load CSV File");
 
     //Empty the meshes FileInfo List
-    m_fileList.clear();
     m_meshList.clear();
     m_glyphList.clear();
     m_selectedIndex.clear();
@@ -402,8 +401,6 @@ void ShapePopulationQT::deleteSelection()
             {
                 if( j == m_selectedIndex[i])
                 {
-                    m_fileList.removeAt(j);
-
                     delete m_meshList.at(j);
                     m_meshList.erase(m_meshList.begin()+j);
                     m_glyphList.erase(m_glyphList.begin()+j);
@@ -437,7 +434,7 @@ void ShapePopulationQT::deleteSelection()
             }
         }
 
-        m_numberOfMeshes = m_fileList.size();
+        m_numberOfMeshes = m_widgetList.size();
         spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
 
         m_noUpdateVectorsByDirection = true;
@@ -929,17 +926,28 @@ void ShapePopulationQT::showCustomizeColorMapByDirectionConfigWindow()
 // *                                       CREATE WIDGETS                                          * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
-void ShapePopulationQT::CreateWidgets()
+void ShapePopulationQT::CreateWidgets(const QFileInfoList& files)
 {
-    this->scrollArea->setVisible(false);
-
-    for (int i = m_numberOfMeshes; i < m_fileList.size(); i++)
+    QList<vtkRenderWindow*> renderWindows;
+    foreach(const QFileInfo& fileInfo, files)
     {
         /* VTK WINDOW */
-        //get filepath and fileNames
-        QByteArray path = m_fileList[i].absoluteFilePath().toLatin1();
-        const char *filePath = path.data();
-        vtkRenderWindow* renderWindow = CreateNewWindow(filePath);
+        renderWindows << CreateNewWindow(fileInfo.absoluteFilePath().toStdString());
+    }
+    CreateWidgets(renderWindows);
+}
+
+void ShapePopulationQT::CreateWidgets(const QList<vtkRenderWindow*>& renderWindows, bool removeExistingWidgets)
+{
+    if (renderWindows.empty())
+    {
+        return;
+    }
+    this->scrollArea->setVisible(false);
+
+    foreach(vtkRenderWindow* renderWindow, renderWindows)
+    {
+        /* VTK WINDOW */
         renderWindow->SetInteractor(NULL);
 
         /* QT WIDGET */
@@ -954,7 +962,10 @@ void ShapePopulationQT::CreateWidgets()
     }
 
     /* WINDOWS */
-    m_windowsList.clear();
+    if (removeExistingWidgets)
+    {
+        m_windowsList.clear();
+    }
     for (unsigned int i = 0; i < m_widgetList.size(); i++)
     {
         m_windowsList.push_back(m_widgetList.at(i)->GetRenderWindow());
@@ -1075,7 +1086,7 @@ void ShapePopulationQT::CreateWidgets()
     this->setVectorScale((double)this->spinbox_vectorScale->value()/100.0);
     this->setVectorDensity(this->spinbox_arrowDens->value());
 
-    m_numberOfMeshes = m_fileList.size();
+    m_numberOfMeshes = m_widgetList.size();
     spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
 
     /* CHECK ALIGNMENT */
@@ -1124,10 +1135,10 @@ void ShapePopulationQT::CreateWidgets()
     /* */
 
     this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
-    this->menuOptions->setEnabled(true);
+    this->m_optionsActions->setEnabled(true);
     this->actionDelete->setEnabled(true);
     this->actionDelete_All->setEnabled(true);
-    this->menuExport->setEnabled(true);
+    this->m_exportActions->setEnabled(true);
     this->actionOpen_Directory->setText("Add Directory");
     this->actionOpen_VTK_Files->setText("Add VTK/VTP files");
     this->actionLoad_CSV->setText("Add CSV file");
@@ -1172,12 +1183,11 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
     /* VTK SELECTION */
     ShapePopulationBase::ClickEvent(a_selectedObject,notUseduLong,notUsedVoid);
 
-
     if(m_selectedIndex.size() == 0)
     {
         /* DISABLE GUI ACTIONS */
         this->actionDelete->setDisabled(true);
-        this->menuExport->setDisabled(true);
+        this->m_exportActions->setDisabled(true);
         this->groupBox_VIEW->setDisabled(true);
         this->groupBox_VISU->setDisabled(true);
         this->gradientWidget_VISU->disable();
@@ -1187,7 +1197,7 @@ void ShapePopulationQT::ClickEvent(vtkObject* a_selectedObject, unsigned long no
     {
         /* ENABLE GUI ACTIONS */
         this->actionDelete->setEnabled(true);
-        this->menuExport->setEnabled(true);
+        this->m_exportActions->setEnabled(true);
         this->groupBox_VIEW->setEnabled(true);
         this->groupBox_VISU->setEnabled(true);
 
@@ -1374,7 +1384,7 @@ void ShapePopulationQT::SelectAll()
 
     /* ENABLE GUI ACTIONS */
     this->actionDelete->setEnabled(true);
-    this->menuExport->setEnabled(true);
+    this->m_exportActions->setEnabled(true);
     this->groupBox_VIEW->setEnabled(true);
     this->groupBox_VISU->setEnabled(true);
     this->gradientWidget_VISU->enable(&m_usedColorBar->colorPointList);
@@ -1411,7 +1421,7 @@ void ShapePopulationQT::UnselectAll()
 
     /* DISABLE GUI ACTIONS */
     this->actionDelete->setDisabled(true);
-    this->menuExport->setDisabled(true);
+    this->m_exportActions->setDisabled(true);
     this->groupBox_VIEW->setDisabled(true);
     this->groupBox_VISU->setDisabled(true);
     this->gradientWidget_VISU->disable();
@@ -1511,7 +1521,7 @@ void ShapePopulationQT::on_tabWidget_currentChanged(int index)
 void ShapePopulationQT::resizeEvent(QResizeEvent *Qevent)
 {
     //Resizing Windows
-    QMainWindow::resizeEvent(Qevent);
+    QWidget::resizeEvent(Qevent);
 
     //According to the View Options
     if (this->radioButton_DISPLAY_square->isChecked() == true )//view square meshes
@@ -2307,7 +2317,7 @@ void ShapePopulationQT::on_radioButton_displayVectorsbyDirection_toggled(bool ch
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                            EXPORT                                             * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
-#ifndef SPV_EXTENSION
+#ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
 void ShapePopulationQT::exportToPS()
 {
     if (this->getExportDirectory() == 0) return;

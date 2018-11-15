@@ -20,7 +20,7 @@ link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Test 1 of creationSphereActor in the class ShapePopulationBase
 add_executable(TestCreationSphereActor mainTestCreationSphere.cxx testCreationSphere.cxx)
-target_link_libraries(TestCreationSphereActor ShapePopulationViewerLib)
+target_link_libraries(TestCreationSphereActor ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_CreationSphereActor
@@ -29,7 +29,7 @@ ExternalData_add_test(
 
 # Test 2 of ChangeView in the class ShapePopulationBase
 add_executable(TestChangeView mainTestChangeView.cxx testChangeView.cxx)
-target_link_libraries(TestChangeView ShapePopulationViewerLib)
+target_link_libraries(TestChangeView ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_ChangeView
@@ -38,7 +38,7 @@ ExternalData_add_test(
 
 # Test 3 of setMeshOpacity in the class ShapePopulationBase
 add_executable(TestMeshOpacity mainTestMeshOpacity.cxx testMeshOpacity.cxx)
-target_link_libraries(TestMeshOpacity ShapePopulationViewerLib)
+target_link_libraries(TestMeshOpacity ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setMeshOpacity
@@ -47,7 +47,7 @@ ExternalData_add_test(
 
 # Test 4 of setVectorScale in the class ShapePopulationBase
 add_executable(TestVectorScale mainTestVectorScale.cxx testVectorScale.cxx)
-target_link_libraries(TestVectorScale ShapePopulationViewerLib)
+target_link_libraries(TestVectorScale ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setVectorScale
@@ -56,7 +56,7 @@ ExternalData_add_test(
 
 # Test 5 of computeCommonRange in the class ShapePopulationBase
 add_executable(TestComputeCommonRange mainTestComputeCommonRange.cxx testComputeCommonRange.cxx)
-target_link_libraries(TestComputeCommonRange ShapePopulationViewerLib)
+target_link_libraries(TestComputeCommonRange ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_computeCommonRange
@@ -65,7 +65,7 @@ ExternalData_add_test(
 
 # Test 6 of UpdateColorMapByDirection in the class ShapePopulationBase
 add_executable(TestUpdateColorMapByDirection mainTestUpdateColorMapByDirection.cxx testUpdateColorMapByDirection.cxx)
-target_link_libraries(TestUpdateColorMapByDirection ShapePopulationViewerLib)
+target_link_libraries(TestUpdateColorMapByDirection ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_UpdateColorMapByDirection
@@ -74,7 +74,7 @@ ExternalData_add_test(
 
 # Test 7 of setBackgroundSelectedColor in the class ShapePopulationBase
 add_executable(TestBackgroundSelectedColor mainTestBackgroundSelectedColor.cxx testBackgroundSelectedColor.cxx)
-target_link_libraries(TestBackgroundSelectedColor ShapePopulationViewerLib)
+target_link_libraries(TestBackgroundSelectedColor ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setBackgroundSelectedColor
@@ -83,7 +83,7 @@ ExternalData_add_test(
 
 # Test 8 of setLabelColor in the class ShapePopulationBase
 add_executable(TestLabelColor mainTestLabelColor.cxx testLabelColor.cxx)
-target_link_libraries(TestLabelColor ShapePopulationViewerLib)
+target_link_libraries(TestLabelColor ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setLabelColor
@@ -92,7 +92,7 @@ ExternalData_add_test(
 
 # Test 9 of setBackgroundUnselectedColor in the class ShapePopulationBase
 add_executable(TestBackgroundUnselectedColor mainTestBackgroundUnselectedColor.cxx testBackgroundUnselectedColor.cxx)
-target_link_libraries(TestBackgroundUnselectedColor ShapePopulationViewerLib)
+target_link_libraries(TestBackgroundUnselectedColor ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setBackgroundUnselectedColor
@@ -101,7 +101,7 @@ ExternalData_add_test(
 
 # Test 10 of creationSphereWidget in the class ShapePopulationBase
 add_executable(TestCreationSphereWidget mainTestCreationSphereWidget.cxx testCreationSphereWidget.cxx)
-target_link_libraries(TestCreationSphereWidget ShapePopulationViewerLib)
+target_link_libraries(TestCreationSphereWidget ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_creationSphereWidget
@@ -110,7 +110,7 @@ ExternalData_add_test(
 
 # Test 11 of displayColorbar in the class ShapePopulationBase
 add_executable(TestDisplayColorbar mainTestDisplayColorbar.cxx testDisplayColorbar.cxx)
-target_link_libraries(TestDisplayColorbar ShapePopulationViewerLib)
+target_link_libraries(TestDisplayColorbar ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayColorbar
@@ -119,7 +119,7 @@ ExternalData_add_test(
 
 # Test 12 of displayAttribute in the class ShapePopulationBase
 add_executable(TestDisplayAttribute mainTestDisplayAttribute.cxx testDisplayAttribute.cxx)
-target_link_libraries(TestDisplayAttribute ShapePopulationViewerLib)
+target_link_libraries(TestDisplayAttribute ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayAttribute
@@ -128,7 +128,7 @@ ExternalData_add_test(
 
 # Test 13 of displayMeshName in the class ShapePopulationBase
 add_executable(TestDisplayMeshName mainTestDisplayMeshName.cxx testDisplayMeshName.cxx)
-target_link_libraries(TestDisplayMeshName ShapePopulationViewerLib)
+target_link_libraries(TestDisplayMeshName ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayMeshName
@@ -137,7 +137,7 @@ ExternalData_add_test(
 
 # Test 14 of displayVectors in the class ShapePopulationBase
 add_executable(TestDisplayVectors mainTestDisplayVectors.cxx testDisplayVectors.cxx)
-target_link_libraries(TestDisplayVectors ShapePopulationViewerLib)
+target_link_libraries(TestDisplayVectors ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayVectors
@@ -146,7 +146,7 @@ ExternalData_add_test(
 
 # Test 15 of computeCommonAttributes in the class ShapePopulationBase
 add_executable(TestComputeCommonAttributes mainTestComputeCommonAttributes.cxx testComputeCommonAttributes.cxx)
-target_link_libraries(TestComputeCommonAttributes ShapePopulationViewerLib)
+target_link_libraries(TestComputeCommonAttributes ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_computeCommonAttributes
@@ -155,7 +155,7 @@ ExternalData_add_test(
 
 # Test 16 of displayColorMapByMagnitude and displayColorMapByDirection in the class ShapePopulationBase
 add_executable(TestDisplayColorMap mainTestDisplayColorMap.cxx testDisplayColorMap.cxx)
-target_link_libraries(TestDisplayColorMap ShapePopulationViewerLib)
+target_link_libraries(TestDisplayColorMap ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayColorMap
@@ -164,7 +164,7 @@ ExternalData_add_test(
 
 # Test 17 of UpdateAttribute in the class ShapePopulationBase
 add_executable(TestUpdateAttribute mainTestUpdateAttribute.cxx testUpdateAttribute.cxx)
-target_link_libraries(TestUpdateAttribute ShapePopulationViewerLib)
+target_link_libraries(TestUpdateAttribute ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_UpdateAttribute
@@ -173,7 +173,7 @@ ExternalData_add_test(
 
 # Test 18 of UpdateColorMapByMagnitude in the class ShapePopulationBase
 add_executable(TestUpdateColorMapByMagnitude mainTestUpdateColorMapByMagnitude.cxx testUpdateColorMapByMagnitude.cxx)
-target_link_libraries(TestUpdateColorMapByMagnitude ShapePopulationViewerLib)
+target_link_libraries(TestUpdateColorMapByMagnitude ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_UpdateColorMapByMagnitude
@@ -182,7 +182,7 @@ ExternalData_add_test(
 
 # Test 19 of the color mode of vectors in the class ShapePopulationBase
 add_executable(TestVectorsColorMode mainTestVectorsColorMode.cxx testVectorsColorMode.cxx)
-target_link_libraries(TestVectorsColorMode ShapePopulationViewerLib)
+target_link_libraries(TestVectorsColorMode ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_VectorsColorMode
@@ -191,7 +191,7 @@ ExternalData_add_test(
 
 # Test 20 of getSelectedIndex in the class ShapePopulationBase
 add_executable(TestSelectedIndex mainTestSelectedIndex.cxx testSelectedIndex.cxx)
-target_link_libraries(TestSelectedIndex ShapePopulationViewerLib)
+target_link_libraries(TestSelectedIndex ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_getSelectedIndex
@@ -199,9 +199,11 @@ ExternalData_add_test(
 )
 
 # Test for the command --help
-add_test(
-        NAME PrintHelp
-        COMMAND $<TARGET_FILE:ShapePopulationViewer> --help
-)
+if(TARGET ShapePopulationViewer)
+  add_test(
+          NAME PrintHelp
+          COMMAND $<TARGET_FILE:ShapePopulationViewer> --help
+  )
+endif()
 
 ExternalData_Add_Target(MY_DATA)

@@ -5,6 +5,7 @@
 
 #include "ShapePopulationData.h"
 #include "ShapePopulationStruct.h"
+#include "ShapePopulationViewerConfig.h"
 
 #include <vtkCamera.h>                      //Camera
 #include <vtkPolyDataMapper.h>              //Mapper
@@ -35,26 +36,23 @@
 
 #include <set>
 
-#cmakedefine ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
-#cmakedefine ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
-
 class ShapePopulationBase
 {
     friend class TestShapePopulationBase;
 
     public :
-    
+
     ShapePopulationBase();
     ~ShapePopulationBase();
-    
-    
+
+
     void KeyPressEventVTK(vtkObject* a_selectedObject, unsigned long, void*);
     void CameraChangedEventVTK(vtkObject*, unsigned long, void*);
     void StartEventVTK(vtkObject*, unsigned long, void*);
     void EndEventVTK(vtkObject*, unsigned long, void*);
-    
+
     protected :
-    
+
     std::vector<ShapePopulationData *> m_meshList;
     std::vector< vtkSmartPointer<vtkGlyph3D> > m_glyphList;
     std::vector< vtkSmartPointer<vtkRenderWindow> > m_windowsList;
@@ -89,18 +87,20 @@ class ShapePopulationBase
     // Setting \a testing to true means a \a vtkRenderWindow is created
     // instead of \a vtkGenericOpenGLRenderWindow.
     vtkRenderWindow* CreateNewWindow(std::string a_filePath, bool testing = false);
-    
+    vtkRenderWindow* CreateNewWindow(vtkPolyData* a_popyData, std::string a_filePath, bool testing = false);
+    vtkRenderWindow* CreateNewWindow(ShapePopulationData* a_mesh, bool testing = false);
+
     //SELECTION
     unsigned int getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow);
     virtual void ClickEvent(vtkObject* a_selectedObject, unsigned long, void*);
     virtual void SelectAll();
     virtual void UnselectAll();
-    
+
     //RENDERING
     void RenderAll();
     void RenderSelection();
     void RealTimeRenderSynchro(bool realtime);
-    
+
     //COLORMAP
     double m_commonRange[2];
     double m_commonMagnitud[2];
@@ -111,7 +111,7 @@ class ShapePopulationBase
     void displayColorMapByMagnitude(bool display);
     void displayColorMapByDirection(bool display);
     void UpdateColorMapByMagnitude(std::vector<unsigned int> a_windowIndex);
-    
+
     //VECTORS
     void setMeshOpacity(double value);
     void setVectorScale(double value);
@@ -120,7 +120,7 @@ class ShapePopulationBase
     void displayVectorsByMagnitude(bool display);
     void displayVectorsByDirection(bool display);
     void UpdateVectorsByDirection();
-    
+
     //DISPLAY
     void displayColorbar(bool display);
     void displayAttribute(bool display);
@@ -141,7 +141,7 @@ class ShapePopulationBase
     void ChangeView(int R, int A, int S,int x_ViewUp,int y_ViewUp,int z_ViewUp);
     void ResetHeadcam();
     virtual void UpdateCameraConfig();
-    
+
     //BACKGROUND
     double m_selectedColor[3];
     double m_unselectedColor[3];
@@ -149,9 +149,8 @@ class ShapePopulationBase
     void setBackgroundSelectedColor(double a_selectedColor[]);
     void setBackgroundUnselectedColor(double a_unselectedColor[]);
     void setLabelColor(double a_labelColor[]);
-    
+
 };
 
 
 #endif
-

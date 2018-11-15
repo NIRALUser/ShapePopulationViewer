@@ -4,6 +4,7 @@
 // local
 #include "ui_ShapePopulationQT.h"
 #include "ShapePopulationBase.h"
+#include "ShapePopulationViewerConfig.h"
 #include "gradientWidgetQT.h"
 #include "cameraDialogQT.h"
 #include "backgroundDialogQT.h"
@@ -12,8 +13,11 @@
 #include <iostream>
 #include <vtkInteractorStyleTrackballCamera.h>
 
+// MRML includes
+class vtkMRMLModelNode;
+
 // QT
-#include <QMainWindow>
+#include <QWidget>
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
 # ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
 #  include <QVTKOpenGLNativeWidget.h>
@@ -23,6 +27,7 @@
 #else
 # include <QVTKWidget.h>
 #endif
+class QActionGroup;
 #include <QFileDialog>              //Open directory/files
 #include <QFileInfo>                //Use Files
 #include <QKeyEvent>                //KeyPressEvent
@@ -36,25 +41,24 @@
 
 
 #include <QDebug>
-#ifndef SPV_EXTENSION
+#ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
 #include <vtkGL2PSExporter.h>
 #endif
 
-class ShapePopulationQT : public QMainWindow, public Ui::ShapePopulationQT, public ShapePopulationBase
+class ShapePopulationQT : public QWidget, public Ui::ShapePopulationQT, public ShapePopulationBase
 {
     Q_OBJECT
-
 public:
 
-    ShapePopulationQT();
+    ShapePopulationQT(QWidget* parent=0);
     ~ShapePopulationQT();
 
     void loadVTKFilesCLP(QFileInfoList a_fileList);
+    void loadModel(vtkMRMLModelNode* modelNode);
     void loadCSVFileCLP(QFileInfo file);
     void loadVTKDirCLP(QDir vtkDir);
     void loadColorMapCLP(std::string a_filePath);
     void loadCameraCLP(std::string a_filePath);
-
 
 protected:
 
@@ -68,7 +72,6 @@ protected:
     QString m_colormapDirectory;
     QString m_exportDirectory;
     QString m_pathSphere;
-    QFileInfoList m_fileList;
 #ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
 # ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
     typedef QVTKOpenGLNativeWidget VTKWidgetType;
@@ -84,7 +87,8 @@ protected:
     CSVloaderQT * m_CSVloaderDialog;
     customizeColorMapByDirectionDialogQT* m_customizeColorMapByDirectionDialog;
 
-    void CreateWidgets();
+    void CreateWidgets(const QFileInfoList& files);
+    void CreateWidgets(const QList<vtkRenderWindow*>& renderWindows, bool removeExistingWidgets=true);
 
 
     //SELECTION
@@ -113,8 +117,6 @@ protected:
 
     protected slots:
 
-    //QUIT
-    void slotExit();
     void on_pushButton_displayTools_clicked();
 
     //FILE
@@ -218,7 +220,7 @@ protected:
     void on_radioButton_displayVectorsbyDirection_toggled(bool checked);
 
     //EXPORT
-#ifndef SPV_EXTENSION
+#ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
     void exportToPDF();
     void exportToPS();
     void exportToEPS();
@@ -236,6 +238,10 @@ signals:
     void sig_axisColor_value(axisColorStruct* axisColor, bool dialogOpen);
     void sig_backgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen);
     void sig_resetColor();
+
+private:
+    QActionGroup* m_exportActions;
+    QActionGroup* m_optionsActions;
 };
 
 #endif

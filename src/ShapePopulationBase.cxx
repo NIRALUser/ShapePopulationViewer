@@ -135,8 +135,22 @@ void ShapePopulationBase::setLabelColor(double a_labelColor[])
 vtkRenderWindow* ShapePopulationBase::CreateNewWindow(std::string a_filePath, bool testing)
 {
     //DATA
-    ShapePopulationData * Mesh = new ShapePopulationData;
-    Mesh->ReadMesh(a_filePath);
+    ShapePopulationData * a_mesh = new ShapePopulationData;
+    a_mesh->ReadMesh(a_filePath);
+    return CreateNewWindow(a_mesh, testing);
+}
+
+vtkRenderWindow* ShapePopulationBase::CreateNewWindow(vtkPolyData* a_popyData, std::string a_filePath, bool testing)
+{
+    //DATA
+    ShapePopulationData * a_mesh = new ShapePopulationData;
+    a_mesh->ReadMesh(a_popyData, a_filePath);
+    return CreateNewWindow(a_mesh, testing);
+}
+
+vtkRenderWindow* ShapePopulationBase::CreateNewWindow(ShapePopulationData* a_mesh, bool testing)
+{
+    ShapePopulationData* Mesh = a_mesh;
     m_meshList.push_back(Mesh);
 
     //MAPPER
@@ -438,7 +452,7 @@ void ShapePopulationBase::RenderSelection()
 void ShapePopulationBase::RealTimeRenderSynchro(bool realtime)
 {
     // Remove observers
-    for (size_t idx = 0; idx < m_windowsListObserverTags.size(); ++idx)
+    for (size_t idx = 0; idx < m_windowsList.size() && idx < m_windowsListObserverTags.size(); ++idx)
       {
       vtkRenderWindow* renderWindow = m_windowsList[idx];
       renderWindow->RemoveObserver(renderWindow->GetCommand(m_windowsListObserverTags[idx]));
@@ -1425,7 +1439,7 @@ void ShapePopulationBase::creationSphereWidget(int index)
 
 void ShapePopulationBase::deleteSphereWidget(int index)
 {
-    if(m_createSphere[index])
+    if(m_createSphere[index] && index < static_cast<int>(m_widgetSphere.size()))
     {
         if (m_widgetSphere[index].GetPointer())
         {
