@@ -135,8 +135,22 @@ void ShapePopulationBase::setLabelColor(double a_labelColor[])
 vtkRenderWindow* ShapePopulationBase::CreateNewWindow(std::string a_filePath, bool testing)
 {
     //DATA
-    ShapePopulationData * Mesh = new ShapePopulationData;
-    Mesh->ReadMesh(a_filePath);
+    ShapePopulationData * a_mesh = new ShapePopulationData;
+    a_mesh->ReadMesh(a_filePath);
+    return CreateNewWindow(a_mesh, testing);
+}
+
+vtkRenderWindow* ShapePopulationBase::CreateNewWindow(vtkPolyData* a_popyData, std::string a_filePath, bool testing)
+{
+    //DATA
+    ShapePopulationData * a_mesh = new ShapePopulationData;
+    a_mesh->ReadMesh(a_popyData, a_filePath);
+    return CreateNewWindow(a_mesh, testing);
+}
+
+vtkRenderWindow* ShapePopulationBase::CreateNewWindow(ShapePopulationData* a_mesh, bool testing)
+{
+    ShapePopulationData* Mesh = a_mesh;
     m_meshList.push_back(Mesh);
 
     //MAPPER

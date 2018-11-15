@@ -1,6 +1,10 @@
 #include "QVTKInteractor.h"
 #include "ShapePopulationQT.h"
 
+// MRML includes
+#ifdef ShapePopulationViewer_BUILD_SLICER_EXTENSION
+# include <vtkMRMLModelNode.h>
+#endif
 
 ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
 {
@@ -189,6 +193,24 @@ void ShapePopulationQT::on_pushButton_displayTools_clicked()
 void ShapePopulationQT::loadVTKFilesCLP(QFileInfoList a_fileList)
 {
     this->CreateWidgets(a_fileList);
+}
+
+void ShapePopulationQT::loadModel(vtkMRMLModelNode* modelNode)
+{
+#ifdef ShapePopulationViewer_BUILD_SLICER_EXTENSION
+    if (modelNode == 0)
+    {
+        return;
+    }
+    QList<vtkRenderWindow*> renderWindows;
+
+    /* VTK WINDOW */
+    renderWindows << CreateNewWindow(modelNode->GetPolyData(), std::string(modelNode->GetName()));
+
+    CreateWidgets(renderWindows);
+#else
+    Q_ASSERT(modelNode);
+#endif
 }
 
 void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
@@ -906,19 +928,26 @@ void ShapePopulationQT::showCustomizeColorMapByDirectionConfigWindow()
 
 void ShapePopulationQT::CreateWidgets(const QFileInfoList& files)
 {
-    if (files.empty())
+    QList<vtkRenderWindow*> renderWindows;
+    foreach(const QFileInfo& fileInfo, files)
+    {
+        /* VTK WINDOW */
+        renderWindows << CreateNewWindow(fileInfo.absoluteFilePath().toStdString());
+    }
+    CreateWidgets(renderWindows);
+}
+
+void ShapePopulationQT::CreateWidgets(const QList<vtkRenderWindow*>& renderWindows, bool removeExistingWidgets)
+{
+    if (renderWindows.empty())
     {
         return;
     }
     this->scrollArea->setVisible(false);
 
-    for (int i = m_numberOfMeshes; i < files.size(); i++)
+    foreach(vtkRenderWindow* renderWindow, renderWindows)
     {
         /* VTK WINDOW */
-        //get filepath and fileNames
-        QByteArray path = files[i].absoluteFilePath().toLatin1();
-        const char *filePath = path.data();
-        vtkRenderWindow* renderWindow = CreateNewWindow(filePath);
         renderWindow->SetInteractor(NULL);
 
         /* QT WIDGET */
@@ -933,7 +962,10 @@ void ShapePopulationQT::CreateWidgets(const QFileInfoList& files)
     }
 
     /* WINDOWS */
-    m_windowsList.clear();
+    if (removeExistingWidgets)
+    {
+        m_windowsList.clear();
+    }
     for (unsigned int i = 0; i < m_widgetList.size(); i++)
     {
         m_windowsList.push_back(m_widgetList.at(i)->GetRenderWindow());
@@ -1054,7 +1086,7 @@ void ShapePopulationQT::CreateWidgets(const QFileInfoList& files)
     this->setVectorScale((double)this->spinbox_vectorScale->value()/100.0);
     this->setVectorDensity(this->spinbox_arrowDens->value());
 
-    m_numberOfMeshes = files.size();
+    m_numberOfMeshes = m_widgetList.size();
     spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
 
     /* CHECK ALIGNMENT */

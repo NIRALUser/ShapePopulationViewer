@@ -4,6 +4,7 @@
 // local
 #include "ui_ShapePopulationQT.h"
 #include "ShapePopulationBase.h"
+#include "ShapePopulationViewerConfig.h"
 #include "gradientWidgetQT.h"
 #include "cameraDialogQT.h"
 #include "backgroundDialogQT.h"
@@ -11,6 +12,9 @@
 #include "customizeColorMapByDirectionDialogQT.h"
 #include <iostream>
 #include <vtkInteractorStyleTrackballCamera.h>
+
+// MRML includes
+class vtkMRMLModelNode;
 
 // QT
 #include <QWidget>
@@ -50,6 +54,7 @@ public:
     ~ShapePopulationQT();
 
     void loadVTKFilesCLP(QFileInfoList a_fileList);
+    void loadModel(vtkMRMLModelNode* modelNode);
     void loadCSVFileCLP(QFileInfo file);
     void loadVTKDirCLP(QDir vtkDir);
     void loadColorMapCLP(std::string a_filePath);
@@ -83,6 +88,7 @@ protected:
     customizeColorMapByDirectionDialogQT* m_customizeColorMapByDirectionDialog;
 
     void CreateWidgets(const QFileInfoList& files);
+    void CreateWidgets(const QList<vtkRenderWindow*>& renderWindows, bool removeExistingWidgets=true);
 
 
     //SELECTION

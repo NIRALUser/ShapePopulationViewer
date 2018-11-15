@@ -25,6 +25,8 @@
 // MRML includes
 #include <vtkMRMLLayoutLogic.h>
 #include <vtkMRMLLayoutNode.h>
+#include <vtkMRMLModelNode.h>
+#include <vtkMRMLScene.h>
 
 // Slicer includes
 #include <qSlicerApplication.h>
@@ -188,4 +190,20 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
         button->setDefaultAction(action);
         d->SettingsLayout->addWidget(button);
     }
+
+    connect(d->ModelLoadPushButton, SIGNAL(clicked()), this, SLOT(loadSelectedModel()));
+}
+
+//-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::loadSelectedModel()
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    this->loadModel(vtkMRMLModelNode::SafeDownCast(d->ModelNodeComboBox->currentNode()));
+}
+
+//-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::loadModel(vtkMRMLModelNode* modelNode)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->loadModel(modelNode);
 }

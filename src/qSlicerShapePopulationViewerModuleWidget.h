@@ -18,8 +18,11 @@
 #ifndef qSlicerShapePopulationViewerModuleWidget_h
 #define qSlicerShapePopulationViewerModuleWidget_h
 
-// SlicerQt includes
+// Slicer includes
 #include "qSlicerAbstractModuleWidget.h"
+
+// MRML includes
+class vtkMRMLModelNode;
 
 #include "qSlicerShapePopulationViewerModuleExport.h"
 
@@ -40,6 +43,10 @@ public:
 
     virtual void enter();
     virtual void exit();
+
+public slots:
+    void loadSelectedModel();
+    void loadModel(vtkMRMLModelNode* modelNode);
 
 protected:
     QScopedPointer<qSlicerShapePopulationViewerModuleWidgetPrivate> d_ptr;

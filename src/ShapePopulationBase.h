@@ -87,6 +87,8 @@ class ShapePopulationBase
     // Setting \a testing to true means a \a vtkRenderWindow is created
     // instead of \a vtkGenericOpenGLRenderWindow.
     vtkRenderWindow* CreateNewWindow(std::string a_filePath, bool testing = false);
+    vtkRenderWindow* CreateNewWindow(vtkPolyData* a_popyData, std::string a_filePath, bool testing = false);
+    vtkRenderWindow* CreateNewWindow(ShapePopulationData* a_mesh, bool testing = false);
 
     //SELECTION
     unsigned int getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow);

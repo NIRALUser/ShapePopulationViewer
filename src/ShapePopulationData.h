@@ -24,7 +24,8 @@ class ShapePopulationData
     ShapePopulationData();
     ~ShapePopulationData(){}
 
-    void ReadMesh(std::string a_filePath);
+    vtkSmartPointer<vtkPolyData> ReadMesh(std::string a_filePath);
+    void ReadMesh(vtkPolyData* polyData, const std::string& a_filePath);
     vtkSmartPointer<vtkPolyData> ReadPolyData(std::string a_filePath);
 
     vtkSmartPointer<vtkPolyData> GetPolyData() {return m_PolyData;}
