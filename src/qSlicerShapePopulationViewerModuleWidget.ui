@@ -13,49 +13,49 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="ModuleWidgetLayout">
    <item>
-    <widget class="ctkCollapsibleButton" name="ActionsCTKCollapsibleButton">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="ModelLabel">
+       <property name="text">
+        <string>Select Model:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="qMRMLNodeComboBox" name="ModelNodeComboBox">
+       <property name="nodeTypes">
+        <stringlist>
+         <string>vtkMRMLModelNode</string>
+        </stringlist>
+       </property>
+       <property name="showChildNodeTypes">
+        <bool>false</bool>
+       </property>
+       <property name="addEnabled">
+        <bool>false</bool>
+       </property>
+       <property name="removeEnabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="ModelLoadPushButton">
+       <property name="text">
+        <string>Load</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="ctkCollapsibleButton" name="ImportCTKCollapsibleButton">
      <property name="text">
-      <string>Actions</string>
+      <string>Import</string>
      </property>
-     <layout class="QVBoxLayout" name="ActionsLayout">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="ModelLabel">
-          <property name="text">
-           <string>Select Model:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="qMRMLNodeComboBox" name="ModelNodeComboBox">
-          <property name="nodeTypes">
-           <stringlist>
-            <string>vtkMRMLModelNode</string>
-           </stringlist>
-          </property>
-          <property name="showChildNodeTypes">
-           <bool>false</bool>
-          </property>
-          <property name="addEnabled">
-           <bool>false</bool>
-          </property>
-          <property name="removeEnabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="ModelLoadPushButton">
-          <property name="text">
-           <string>Load</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
+     <layout class="QHBoxLayout" name="ImportLayout">
      </layout>
     </widget>
    </item>

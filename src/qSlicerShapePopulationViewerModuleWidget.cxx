@@ -171,17 +171,30 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
     layoutNode->AddLayoutDescription(
                 vtkMRMLLayoutNode::SlicerLayoutUserView, shapePopulationViewerLayout);
 
-    // Actions
+    // Delete Selection
+    {
+        QToolButton* button = new QToolButton();
+        button->setDefaultAction(d->ShapePopulationWidget->actionDelete);
+        d->ModuleWidgetLayout->insertWidget(1, button);
+    }
+
+    // Delete All
+    {
+        QToolButton* button = new QToolButton();
+        button->setDefaultAction(d->ShapePopulationWidget->actionDelete_All);
+        d->ModuleWidgetLayout->insertWidget(2, button);
+    }
+
+    // Import
     foreach(QAction* action, QList<QAction*>()
             << d->ShapePopulationWidget->actionOpen_Directory
             << d->ShapePopulationWidget->actionOpen_VTK_Files
             << d->ShapePopulationWidget->actionLoad_CSV
-            << d->ShapePopulationWidget->actionDelete
-            << d->ShapePopulationWidget->actionDelete_All)
+            )
     {
         QToolButton* button = new QToolButton();
         button->setDefaultAction(action);
-        d->ActionsLayout->addWidget(button);
+        d->ImportLayout->addWidget(button);
     }
 
     // Export
