@@ -12,11 +12,14 @@ set(rightCondyleExpectedResult DATA{${SOURCE_DIR}/rightCondyleExpectedResult.vtk
 set(rightCondyleExpectedResult2 DATA{${SOURCE_DIR}/rightCondyleExpectedResult2.vtk})
 set(rightCondyle2 DATA{${SOURCE_DIR}/rightCondyle_signedclosestpoint.vtk})
 
+# Test launcher
+set(ShapePopulationViewer_LAUNCH_COMMAND )
+if(DEFINED Slicer_LAUNCH_COMMAND)
+  set(ShapePopulationViewer_LAUNCH_COMMAND ${Slicer_LAUNCH_COMMAND})
+endif()
+
 # Include directories
 include_directories(${CMAKE_SOURCE_DIR})
-
-# Link directories
-link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Test 1 of creationSphereActor in the class ShapePopulationBase
 add_executable(TestCreationSphereActor mainTestCreationSphere.cxx testCreationSphere.cxx)
@@ -24,7 +27,7 @@ target_link_libraries(TestCreationSphereActor ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_CreationSphereActor
-        COMMAND $<TARGET_FILE:TestCreationSphereActor> ${sphere}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestCreationSphereActor> ${sphere}
 )
 
 # Test 2 of ChangeView in the class ShapePopulationBase
@@ -33,7 +36,7 @@ target_link_libraries(TestChangeView ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_ChangeView
-        COMMAND $<TARGET_FILE:TestChangeView> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestChangeView> ${rightCondyle}
 )
 
 # Test 3 of setMeshOpacity in the class ShapePopulationBase
@@ -42,7 +45,7 @@ target_link_libraries(TestMeshOpacity ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setMeshOpacity
-        COMMAND $<TARGET_FILE:TestMeshOpacity> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestMeshOpacity> ${rightCondyle}
 )
 
 # Test 4 of setVectorScale in the class ShapePopulationBase
@@ -51,7 +54,7 @@ target_link_libraries(TestVectorScale ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setVectorScale
-        COMMAND $<TARGET_FILE:TestVectorScale> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestVectorScale> ${rightCondyle}
 )
 
 # Test 5 of computeCommonRange in the class ShapePopulationBase
@@ -60,7 +63,7 @@ target_link_libraries(TestComputeCommonRange ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_computeCommonRange
-        COMMAND $<TARGET_FILE:TestComputeCommonRange> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestComputeCommonRange> ${rightCondyle}
 )
 
 # Test 6 of UpdateColorMapByDirection in the class ShapePopulationBase
@@ -69,7 +72,7 @@ target_link_libraries(TestUpdateColorMapByDirection ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_UpdateColorMapByDirection
-        COMMAND $<TARGET_FILE:TestUpdateColorMapByDirection> ${rightCondyle} ${rightCondyleExpectedResult}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestUpdateColorMapByDirection> ${rightCondyle} ${rightCondyleExpectedResult}
 )
 
 # Test 7 of setBackgroundSelectedColor in the class ShapePopulationBase
@@ -78,7 +81,7 @@ target_link_libraries(TestBackgroundSelectedColor ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setBackgroundSelectedColor
-        COMMAND $<TARGET_FILE:TestBackgroundSelectedColor> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestBackgroundSelectedColor> ${rightCondyle}
 )
 
 # Test 8 of setLabelColor in the class ShapePopulationBase
@@ -87,7 +90,7 @@ target_link_libraries(TestLabelColor ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setLabelColor
-        COMMAND $<TARGET_FILE:TestLabelColor> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestLabelColor> ${rightCondyle}
 )
 
 # Test 9 of setBackgroundUnselectedColor in the class ShapePopulationBase
@@ -96,7 +99,7 @@ target_link_libraries(TestBackgroundUnselectedColor ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_setBackgroundUnselectedColor
-        COMMAND $<TARGET_FILE:TestBackgroundUnselectedColor> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestBackgroundUnselectedColor> ${rightCondyle}
 )
 
 # Test 10 of creationSphereWidget in the class ShapePopulationBase
@@ -105,7 +108,7 @@ target_link_libraries(TestCreationSphereWidget ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_creationSphereWidget
-        COMMAND $<TARGET_FILE:TestCreationSphereWidget> ${sphere}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestCreationSphereWidget> ${sphere}
 )
 
 # Test 11 of displayColorbar in the class ShapePopulationBase
@@ -114,7 +117,7 @@ target_link_libraries(TestDisplayColorbar ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayColorbar
-        COMMAND $<TARGET_FILE:TestDisplayColorbar> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestDisplayColorbar> ${rightCondyle}
 )
 
 # Test 12 of displayAttribute in the class ShapePopulationBase
@@ -123,7 +126,7 @@ target_link_libraries(TestDisplayAttribute ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayAttribute
-        COMMAND $<TARGET_FILE:TestDisplayAttribute> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestDisplayAttribute> ${rightCondyle}
 )
 
 # Test 13 of displayMeshName in the class ShapePopulationBase
@@ -132,7 +135,7 @@ target_link_libraries(TestDisplayMeshName ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayMeshName
-        COMMAND $<TARGET_FILE:TestDisplayMeshName> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestDisplayMeshName> ${rightCondyle}
 )
 
 # Test 14 of displayVectors in the class ShapePopulationBase
@@ -141,7 +144,7 @@ target_link_libraries(TestDisplayVectors ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayVectors
-        COMMAND $<TARGET_FILE:TestDisplayVectors> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestDisplayVectors> ${rightCondyle}
 )
 
 # Test 15 of computeCommonAttributes in the class ShapePopulationBase
@@ -150,7 +153,7 @@ target_link_libraries(TestComputeCommonAttributes ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_computeCommonAttributes
-        COMMAND $<TARGET_FILE:TestComputeCommonAttributes> ${rightCondyle} ${rightCondyle2}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestComputeCommonAttributes> ${rightCondyle} ${rightCondyle2}
 )
 
 # Test 16 of displayColorMapByMagnitude and displayColorMapByDirection in the class ShapePopulationBase
@@ -159,7 +162,7 @@ target_link_libraries(TestDisplayColorMap ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_displayColorMap
-        COMMAND $<TARGET_FILE:TestDisplayColorMap> ${rightCondyle} ${rightCondyleExpectedResult2}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestDisplayColorMap> ${rightCondyle} ${rightCondyleExpectedResult2}
 )
 
 # Test 17 of UpdateAttribute in the class ShapePopulationBase
@@ -168,7 +171,7 @@ target_link_libraries(TestUpdateAttribute ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_UpdateAttribute
-        COMMAND $<TARGET_FILE:TestUpdateAttribute> ${rightCondyle} ${rightCondyleExpectedResult2}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestUpdateAttribute> ${rightCondyle} ${rightCondyleExpectedResult2}
 )
 
 # Test 18 of UpdateColorMapByMagnitude in the class ShapePopulationBase
@@ -177,7 +180,7 @@ target_link_libraries(TestUpdateColorMapByMagnitude ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_UpdateColorMapByMagnitude
-        COMMAND $<TARGET_FILE:TestUpdateColorMapByMagnitude> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestUpdateColorMapByMagnitude> ${rightCondyle}
 )
 
 # Test 19 of the color mode of vectors in the class ShapePopulationBase
@@ -186,7 +189,7 @@ target_link_libraries(TestVectorsColorMode ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_VectorsColorMode
-        COMMAND $<TARGET_FILE:TestVectorsColorMode> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestVectorsColorMode> ${rightCondyle}
 )
 
 # Test 20 of getSelectedIndex in the class ShapePopulationBase
@@ -195,14 +198,14 @@ target_link_libraries(TestSelectedIndex ShapePopulationViewerWidget)
 ExternalData_add_test(
         MY_DATA
         NAME TestShapePopulationBase_getSelectedIndex
-        COMMAND $<TARGET_FILE:TestSelectedIndex> ${rightCondyle}
+        COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:TestSelectedIndex> ${rightCondyle}
 )
 
 # Test for the command --help
 if(TARGET ShapePopulationViewer)
   add_test(
           NAME PrintHelp
-          COMMAND $<TARGET_FILE:ShapePopulationViewer> --help
+          COMMAND ${ShapePopulationViewer_LAUNCH_COMMAND} $<TARGET_FILE:ShapePopulationViewer> --help
   )
 endif()
 
