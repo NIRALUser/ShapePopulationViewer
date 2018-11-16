@@ -27,8 +27,6 @@
 #include <QPoint>
 #include <QHash>
 #include <QFileDialog>
-#include <QXmlStreamWriter>
-#include <QXmlStreamReader>
 #include <QMessageBox>
 #include <sstream>
 
@@ -53,7 +51,6 @@ public:
 
     void saveColorPointList(QString a_filePath);
     void loadColorPointList(QString a_filePath, std::vector<colorPointStruct> * a_colorPointList);
-    bool getXmlReaderValue(QXmlStreamReader * a_xmlReader, double * a_colorPointValue);
 
     void enable(std::vector<colorPointStruct> *a_colorPointList);
     void disable();

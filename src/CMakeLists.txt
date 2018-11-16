@@ -25,6 +25,7 @@ set(CXX_FILES
   gradientArrow.cxx
   gradientWidgetQT.cxx
   ShapePopulationBase.cxx
+  ShapePopulationColorMapIO.cxx
   ShapePopulationData.cxx
   ShapePopulationMainWindowQT.cxx
   ShapePopulationQT.cxx
