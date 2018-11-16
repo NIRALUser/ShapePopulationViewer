@@ -102,8 +102,10 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
 #else
     connect(m_exportActions,SIGNAL(triggered(QAction*)),this,SLOT(showNoExportWindow()));
 #endif
+#ifdef ShapePopulationViewer_BUILD_SLICER_EXTENSION
     pushButton_VISU_add->setVisible(false);
     pushButton_VISU_delete->setVisible(false);
+#endif
 
     //gradView Signals
     connect(gradientWidget_VISU,SIGNAL(arrowMovedSignal(qreal)), this, SLOT(slot_gradArrow_moved(qreal)));
