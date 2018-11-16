@@ -102,10 +102,15 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
 #else
     connect(m_exportActions,SIGNAL(triggered(QAction*)),this,SLOT(showNoExportWindow()));
 #endif
+    pushButton_VISU_add->setVisible(false);
+    pushButton_VISU_delete->setVisible(false);
+
     //gradView Signals
     connect(gradientWidget_VISU,SIGNAL(arrowMovedSignal(qreal)), this, SLOT(slot_gradArrow_moved(qreal)));
     connect(gradientWidget_VISU,SIGNAL(arrowSelectedSignal(qreal)), this, SLOT(slot_gradArrow_selected(qreal)));
+#ifndef ShapePopulationViewer_BUILD_SLICER_EXTENSION
     connect(gradientWidget_VISU,SIGNAL(arrowDoubleClickedSignal()), this, SLOT(slot_gradArrow_doubleClicked()));
+#endif
     connect(gradientWidget_VISU,SIGNAL(noSelectionSignal()), this, SLOT(slot_no_gradArrow_selected()));
 
     //backgroundDialog signals
@@ -209,7 +214,7 @@ void ShapePopulationQT::loadModel(vtkMRMLModelNode* modelNode)
 
     CreateWidgets(renderWindows);
 #else
-    Q_ASSERT(modelNode);
+    Q_UNUSED(modelNode);
 #endif
 }
 
@@ -1718,6 +1723,11 @@ void ShapePopulationQT::on_comboBox_VISU_attribute_currentIndexChanged(int)
         // Change the colorbar selected
         m_usedColorBar = m_colorBarList[index]; //the colorbar depends of the attribute
         this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
+
+#ifdef ShapePopulationViewer_BUILD_SLICER_EXTENSION
+        this->gradientWidget_VISU->setFocusIndex(1);
+#endif
+
         m_noChange = true;
         spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
         spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
@@ -1881,8 +1891,8 @@ void ShapePopulationQT::on_spinBox_VISU_min_valueChanged(double min)
         }
         m_usedColorBar->range[0] = min;
         this->updateColorbar_QT();
+        this->updateArrowPosition();
     }
-    this->updateArrowPosition();
 }
 
 void ShapePopulationQT::on_spinBox_VISU_max_valueChanged(double max)
@@ -1953,7 +1963,7 @@ void ShapePopulationQT::on_pushButton_VISU_resetRange_Dir_clicked()
     m_noChange = false;
 }
 
-
+#ifndef ShapePopulationViewer_BUILD_SLICER_EXTENSION
 void ShapePopulationQT::on_pushButton_VISU_delete_clicked()
 {
     gradientWidget_VISU->deleteFocusArrow();
@@ -1961,6 +1971,7 @@ void ShapePopulationQT::on_pushButton_VISU_delete_clicked()
     if(gradientWidget_VISU->getNumberOfArrows() <= 2) pushButton_VISU_delete->setDisabled(true);
     this->updateColorbar_QT();
 }
+#endif
 
 void ShapePopulationQT::on_spinBox_VISU_position_valueChanged(double arg1)
 {
@@ -1979,6 +1990,7 @@ void ShapePopulationQT::on_spinBox_VISU_position_valueChanged(double arg1)
     this->updateColorbar_QT();
 }
 
+#ifndef ShapePopulationViewer_BUILD_SLICER_EXTENSION
 void ShapePopulationQT::on_pushButton_VISU_add_clicked()
 {
     QColor color;
@@ -1989,6 +2001,7 @@ void ShapePopulationQT::on_pushButton_VISU_add_clicked()
         this->updateColorbar_QT();
     }
 }
+#endif
 
 void ShapePopulationQT::on_pushButton_VISU_reset_clicked()
 {
@@ -2061,7 +2074,7 @@ void ShapePopulationQT::slot_gradArrow_selected(qreal newPos)
     this->spinBox_VISU_position->setFocus();
     this->spinBox_VISU_position->selectAll();
 }
-
+#ifndef ShapePopulationViewer_BUILD_SLICER_EXTENSION
 void ShapePopulationQT::slot_gradArrow_doubleClicked()
 {
     QColor color = gradientWidget_VISU->getFocusColor();
@@ -2073,7 +2086,7 @@ void ShapePopulationQT::slot_gradArrow_doubleClicked()
 
     this->updateColorbar_QT();
 }
-
+#endif
 void ShapePopulationQT::slot_no_gradArrow_selected()
 {
     pushButton_VISU_delete->setDisabled(true);

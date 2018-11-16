@@ -198,8 +198,10 @@ protected:
     void on_pushButton_VISU_resetRange_Dir_clicked();
     // arrows of the gradient widget
     void on_spinBox_VISU_position_valueChanged(double arg1);
+#ifndef ShapePopulationViewer_BUILD_SLICER_EXTENSION
     void on_pushButton_VISU_delete_clicked();
     void on_pushButton_VISU_add_clicked();
+#endif
     void on_pushButton_VISU_reset_clicked();
     // color map
     void on_radioButton_displayColorMapByMagnitude_toggled(bool checked);
@@ -208,7 +210,9 @@ protected:
     //slots for gradView signals
     void slot_gradArrow_moved(qreal newPos);
     void slot_gradArrow_selected(qreal newPos);
+#ifndef ShapePopulationViewer_BUILD_SLICER_EXTENSION
     void slot_gradArrow_doubleClicked();
+#endif
     void slot_no_gradArrow_selected();
 
     //VECTORS
