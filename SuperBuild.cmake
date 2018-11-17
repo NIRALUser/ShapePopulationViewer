@@ -9,7 +9,7 @@ find_package(Git REQUIRED)
 # Superbuild option(s)
 #-----------------------------------------------------------------------------
 option(USE_SYSTEM_ITK "Build using an externally defined version of ITK" OFF)
-set(ShapePopulationViewer_USE_SYSTE_ITK ${USE_SYSTEM_ITK})
+set(ShapePopulationViewer_USE_SYSTEM_ITK ${USE_SYSTEM_ITK})
 
 option(USE_SYSTEM_SlicerExecutionModel "Build using an externally defined version of SlicerExecutionModel"  OFF)
 set(ShapePopulationViewer_USE_SYSTEM_SlicerExecutionModel ${USE_SYSTEM_SlicerExecutionModel})
