@@ -59,6 +59,14 @@ endif()
 mark_as_superbuild(${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION:BOOL)
 
 #-----------------------------------------------------------------------------
+# Slicer
+#-----------------------------------------------------------------------------
+if(${EXTENSION_NAME}_BUILD_SLICER_EXTENSION)
+  find_package(Slicer REQUIRED)
+  include(${Slicer_USE_FILE})
+endif()
+
+#-----------------------------------------------------------------------------
 # Qt
 #
 # If building as a Slicer extension, use Slicer's Qt Version
@@ -70,7 +78,6 @@ mark_as_superbuild(${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION:BOOL)
 set(_qt_version "4")
 
 if (${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION)
-  find_package(Slicer REQUIRED)
   if (Slicer_REQUIRED_QT_VERSION VERSION_GREATER "4.9")
     set(_qt_version "5")
   endif()
@@ -80,8 +87,8 @@ elseif(DEFINED Qt5_DIR)
   set(_qt_version "5")
 endif()
 
-SET(ShapePopulationViewer_QT_VERSION ${_qt_version} CACHE STRING "Version of Qt to use")
-SET_PROPERTY(CACHE ShapePopulationViewer_QT_VERSION PROPERTY STRINGS 4 5)
+set(ShapePopulationViewer_QT_VERSION ${_qt_version} CACHE STRING "Version of Qt to use")
+set_property(CACHE ShapePopulationViewer_QT_VERSION PROPERTY STRINGS 4 5)
 
 # Select VTK major version based on Qt version
 if(ShapePopulationViewer_QT_VERSION STREQUAL "4")
