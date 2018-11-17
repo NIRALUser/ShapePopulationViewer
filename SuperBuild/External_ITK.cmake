@@ -7,7 +7,7 @@ set(${proj}_DEPENDENCIES "VTK")
 # Include dependent projects if any
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
-if(ShapePopulationViewer_USE_SYSTEM_${proj})
+if(${SUPERBUILD_TOPLEVEL_PROJECT}_USE_SYSTEM_${proj})
   unset(ITK_DIR CACHE)
   find_package(ITK 4.13.1 REQUIRED NO_MODULE)
 endif()
@@ -17,16 +17,16 @@ if(DEFINED ITK_DIR AND NOT EXISTS ${ITK_DIR})
   message(FATAL_ERROR "ITK_DIR variable is defined but corresponds to nonexistent directory")
 endif()
 
-if(NOT DEFINED ITK_DIR AND NOT ShapePopulationViewer_USE_SYSTEM_${proj})
+if(NOT DEFINED ITK_DIR AND NOT ${SUPERBUILD_TOPLEVEL_PROJECT}_USE_SYSTEM_${proj})
 
   ExternalProject_SetIfNotDefined(
-    ShapePopulationViewer_${proj}_GIT_REPOSITORY
+    ${SUPERBUILD_TOPLEVEL_PROJECT}_${proj}_GIT_REPOSITORY
     "${EP_GIT_PROTOCOL}://github.com/Slicer/ITK.git"
     QUIET
     )
 
   ExternalProject_SetIfNotDefined(
-    ShapePopulationViewer_${proj}_GIT_TAG
+    ${SUPERBUILD_TOPLEVEL_PROJECT}_${proj}_GIT_TAG
     "a44f430b3edb5fff62671b4ba87cf41c60ee272b" # slicer-v4.13.1-2018-08-17-cdc3e57
     QUIET
     )
@@ -36,8 +36,8 @@ if(NOT DEFINED ITK_DIR AND NOT ShapePopulationViewer_USE_SYSTEM_${proj})
 
   ExternalProject_Add(${proj}
     ${${proj}_EP_ARGS}
-    GIT_REPOSITORY "${ShapePopulationViewer_${proj}_GIT_REPOSITORY}"
-    GIT_TAG "${ShapePopulationViewer_${proj}_GIT_TAG}"
+    GIT_REPOSITORY "${${SUPERBUILD_TOPLEVEL_PROJECT}_${proj}_GIT_REPOSITORY}"
+    GIT_TAG "${${SUPERBUILD_TOPLEVEL_PROJECT}_${proj}_GIT_TAG}"
     SOURCE_DIR ${EP_SOURCE_DIR}
     BINARY_DIR ${EP_BINARY_DIR}
     CMAKE_CACHE_ARGS
