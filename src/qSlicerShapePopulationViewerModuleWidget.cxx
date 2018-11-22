@@ -247,6 +247,18 @@ void qSlicerShapePopulationViewerModuleWidget::loadModel(vtkMRMLModelNode* model
 }
 
 //-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::loadCSVFile(const QString& filePath)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    QFileInfoList modelFileInfoList;
+    foreach(const QString& modelFilePath, ShapePopulationQT::parseCSVFile(filePath))
+    {
+        modelFileInfoList << QFileInfo(modelFilePath);
+    }
+    d->ShapePopulationWidget->loadVTKFilesCLP(modelFileInfoList);
+}
+
+//-----------------------------------------------------------------------------
 void qSlicerShapePopulationViewerModuleWidget::onMRMLSceneNodeAddedEvent(vtkObject *vtkNotUsed(caller), vtkObject *callData)
 {
     Q_D(qSlicerShapePopulationViewerModuleWidget);

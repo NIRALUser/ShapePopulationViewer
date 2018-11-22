@@ -60,6 +60,8 @@ public:
     void loadColorMapCLP(std::string a_filePath);
     void loadCameraCLP(std::string a_filePath);
 
+    static QStringList parseCSVFile(const QString& csvFilePath);
+
 protected:
 
     bool m_toolsDisplayed;

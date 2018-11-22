@@ -220,6 +220,36 @@ void ShapePopulationQT::loadModel(vtkMRMLModelNode* modelNode)
 #endif
 }
 
+QStringList ShapePopulationQT::parseCSVFile(const QString& csvFilePath)
+{
+    QStringList filePaths;
+
+    //Read .CSV with VTK
+    vtkNew<vtkDelimitedTextReader> CSVreader;
+    CSVreader->SetFieldDelimiterCharacters(",");
+    CSVreader->SetFileName(csvFilePath.toLatin1());
+    CSVreader->SetHaveHeaders(true);
+    CSVreader->Update();
+
+    vtkTable* table = CSVreader->GetOutput();
+    for(vtkIdType index = 0; index < table->GetNumberOfRows(); ++index)
+    {
+        QString filePath = QString(table->GetValue(index, 0).ToString().c_str());
+        if (!filePath.endsWith(".vtk") && !filePath.endsWith(".vtp"))
+        {
+            qWarning() << filePath << "is not a vtk/vtp file";
+            continue;
+        }
+        if (!QFileInfo(filePath).exists())
+        {
+            qWarning() << filePath << "does not exist";
+            continue;
+        }
+        filePaths << filePath;
+    }
+    return filePaths;
+}
+
 void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
 {
     //Read .CSV with VTK
