@@ -18,6 +18,7 @@
 // Qt includes
 #include <QAction>
 #include <QDebug>
+#include <QFileInfo>
 #include <QList>
 #include <QMainWindow>
 #include <QToolButton>
@@ -244,6 +245,13 @@ void qSlicerShapePopulationViewerModuleWidget::loadModel(vtkMRMLModelNode* model
 {
     Q_D(qSlicerShapePopulationViewerModuleWidget);
     d->ShapePopulationWidget->loadModel(modelNode);
+}
+
+//-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::loadModel(const QString& filePath)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->loadVTKFilesCLP(QFileInfoList() << QFileInfo(filePath));
 }
 
 //-----------------------------------------------------------------------------

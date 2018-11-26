@@ -47,6 +47,7 @@ public:
 public slots:
     void loadSelectedModel();
     void loadModel(vtkMRMLModelNode* modelNode);
+    void loadModel(const QString& filePath);
     void loadCSVFile(const QString& filePath);
 
 protected slots:
