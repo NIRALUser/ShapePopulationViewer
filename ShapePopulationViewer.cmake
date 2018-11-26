@@ -12,8 +12,6 @@ if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
   set(EXTENSION_SCREENSHOTURLS "http://wiki.na-mic.org/Wiki/images/8/81/Screenshot1.png http://wiki.na-mic.org/Wiki/images/1/13/SPVscreenshot2.png")
   set(EXTENSION_DEPENDS "NA") # Specified as a space separated list or 'NA' if any
   set(EXTENSION_BUILD_SUBDIRECTORY .)
-  find_package(Slicer REQUIRED)
-  include(${Slicer_USE_FILE})
 endif()
 
 #-----------------------------------------------------------------------------

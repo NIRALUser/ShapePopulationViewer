@@ -9,7 +9,7 @@ find_package(Git REQUIRED)
 # Superbuild option(s)
 #-----------------------------------------------------------------------------
 option(USE_SYSTEM_ITK "Build using an externally defined version of ITK" OFF)
-set(ShapePopulationViewer_USE_SYSTE_ITK ${USE_SYSTEM_ITK})
+set(ShapePopulationViewer_USE_SYSTEM_ITK ${USE_SYSTEM_ITK})
 
 option(USE_SYSTEM_SlicerExecutionModel "Build using an externally defined version of SlicerExecutionModel"  OFF)
 set(ShapePopulationViewer_USE_SYSTEM_SlicerExecutionModel ${USE_SYSTEM_SlicerExecutionModel})
@@ -36,7 +36,7 @@ set(proj ${SUPERBUILD_TOPLEVEL_PROJECT})
 
 ExternalProject_Include_Dependencies(${proj}
   PROJECT_VAR proj
-  SUPERBUILD_VAR ${PROJECT_NAME}_SUPERBUILD
+  SUPERBUILD_VAR ${LOCAL_PROJECT_NAME}_SUPERBUILD
   )
 
 ExternalProject_Add(${proj}
@@ -55,8 +55,8 @@ ExternalProject_Add(${proj}
     -DCMAKE_CXX_STANDARD_REQUIRED:BOOL=${CMAKE_CXX_STANDARD_REQUIRED}
     -DCMAKE_CXX_EXTENSIONS:BOOL=${CMAKE_CXX_EXTENSIONS}
     # Superbuild
-    -D${EXTENSION_NAME}_SUPERBUILD:BOOL=OFF
-    -DEXTENSION_SUPERBUILD_BINARY_DIR:PATH=${${EXTENSION_NAME}_BINARY_DIR}
+    -D${LOCAL_PROJECT_NAME}_SUPERBUILD:BOOL=OFF
+    -DEXTENSION_SUPERBUILD_BINARY_DIR:PATH=${${LOCAL_PROJECT_NAME}_BINARY_DIR}
   INSTALL_COMMAND ""
   DEPENDS
     ${${LOCAL_PROJECT_NAME}_DEPENDS}

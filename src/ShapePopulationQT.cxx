@@ -102,8 +102,10 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
 #else
     connect(m_exportActions,SIGNAL(triggered(QAction*)),this,SLOT(showNoExportWindow()));
 #endif
+#ifdef ShapePopulationViewer_BUILD_SLICER_EXTENSION
     pushButton_VISU_add->setVisible(false);
     pushButton_VISU_delete->setVisible(false);
+#endif
 
     //gradView Signals
     connect(gradientWidget_VISU,SIGNAL(arrowMovedSignal(qreal)), this, SLOT(slot_gradArrow_moved(qreal)));
@@ -216,6 +218,36 @@ void ShapePopulationQT::loadModel(vtkMRMLModelNode* modelNode)
 #else
     Q_UNUSED(modelNode);
 #endif
+}
+
+QStringList ShapePopulationQT::parseCSVFile(const QString& csvFilePath)
+{
+    QStringList filePaths;
+
+    //Read .CSV with VTK
+    vtkNew<vtkDelimitedTextReader> CSVreader;
+    CSVreader->SetFieldDelimiterCharacters(",");
+    CSVreader->SetFileName(csvFilePath.toLatin1());
+    CSVreader->SetHaveHeaders(true);
+    CSVreader->Update();
+
+    vtkTable* table = CSVreader->GetOutput();
+    for(vtkIdType index = 0; index < table->GetNumberOfRows(); ++index)
+    {
+        QString filePath = QString(table->GetValue(index, 0).ToString().c_str());
+        if (!filePath.endsWith(".vtk") && !filePath.endsWith(".vtp"))
+        {
+            qWarning() << filePath << "is not a vtk/vtp file";
+            continue;
+        }
+        if (!QFileInfo(filePath).exists())
+        {
+            qWarning() << filePath << "does not exist";
+            continue;
+        }
+        filePaths << filePath;
+    }
+    return filePaths;
 }
 
 void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)

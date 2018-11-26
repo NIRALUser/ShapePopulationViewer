@@ -7,8 +7,8 @@ set(${proj}_DEPENDENCIES ITK)
 # Include dependent projects if any
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
-if(ShapePopulationViewer_USE_SYSTEM_${proj})
-  message(FATAL_ERROR "Enabling ShapePopulationViewer_USE_SYSTEM_${proj} is not supported !")
+if(${SUPERBUILD_TOPLEVEL_PROJECT}_USE_SYSTEM_${proj})
+  message(FATAL_ERROR "Enabling ${SUPERBUILD_TOPLEVEL_PROJECT}_USE_SYSTEM_${proj} is not supported !")
 endif()
 
 # Sanity checks
@@ -16,16 +16,16 @@ if(DEFINED SlicerExecutionModel_DIR AND NOT EXISTS ${SlicerExecutionModel_DIR})
   message(FATAL_ERROR "SlicerExecutionModel_DIR variable is defined but corresponds to nonexistent directory")
 endif()
 
-if(NOT DEFINED SlicerExecutionModel_DIR AND NOT ShapePopulationViewer_USE_SYSTEM_${proj})
+if(NOT DEFINED SlicerExecutionModel_DIR AND NOT ${SUPERBUILD_TOPLEVEL_PROJECT}_USE_SYSTEM_${proj})
 
   ExternalProject_SetIfNotDefined(
-    ShapePopulationViewer_${proj}_GIT_REPOSITORY
+    ${SUPERBUILD_TOPLEVEL_PROJECT}_${proj}_GIT_REPOSITORY
     "${EP_GIT_PROTOCOL}://github.com/Slicer/SlicerExecutionModel.git"
     QUIET
     )
 
   ExternalProject_SetIfNotDefined(
-    ShapePopulationViewer_${proj}_GIT_TAG
+    ${SUPERBUILD_TOPLEVEL_PROJECT}_${proj}_GIT_TAG
     "0dee798848bacf26d6d4c0fc5f5397d72c1a202b"
     QUIET
     )
@@ -35,8 +35,8 @@ if(NOT DEFINED SlicerExecutionModel_DIR AND NOT ShapePopulationViewer_USE_SYSTEM
 
   ExternalProject_Add(${proj}
     ${${proj}_EP_ARGS}
-    GIT_REPOSITORY "${ShapePopulationViewer_${proj}_GIT_REPOSITORY}"
-    GIT_TAG "${ShapePopulationViewer_${proj}_GIT_TAG}"
+    GIT_REPOSITORY "${${SUPERBUILD_TOPLEVEL_PROJECT}_${proj}_GIT_REPOSITORY}"
+    GIT_TAG "${${SUPERBUILD_TOPLEVEL_PROJECT}_${proj}_GIT_TAG}"
     SOURCE_DIR ${EP_SOURCE_DIR}
     BINARY_DIR ${EP_BINARY_DIR}
     CMAKE_CACHE_ARGS

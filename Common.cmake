@@ -23,8 +23,6 @@ if(NOT DEFINED ShapePopulationViewer_BUILD_TESTING)
   set(ShapePopulationViewer_BUILD_TESTING ${BUILD_TESTING})
 endif()
 
-set(PRIMARY_PROJECT_NAME ${LOCAL_PROJECT_NAME})
-
 #-----------------------------------------------------------------------------
 # Sanity checks
 #------------------------------------------------------------------------------
