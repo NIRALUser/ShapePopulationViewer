@@ -209,15 +209,24 @@ void ShapePopulationQT::loadModel(vtkMRMLModelNode* modelNode)
     {
         return;
     }
-    QList<vtkRenderWindow*> renderWindows;
-
-    /* VTK WINDOW */
-    renderWindows << CreateNewWindow(modelNode->GetPolyData(), std::string(modelNode->GetName()));
-
-    CreateWidgets(renderWindows);
+    this->loadModel(modelNode->GetPolyData(), QString(modelNode->GetName()));
 #else
     Q_UNUSED(modelNode);
 #endif
+}
+
+void ShapePopulationQT::loadModel(vtkPolyData* polyData, const QString& modelName)
+{
+    if (polyData == 0)
+    {
+        return;
+    }
+    QList<vtkRenderWindow*> renderWindows;
+
+    /* VTK WINDOW */
+    renderWindows << CreateNewWindow(polyData, modelName.toStdString());
+
+    CreateWidgets(renderWindows);
 }
 
 QStringList ShapePopulationQT::parseCSVFile(const QString& csvFilePath)

@@ -24,6 +24,9 @@
 // MRML includes
 class vtkMRMLModelNode;
 
+// VTK includes
+class vtkPolyData;
+
 #include "qSlicerShapePopulationViewerModuleExport.h"
 
 class qSlicerShapePopulationViewerModuleWidgetPrivate;
@@ -48,7 +51,10 @@ public slots:
     void loadSelectedModel();
     void loadModel(vtkMRMLModelNode* modelNode);
     void loadModel(const QString& filePath);
+    void loadModel(vtkPolyData* polydata, const QString& modelName);
     void loadCSVFile(const QString& filePath);
+
+    void deleteModels();
 
 protected slots:
     void onMRMLSceneNodeAddedEvent(vtkObject*,vtkObject*);
