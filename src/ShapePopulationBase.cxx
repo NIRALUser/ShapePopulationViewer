@@ -441,10 +441,13 @@ void ShapePopulationBase::RenderSelection()
 {
     if(m_selectedIndex.size()==0 || m_renderAllSelection == false) return;
 
+    bool saved_renderAllSelection = m_renderAllSelection;
+    m_renderAllSelection = false;
     for (unsigned int i = 0; i < m_selectedIndex.size();i++) //render all windows selected (one of them will be the event window)
     {
         m_windowsList[m_selectedIndex[i]]->Render();
     }
+    m_renderAllSelection = saved_renderAllSelection;
 
     //this->sendCameraConfig();
 }

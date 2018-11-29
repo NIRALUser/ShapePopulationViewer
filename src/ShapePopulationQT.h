@@ -55,6 +55,7 @@ public:
 
     void loadVTKFilesCLP(QFileInfoList a_fileList);
     void loadModel(vtkMRMLModelNode* modelNode);
+    void loadModel(vtkPolyData* polyData, const QString& modelName);
     void loadCSVFileCLP(QFileInfo file);
     void loadVTKDirCLP(QDir vtkDir);
     void loadColorMapCLP(std::string a_filePath);

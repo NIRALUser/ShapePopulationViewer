@@ -255,6 +255,13 @@ void qSlicerShapePopulationViewerModuleWidget::loadModel(const QString& filePath
 }
 
 //-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::loadModel(vtkPolyData* polyData, const QString& modelName)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->loadModel(polyData, modelName);
+}
+
+//-----------------------------------------------------------------------------
 void qSlicerShapePopulationViewerModuleWidget::loadCSVFile(const QString& filePath)
 {
     Q_D(qSlicerShapePopulationViewerModuleWidget);
@@ -264,6 +271,13 @@ void qSlicerShapePopulationViewerModuleWidget::loadCSVFile(const QString& filePa
         modelFileInfoList << QFileInfo(modelFilePath);
     }
     d->ShapePopulationWidget->loadVTKFilesCLP(modelFileInfoList);
+}
+
+//-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::deleteModels()
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->actionDelete_All->trigger();
 }
 
 //-----------------------------------------------------------------------------
