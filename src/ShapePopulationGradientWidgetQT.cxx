@@ -48,7 +48,7 @@ ShapePopulationGradientWidgetQT::ShapePopulationGradientWidgetQT(QWidget* parent
     Q_D(ShapePopulationGradientWidgetQT);
     this->setHorizontalSliderVisible(false);
     this->setVerticalSliderVisible(false);
-    this->setTopWidgetsVisible(false);
+    // this->setTopWidgetsVisible(false);
 
     d->CTF = vtkSmartPointer<vtkColorTransferFunction>::New();
     this->view()->addColorTransferFunction(d->CTF);
