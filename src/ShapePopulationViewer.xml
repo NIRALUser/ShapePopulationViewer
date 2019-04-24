@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Quantification</category>
-  <title>ShapePopulationViewer</title>
+  <category>Shape Visualization</category>
+  <title>Shape Population Viewer</title>
   <version>1.4.0</version>
   <description>
 ShapePopulationViewer is a software that allows you to dynamically interact with multiple surfaces at the same time. It is very useful for visualisation and comparison of 3D surfaces by also displaying their scalars attributes and allowing the user to simply modify the colormap gradient.
