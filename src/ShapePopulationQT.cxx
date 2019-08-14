@@ -2102,6 +2102,8 @@ void ShapePopulationQT::slot_gradArrow_moved(qreal newPos)
 
     //set the spinbox value
     spinBox_VISU_position->setValue(absPos);
+
+    this->updateColorbar_QT();
 }
 
 void ShapePopulationQT::slot_gradArrow_selected(qreal newPos)
