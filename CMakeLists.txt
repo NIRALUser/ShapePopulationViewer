@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
+if(POLICY CMP0083)
+  cmake_policy(SET CMP0083 NEW)
+endif()
 
 # C++ standard
 set(_msg "Setting C++ standard")
