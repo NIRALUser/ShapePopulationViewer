@@ -59,17 +59,18 @@ set(QT_QRC_FILES
   )
 
 # --- LIBRARIES ---------------------------------------------------------------------------
+set(_moc_options)
+if(ShapePopulationViewer_BUILD_SLICER_EXTENSION)
+  set(_moc_options OPTIONS -DShapePopulationViewer_BUILD_SLICER_EXTENSION)
+endif()
+
 if(ShapePopulationViewer_QT_VERSION VERSION_EQUAL "4")
   QT4_WRAP_UI(UISrcs ${UI_FILES})
-  set(_moc_options)
-  if(ShapePopulationViewer_BUILD_SLICER_EXTENSION)
-    set(_moc_options OPTIONS -DShapePopulationViewer_BUILD_SLICER_EXTENSION)
-  endif()
   QT4_WRAP_CPP(MOCSrcs ${QT_WRAP} ${_moc_options})
   QT4_ADD_RESOURCES(QRCrcs ${QT_QRC_FILES})
 else()
   QT5_WRAP_UI(UISrcs ${UI_FILES})
-  QT5_WRAP_CPP(MOCSrcs ${QT_WRAP})
+  QT5_WRAP_CPP(MOCSrcs ${QT_WRAP} ${_moc_options})
   QT5_ADD_RESOURCES(QRCrcs ${QT_QRC_FILES})
 endif()
 add_library(${LOCAL_PROJECT_NAME}Widget STATIC
