@@ -2,8 +2,7 @@
 # SLICER EXTENSION
 #-----------------------------------------------------------------------------
 if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
-  set(EXTENSION_NAME ${LOCAL_PROJECT_NAME} )
-  set(MODULE_NAME ${LOCAL_PROJECT_NAME} )
+  set(EXTENSION_NAME "ShapePopulationViewer")
   set(EXTENSION_HOMEPAGE "https://www.nitrc.org/projects/shapepopviewer/")
   set(EXTENSION_CATEGORY "Shape Visualization")
   set(EXTENSION_CONTRIBUTORS "Alexis Girault (NIRAL, UNC), Francois Budin (NIRAL, UNC), Laura Pascal (DCBIA-OrthoLab, UofM)")
