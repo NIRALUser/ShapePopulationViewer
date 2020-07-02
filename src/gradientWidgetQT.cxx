@@ -19,6 +19,7 @@
 
 // Qt includes
 #include <QPainter>
+#include <QPainterPath>
 #include <QMouseEvent>
 
 // local includes
