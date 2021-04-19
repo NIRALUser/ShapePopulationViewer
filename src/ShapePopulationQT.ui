@@ -1656,6 +1656,11 @@ p, li { white-space: pre-wrap; }
     <string>Load CSV Files</string>
    </property>
   </action>
+  <action name="actionOpen_SRep_Files">
+   <property name="text">
+    <string>Open S-Rep Files</string>
+   </property>
+  </action>
   <action name="actionDelete">
    <property name="text">
     <string>Delete Selection</string>

@@ -84,6 +84,7 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
     //Menu signals
     connect(actionOpen_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
     connect(actionOpen_VTK_Files,SIGNAL(triggered()),this,SLOT(openFiles()));
+    connect(actionOpen_SRep_Files,SIGNAL(triggered()),this,SLOT(openSRepFiles()));
     connect(actionLoad_CSV,SIGNAL(triggered()),this,SLOT(loadCSV()));
     connect(m_CSVloaderDialog,SIGNAL(sig_itemsSelected(QFileInfoList)),this,SLOT(slot_itemsSelected(QFileInfoList)));
     connect(actionDelete,SIGNAL(triggered()),this,SLOT(deleteSelection()));
@@ -198,6 +199,11 @@ void ShapePopulationQT::on_pushButton_displayTools_clicked()
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 
 void ShapePopulationQT::loadVTKFilesCLP(QFileInfoList a_fileList)
+{
+    this->CreateWidgets(a_fileList);
+}
+
+void ShapePopulationQT::loadSRepFilesCLP(QFileInfoList a_fileList)
 {
     this->CreateWidgets(a_fileList);
 }
@@ -345,6 +351,28 @@ void ShapePopulationQT::openFiles()
     this->CreateWidgets(fileInfos);
 }
 
+void ShapePopulationQT::openSRepFiles()
+{
+    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open Files"),m_lastDirectory,"S-Rep Files (*.xml)");
+    if(stringList.isEmpty())
+    {
+        return ;
+    }
+
+    m_lastDirectory=QFileInfo(stringList.at(0)).path();
+
+    //Add to fileList
+    QFileInfoList fileInfos;
+
+    //Control the files format
+    foreach(const QString& filePath, stringList)
+    {
+        fileInfos.append(QFileInfo(filePath));
+    }
+
+    //Display widgets
+    this->CreateWidgets(fileInfos);
+}
 
 void ShapePopulationQT::loadCSV()
 {
@@ -1198,6 +1226,7 @@ void ShapePopulationQT::CreateWidgets(const QList<vtkRenderWindow*>& renderWindo
     this->actionOpen_Directory->setText("Add Directory");
     this->actionOpen_VTK_Files->setText("Add VTK/VTP files");
     this->actionLoad_CSV->setText("Add CSV file");
+    this->actionOpen_SRep_Files->setText("Add S-Rep files");
 
     /* DISPLAY INFOS */
     this->updateInfo_QT();
