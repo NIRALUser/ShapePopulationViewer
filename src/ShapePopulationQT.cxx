@@ -372,6 +372,13 @@ void ShapePopulationQT::openSRepFiles()
 
     //Display widgets
     this->CreateWidgets(fileInfos);
+
+    //Load color map for S-Reps
+    QString filename = ":/resources/sRepColorMap.spvcm";
+    QFileInfo file(filename);
+    m_colormapDirectory= file.path();
+    gradientWidget_VISU->loadColorPointList(filename, &m_usedColorBar->colorPointList);
+    this->updateColorbar_QT();
 }
 
 void ShapePopulationQT::loadCSV()
@@ -426,6 +433,7 @@ void ShapePopulationQT::deleteAll()
     //Initialize Menu actions
     actionOpen_Directory->setText("Open Directory");
     actionOpen_VTK_Files->setText("Open VTK Files");
+    actionOpen_SRep_Files->setText("Open SRep Files");
     actionLoad_CSV->setText("Load CSV File");
 
     //Empty the meshes FileInfo List

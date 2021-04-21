@@ -7,5 +7,6 @@
         <file>resources/eyeClosedDisabled.png</file>
         <file>resources/eyeOpenDisabled.png</file>
         <file>resources/logo.png</file>
+        <file>resources/sRepColorMap.spvcm</file>
     </qresource>
 </RCC>
