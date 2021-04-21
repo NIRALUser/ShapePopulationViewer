@@ -1643,6 +1643,11 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
                 fileList.append(QFileInfo(filePath));
                 load = true;
             }
+            else if(filePath.endsWith(".xml") && QFileInfo(filePath).exists())
+            {
+                fileList.append(QFileInfo(filePath));
+                load = true;
+            }
             else if(filePath.endsWith(".csv") && QFileInfo(filePath).exists())
             {
                 this->loadCSVFileCLP(QFileInfo(filePath));
@@ -1662,7 +1667,7 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
         }
         if(load == true)
         {
-            this->loadVTKFilesCLP(fileList);
+            this->CreateWidgets(fileList);
         }
     }
 }

@@ -129,14 +129,16 @@ void ShapePopulationData::ReadSRep(vtkPolyData* upPD, vtkPolyData* downPD, vtkPo
         m_FileName = a_filePath;
     }
 
-    // merge poly data
+    // Create spoke geometries and merge poly data
     vtkNew<vtkAppendPolyData> append;
-    append->AddInputData(upPD);
-    append->AddInputData(downPD);
-    append->AddInputData(crestPD);
+    append->AddInputData(ExtractSpokes(upPD, 0));
+    append->AddInputData(ExtractSpokes(downPD, 4));
+    append->AddInputData(ExtractSpokes(crestPD, 2));
+    append->AddInputData(AttachCellType(upPD, 1));
+    append->AddInputData(AttachCellType(crestPD, 3));
     append->Update();
 
-    //Update the class members
+    // Update the class members
     m_PolyData = append->GetOutput();
 
     int numAttributes = m_PolyData->GetPointData()->GetNumberOfArrays();
@@ -145,24 +147,67 @@ void ShapePopulationData::ReadSRep(vtkPolyData* upPD, vtkPolyData* downPD, vtkPo
         int dim = m_PolyData->GetPointData()->GetArray(j)->GetNumberOfComponents();
         const char * AttributeName = m_PolyData->GetPointData()->GetArrayName(j);
 
-        if (dim == 1 || dim == 3 )
+        if (dim == 1)
         {
             std::string AttributeString = AttributeName;
             m_AttributeList.push_back(AttributeString);
-        }
-        if( dim == 3)
-        {
-            //Vectors
-            vtkPVPostFilter *  getVectors = vtkPVPostFilter::New();
-            std::ostringstream strs;
-            strs.str("");
-            strs.clear();
-            strs << AttributeName << "_mag" << std::endl;
-            getVectors->DoAnyNeededConversions(m_PolyData,strs.str().c_str(),vtkDataObject::FIELD_ASSOCIATION_POINTS, AttributeName, "Magnitude");
-            getVectors->Delete();
         }
     }
     std::sort(m_AttributeList.begin(),m_AttributeList.end());
 }
 
+vtkSmartPointer<vtkPolyData> ShapePopulationData::ExtractSpokes(vtkPolyData* polyData, int cellType)
+{
+    int nPoints = polyData->GetNumberOfPoints();
+    auto* pointData = polyData->GetPointData();
+    auto* arr_length = pointData->GetArray("spokeLength");
+    auto* arr_dirs = pointData->GetArray("spokeDirection");
+
+    vtkNew<vtkPoints> spokePoints;
+    vtkNew<vtkCellArray> spokeLines;
+    vtkNew<vtkIntArray> typeArray;
+    typeArray->SetName("cellType");
+    typeArray->SetNumberOfComponents(1);
+
+    for (int i  = 0; i < nPoints; ++i)
+    {
+        auto* pt0 = polyData->GetPoint(i);
+        auto spoke_length = arr_length->GetTuple1(i);
+        auto* dir = arr_dirs->GetTuple3(i);
+        double pt1[] = {pt0[0] + spoke_length * dir[0],
+                        pt0[1] + spoke_length * dir[1],
+                        pt0[2] + spoke_length * dir[2]};
+        int id0 = spokePoints->InsertNextPoint(pt0);
+        int id1 = spokePoints->InsertNextPoint(pt1);
+
+        vtkNew<vtkLine> arrow;
+        arrow->GetPointIds()->SetId(0, id0);
+        arrow->GetPointIds()->SetId(1, id1);
+        spokeLines->InsertNextCell(arrow);
+        typeArray->InsertNextValue(cellType);
+        typeArray->InsertNextValue(cellType);
+    }
+
+    vtkNew<vtkPolyData> spokePD;
+    spokePD->SetPoints(spokePoints);
+    spokePD->SetLines(spokeLines);
+    spokePD->GetPointData()->SetActiveScalars("cellType");
+    spokePD->GetPointData()->SetScalars(typeArray);
+    return spokePD;
+}
+
+vtkSmartPointer<vtkPolyData> ShapePopulationData::AttachCellType(vtkPolyData *polyData, int cellType)
+{
+    vtkNew<vtkIntArray> outputType;
+    outputType->SetName("cellType");
+    outputType->SetNumberOfComponents(1);
+    for (int i = 0; i < polyData->GetNumberOfPoints(); ++i)
+    {
+        outputType->InsertNextValue(cellType);
+    }
+
+    polyData->GetPointData()->SetActiveScalars("cellType");
+    polyData->GetPointData()->SetScalars(outputType);
+    return polyData;
+}
 

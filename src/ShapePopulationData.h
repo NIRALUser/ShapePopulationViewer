@@ -4,11 +4,17 @@
 #include <vtkVersion.h>
 
 #include <vtkAppendPolyData.h>
+#include <vtkCellArray.h>
+#include <vtkIntArray.h>
+#include <vtkLine.h>
+#include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkPointData.h>
+#include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPolyDataReader.h>
+#include <vtkXMLDataElement.h>
 #include <vtkXMLDataParser.h>
 #include <vtkXMLPolyDataReader.h>
 
@@ -37,6 +43,9 @@ class ShapePopulationData
     std::vector<std::string> GetAttributeList() {return m_AttributeList;}
 
     protected :
+
+    static vtkSmartPointer<vtkPolyData> ExtractSpokes(vtkPolyData* polyData, int cellType);
+    static vtkSmartPointer<vtkPolyData> AttachCellType(vtkPolyData* polyData, int cellType);
 
     vtkSmartPointer<vtkPolyData> m_PolyData;
     std::string m_FileName;
