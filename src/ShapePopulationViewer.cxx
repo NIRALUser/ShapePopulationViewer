@@ -87,6 +87,30 @@ int main( int argc, char** argv )
             checkConfigurationFiles(cameraConfig, colormapConfig, shapePopulation);
         }
     }
+
+    if(!SRepFiles.empty())
+    {
+        bool load = false;
+        QFileInfoList fileList;
+        for(unsigned int i = 0 ; i < SRepFiles.size(); i++)
+        {
+            QString QFilePath(SRepFiles[i].c_str());
+            QFileInfo SRepFileInfo(QFilePath);
+            if (!QFilePath.endsWith(".xml")) wrongFileFormat(SRepFiles[i],"xml", &window);         // Control the files format
+            else if(!SRepFileInfo.exists()) fileDoesNotExist(SRepFiles[i], &window);                  // Control that the file exists
+            else
+            {
+                fileList.append(SRepFileInfo);
+                load = true;
+            }
+        }
+        if(load == true)
+        {
+            shapePopulation->loadSRepFilesCLP(fileList);
+            checkConfigurationFiles(cameraConfig, colormapConfig, shapePopulation);
+        }
+    }
+
     if(!vtkDirectory.empty())
     {
         QDir vtkDir(vtkDirectory.c_str());

@@ -206,6 +206,13 @@ void ShapePopulationQT::loadVTKFilesCLP(QFileInfoList a_fileList)
 void ShapePopulationQT::loadSRepFilesCLP(QFileInfoList a_fileList)
 {
     this->CreateWidgets(a_fileList);
+
+    //Load color map for S-Reps
+    QString filename = ":/resources/sRepColorMap.spvcm";
+    QFileInfo file(filename);
+    m_colormapDirectory= file.path();
+    gradientWidget_VISU->loadColorPointList(filename, &m_usedColorBar->colorPointList);
+    this->updateColorbar_QT();
 }
 
 void ShapePopulationQT::loadModel(vtkMRMLModelNode* modelNode)

@@ -26,7 +26,7 @@ ShapePopulationViewer is a software that allows you to dynamically interact with
       <label>SRep Files</label>
       <channel>input</channel>
       <longflag>--srepfiles</longflag>
-      <flag>-v</flag>
+      <flag>-s</flag>
       <description><![CDATA[.xml Input files]]></description>
     </geometry>
 
