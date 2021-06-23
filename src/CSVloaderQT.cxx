@@ -55,13 +55,13 @@ void CSVloaderQT::on_buttonBox_accepted()
     for (int i = 0; i < fileList.size(); i++)
     {
         QString QFilePath = fileList[i].absoluteFilePath();
-        if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp"))
+        if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp") && !QFilePath.endsWith(".xml"))
         {
             fileList.removeAt(i);
             i--;
             std::ostringstream strs;
             strs << QFilePath.toStdString() << std::endl
-                 << "This is not a vtk/vtp file."<< std::endl;
+                 << "This is not a vtk/vtp/xml file."<< std::endl;
             QMessageBox::critical(this,"Wrong file format",QString(strs.str().c_str()), QMessageBox::Ok);
         }
         else if(!fileList[i].exists())
