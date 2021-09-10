@@ -30,6 +30,15 @@ ShapePopulationViewer is a software that allows you to dynamically interact with
       <description><![CDATA[srep Input files]]></description>
     </geometry>
 
+    <geometry fileExtensions=".fcsv" multiple="true" >
+      <name>FiducialFiles</name>
+      <label>Fiducial Files</label>
+      <channel>input</channel>
+      <longflag>--fiducialfiles</longflag>
+      <flag>-f</flag>
+      <description><![CDATA[.fcsv Input files]]></description>
+    </geometry>
+
     <file fileExtensions=".csv" >
       <name >CSVFile</name>
       <label>Load from CSV File</label>

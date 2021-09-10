@@ -1661,6 +1661,11 @@ p, li { white-space: pre-wrap; }
     <string>Open S-Rep Files</string>
    </property>
   </action>
+  <action name="actionOpen_Fiducial_Files">
+   <property name="text">
+    <string>Open Fiducial Files</string>
+   </property>
+  </action>
   <action name="actionDelete">
    <property name="text">
     <string>Delete Selection</string>

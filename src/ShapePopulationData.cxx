@@ -100,6 +100,10 @@ vtkSmartPointer<vtkPolyData> ShapePopulationData::ReadMesh(std::string a_filePat
     {
         ReadSRep(a_filePath);
     }
+    else if(endswith(a_filePath, ".fcsv"))
+    {
+        ReadFiducial(a_filePath);
+    }
     else
     {
         return 0;
@@ -179,6 +183,91 @@ void ShapePopulationData::ReadSRep(vtkPolyData* upPD, vtkPolyData* downPD, vtkPo
     append->Update();
 
     // Update the class members
+    m_PolyData = append->GetOutput();
+
+    int numAttributes = m_PolyData->GetPointData()->GetNumberOfArrays();
+    for (int j = 0; j < numAttributes; j++)
+    {
+        int dim = m_PolyData->GetPointData()->GetArray(j)->GetNumberOfComponents();
+        const char * AttributeName = m_PolyData->GetPointData()->GetArrayName(j);
+
+        if (dim == 1)
+        {
+            std::string AttributeString = AttributeName;
+            m_AttributeList.push_back(AttributeString);
+        }
+    }
+    std::sort(m_AttributeList.begin(),m_AttributeList.end());
+}
+
+void ShapePopulationData::ReadFiducial(const std::string& a_filePath)
+{
+    // Read file and record fiducial positions
+    QFile inputFile(a_filePath.c_str());
+    if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        return;
+    }
+    QTextStream inputStream(&inputFile);
+    std::vector<std::vector<double>> sphereCenters;
+    while(!inputStream.atEnd())
+    {
+        auto line = inputStream.readLine();
+        if (line.startsWith("vtkMRMLMarkupsFiducialNode"))
+        {
+            QStringList list  = line.split(',');
+            std::vector<double> center;
+            center.push_back(list[1].toDouble());
+            center.push_back(list[2].toDouble());
+            center.push_back(list[3].toDouble());
+            sphereCenters.push_back(center);
+        }
+    }
+    inputFile.close();
+
+    // Check closest distance between fiducials to decide sphere radius
+    auto closestDistance = VTK_DOUBLE_MAX;
+    for (int i = 0; i < (int)sphereCenters.size() - 1; ++i)
+    {
+        auto centerI = sphereCenters[i];
+        for (int j = i + 1; j < (int)sphereCenters.size(); j++)
+        {
+            auto centerJ = sphereCenters[j];
+            double diff[3] = {centerJ[0] - centerI[0],
+                              centerJ[1] - centerI[1],
+                              centerJ[2] - centerI[2]};
+            double distance = std::sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+            }
+        }
+    }
+
+    // Create geometry for visualization
+    vtkNew<vtkAppendPolyData> append;
+    double radius = closestDistance * 0.2;
+    for (int i = 0; i < (int)sphereCenters.size(); ++i)
+    {
+        vtkNew<vtkSphereSource> sphere;
+        sphere->SetRadius(radius);
+        sphere->SetCenter(sphereCenters[i][0], sphereCenters[i][1], sphereCenters[i][2]);
+        sphere->Update();
+        auto spherePD = sphere->GetOutput();
+        vtkNew <vtkIntArray> intArray;
+        intArray->SetNumberOfComponents(1);
+        intArray->SetNumberOfValues(spherePD->GetNumberOfPoints());
+        intArray->SetName("Fiducial Index");
+        for (int j = 0; j < spherePD->GetNumberOfPoints(); ++j)
+        {
+            intArray->SetValue(j, i);
+        }
+        spherePD->GetPointData()->SetActiveScalars("Fiducial Index");
+        spherePD->GetPointData()->SetScalars(intArray);
+        append->AddInputData(spherePD);
+    }
+    append->Update();
+
     m_PolyData = append->GetOutput();
 
     int numAttributes = m_PolyData->GetPointData()->GetNumberOfArrays();

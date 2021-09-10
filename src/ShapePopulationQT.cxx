@@ -85,6 +85,7 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
     connect(actionOpen_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
     connect(actionOpen_VTK_Files,SIGNAL(triggered()),this,SLOT(openFiles()));
     connect(actionOpen_SRep_Files,SIGNAL(triggered()),this,SLOT(openSRepFiles()));
+    connect(actionOpen_Fiducial_Files,SIGNAL(triggered()),this,SLOT(openFiducialFiles()));
     connect(actionLoad_CSV,SIGNAL(triggered()),this,SLOT(loadCSV()));
     connect(m_CSVloaderDialog,SIGNAL(sig_itemsSelected(QFileInfoList)),this,SLOT(slot_itemsSelected(QFileInfoList)));
     connect(actionDelete,SIGNAL(triggered()),this,SLOT(deleteSelection()));
@@ -213,6 +214,12 @@ void ShapePopulationQT::loadSRepFilesCLP(QFileInfoList a_fileList)
     m_colormapDirectory= file.path();
     gradientWidget_VISU->loadColorPointList(filename, &m_usedColorBar->colorPointList);
     this->updateColorbar_QT();
+}
+
+void ShapePopulationQT::loadFiducialFilesCLP(QFileInfoList a_fileList)
+{
+
+    this->CreateWidgets(a_fileList);
 }
 
 void ShapePopulationQT::loadModel(vtkMRMLModelNode* modelNode)
@@ -388,6 +395,29 @@ void ShapePopulationQT::openSRepFiles()
     this->updateColorbar_QT();
 }
 
+void ShapePopulationQT::openFiducialFiles()
+{
+    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open Files"),m_lastDirectory,"Fiducial Files (*.fcsv)");
+    if(stringList.isEmpty())
+    {
+      return ;
+    }
+
+    m_lastDirectory=QFileInfo(stringList.at(0)).path();
+
+    //Add to fileList
+    QFileInfoList fileInfos;
+
+    //Control the files format
+    foreach(const QString& filePath, stringList)
+    {
+      fileInfos.append(QFileInfo(filePath));
+    }
+
+    //Display widgets
+    this->CreateWidgets(fileInfos);
+}
+
 void ShapePopulationQT::loadCSV()
 {
     // get directory
@@ -441,6 +471,7 @@ void ShapePopulationQT::deleteAll()
     actionOpen_Directory->setText("Open Directory");
     actionOpen_VTK_Files->setText("Open VTK Files");
     actionOpen_SRep_Files->setText("Open SRep Files");
+    actionOpen_Fiducial_Files->setText("Open Fiducial Files");
     actionLoad_CSV->setText("Load CSV File");
 
     //Empty the meshes FileInfo List
@@ -1242,6 +1273,7 @@ void ShapePopulationQT::CreateWidgets(const QList<vtkRenderWindow*>& renderWindo
     this->actionOpen_VTK_Files->setText("Add VTK/VTP files");
     this->actionLoad_CSV->setText("Add CSV file");
     this->actionOpen_SRep_Files->setText("Add S-Rep files");
+    this->actionOpen_Fiducial_Files->setText("Add Fiducial files");
 
     /* DISPLAY INFOS */
     this->updateInfo_QT();

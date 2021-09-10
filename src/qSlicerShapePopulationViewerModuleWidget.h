@@ -54,6 +54,7 @@ public slots:
     void loadModel(vtkPolyData* polydata, const QString& modelName);
     void loadCSVFile(const QString& filePath);
     void loadSRep(const QString& filePath);
+    void loadFiducial(const QString& filePath);
 
     void deleteModels();
 

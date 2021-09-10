@@ -192,6 +192,7 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
             << d->ShapePopulationWidget->actionOpen_VTK_Files
             << d->ShapePopulationWidget->actionLoad_CSV
             << d->ShapePopulationWidget->actionOpen_SRep_Files
+            << d->ShapePopulationWidget->actionOpen_Fiducial_Files
     )
     {
         QToolButton* button = new QToolButton();
@@ -279,6 +280,13 @@ void qSlicerShapePopulationViewerModuleWidget::loadSRep(const QString &filePath)
 {
     Q_D(qSlicerShapePopulationViewerModuleWidget);
     d->ShapePopulationWidget->loadSRepFilesCLP(QFileInfoList() << QFileInfo(filePath));
+}
+
+//-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::loadFiducial(const QString &filePath)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->loadFiducialFilesCLP(QFileInfoList() << QFileInfo(filePath));
 }
 
 //-----------------------------------------------------------------------------

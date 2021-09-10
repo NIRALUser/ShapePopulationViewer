@@ -14,6 +14,7 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPolyDataReader.h>
+#include <vtkSphereSource.h>
 #include <vtkXMLDataElement.h>
 #include <vtkXMLDataParser.h>
 #include <vtkXMLPolyDataReader.h>
@@ -25,6 +26,10 @@
 #include <algorithm>
 #include <sstream>
 
+#include <QFile>
+#include <QString>
+#include <QTextStream>
+
 class ShapePopulationData
 {
     public :
@@ -35,6 +40,7 @@ class ShapePopulationData
     vtkSmartPointer<vtkPolyData> ReadMesh(std::string a_filePath);
     void ReadMesh(vtkPolyData* polyData, const std::string& a_filePath);
     void ReadSRep(vtkPolyData* upPD, vtkPolyData* downPD, vtkPolyData* crestPD, const std::string& a_filePath);
+    void ReadFiducial(const std::string& a_filePath);
     vtkSmartPointer<vtkPolyData> ReadPolyData(std::string a_filePath);
 
     vtkSmartPointer<vtkPolyData> GetPolyData() {return m_PolyData;}
