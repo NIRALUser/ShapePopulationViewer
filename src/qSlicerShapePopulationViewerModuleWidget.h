@@ -56,6 +56,10 @@ public slots:
 
     void deleteModels();
 
+    void setVectorScale(double value);
+    void setVectorDensity(double value);
+    void displayVectors(bool display);
+
 protected slots:
     void onMRMLSceneNodeAddedEvent(vtkObject*,vtkObject*);
     void onMRMLNodeModified(vtkObject*);
