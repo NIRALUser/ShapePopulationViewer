@@ -32,7 +32,7 @@
 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
-#include "vtkMaskPoints.h"
+#include "vtkDecimatePro.h"
 
 #include <set>
 
