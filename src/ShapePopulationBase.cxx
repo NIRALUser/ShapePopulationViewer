@@ -937,10 +937,9 @@ void ShapePopulationBase::setVectorDensity(double value)
         m_vectorDensity[m_selectedIndex[i]] = value;
 
         ShapePopulationData * mesh = m_meshList[m_selectedIndex[i]];
-        vtkSmartPointer<vtkMaskPoints> filter = vtkSmartPointer<vtkMaskPoints>::New();
+        vtkSmartPointer<vtkDecimatePro> filter = vtkSmartPointer<vtkDecimatePro>::New();
         filter->SetInputData(mesh->GetPolyData());
-        filter->SetOnRatio(101-value);
-
+        filter->SetTargetReduction(1 - value/100);
 
         vtkGlyph3D* glyph = m_glyphList[m_selectedIndex[i]];
         glyph->SetInputConnection(filter->GetOutputPort());
