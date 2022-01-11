@@ -280,6 +280,21 @@ void qSlicerShapePopulationViewerModuleWidget::deleteModels()
     d->ShapePopulationWidget->actionDelete_All->trigger();
 }
 
+void qSlicerShapePopulationViewerModuleWidget::setVectorScale(double value){
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->slider_vectorScale->setValue((int) (value * 100));
+}
+
+void qSlicerShapePopulationViewerModuleWidget::setVectorDensity(double value){
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->slider_arrowDens->setValue((int) (value * 100));
+}
+
+void qSlicerShapePopulationViewerModuleWidget::displayVectors(bool display){
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->checkBox_displayVectors->setChecked(display);
+}
+
 //-----------------------------------------------------------------------------
 void qSlicerShapePopulationViewerModuleWidget::onMRMLSceneNodeAddedEvent(vtkObject *vtkNotUsed(caller), vtkObject *callData)
 {
