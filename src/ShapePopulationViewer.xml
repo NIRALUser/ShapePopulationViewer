@@ -21,13 +21,13 @@ ShapePopulationViewer is a software that allows you to dynamically interact with
       <description><![CDATA[.vtk Input files]]></description>
     </geometry>
 
-    <geometry fileExtensions=".xml" multiple="true" >
+    <geometry fileExtensions=".xml,.srep.json" multiple="true" >
       <name>SRepFiles</name>
       <label>SRep Files</label>
       <channel>input</channel>
       <longflag>--srepfiles</longflag>
       <flag>-s</flag>
-      <description><![CDATA[.xml Input files]]></description>
+      <description><![CDATA[srep Input files]]></description>
     </geometry>
 
     <file fileExtensions=".csv" >

@@ -90,6 +90,8 @@ if(ShapePopulationViewer_BUILD_SLICER_EXTENSION)
 
   # Current_{source,binary} and Slicer_{Libs,Base} already included
   set(MODULE_INCLUDE_DIRECTORIES
+    ${vtkSlicerSRepModuleMRML_INCLUDE_DIRS}
+    ${vtkSlicerSRepModuleLogic_INCLUDE_DIRS}
     )
   set(MODULE_SRCS
     qSlicer${MODULE_NAME}LayoutViewFactory.cxx
@@ -109,6 +111,8 @@ if(ShapePopulationViewer_BUILD_SLICER_EXTENSION)
     )
   set(MODULE_TARGET_LIBRARIES
     ${LOCAL_PROJECT_NAME}Widget
+    vtkSlicerSRepModuleMRML
+    vtkSlicerSRepModuleLogic
     )
   set(MODULE_RESOURCES
     )

@@ -96,7 +96,7 @@ int main( int argc, char** argv )
         {
             QString QFilePath(SRepFiles[i].c_str());
             QFileInfo SRepFileInfo(QFilePath);
-            if (!QFilePath.endsWith(".xml")) wrongFileFormat(SRepFiles[i],"xml", &window);         // Control the files format
+            if (!QFilePath.endsWith(".xml") && !QFilePath.endsWith(".srep.json")) wrongFileFormat(SRepFiles[i],"xml/srep.json", &window);         // Control the files format
             else if(!SRepFileInfo.exists()) fileDoesNotExist(SRepFiles[i], &window);                  // Control that the file exists
             else
             {

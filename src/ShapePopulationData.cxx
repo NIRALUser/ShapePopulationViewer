@@ -1,5 +1,41 @@
 #include "ShapePopulationData.h"
 
+#include <qSlicerCoreApplication.h>
+#include <vtkMRMLScene.h>
+#include <vtkMRMLSRepNode.h>
+#include <vtkMRMLSRepStorageNode.h>
+#include <vtkSlicerApplicationLogic.h>
+#include <vtkSlicerSRepLogic.h>
+#include <vtkSRepExportPolyDataProperties.h>
+
+namespace {
+
+class ScopedRemove {
+public:
+    ScopedRemove(vtkMRMLNode* toRemove, vtkMRMLScene* scene)
+        : m_ToRemove(toRemove)
+        , m_Scene(scene)
+    {}
+
+    void cancel() {
+        m_ToRemove = nullptr;
+        m_Scene = nullptr;
+    }
+
+    ~ScopedRemove() {
+        if (m_ToRemove && m_Scene) {
+            m_Scene->RemoveNode(m_ToRemove);
+            m_ToRemove = nullptr;
+            m_Scene = nullptr;
+        }
+    }
+private:
+    vtkMRMLNode* m_ToRemove;
+    vtkMRMLScene* m_Scene;
+};
+
+}
+
 static bool endswith(std::string file, std::string ext)
 {
     int epos = file.length() - ext.length();
@@ -59,6 +95,10 @@ vtkSmartPointer<vtkPolyData> ShapePopulationData::ReadMesh(std::string a_filePat
         if(upPD == NULL || downPD == NULL || crestPD == NULL) return 0;
 
         ReadSRep(upPD, downPD, crestPD, a_filePath);
+    }
+    else if (endswith(a_filePath, ".srep.json"))
+    {
+        ReadSRep(a_filePath);
     }
     else
     {
@@ -211,3 +251,97 @@ vtkSmartPointer<vtkPolyData> ShapePopulationData::AttachCellType(vtkPolyData *po
     return polyData;
 }
 
+void ShapePopulationData::ReadSRep(const std::string& a_filePath)
+{
+    size_t found = a_filePath.find_last_of("/\\");
+    if (found != std::string::npos)
+    {
+        m_FileDir = a_filePath.substr(0,found);
+        m_FileName = a_filePath.substr(found+1);
+    }
+    else
+    {
+        m_FileName = a_filePath;
+    }
+
+    vtkMRMLScene* mrmlScene = qSlicerCoreApplication::application()->applicationLogic()->GetMRMLScene();
+    if (!mrmlScene) {
+        std::cerr << "ShapePopulationData::ReadSRep Unable to get application MRML scene!" << std::endl;
+        return;
+    }
+    vtkMRMLSRepStorageNode* storageNode = vtkMRMLSRepStorageNode::SafeDownCast(mrmlScene->AddNewNodeByClass("vtkMRMLSRepStorageNode"));
+    if (!storageNode) {
+        std::cerr << "ShapePopulationData::ReadSRep Unable to get storageNode!" << std::endl;
+        return;
+    }
+    ScopedRemove removeStorage(storageNode, mrmlScene);
+    storageNode->SetFileName(a_filePath.c_str());
+
+    vtkMRMLSRepNode* srepNode = storageNode->CreateSRepNode("srep");
+    if (!srepNode) {
+        std::cerr << "ShapePopulationData::ReadSRep Unable to get srepNode!" << std::endl;
+        return;
+    }
+    ScopedRemove removeSRep(srepNode, mrmlScene);
+    /// removing the srep node will remove its associated storage node
+    removeStorage.cancel();
+
+    auto spokeExportProps = vtkSmartPointer<vtkSRepExportPolyDataProperties>::New();
+    spokeExportProps->SetIncludeSkeletalSheet(false);
+    spokeExportProps->SetIncludeCrestCurve(false);
+    spokeExportProps->SetIncludeSkeletonToCrestConnection(false);
+    spokeExportProps->SetIncludeSpine(false);
+    spokeExportProps->SetPointTypeArrayName("cellType");
+    spokeExportProps->SetLineTypeArrayName("cellType");
+    vtkNew<vtkIntArray> spokeTypeArray;
+    spokeTypeArray->SetNumberOfTuples(vtkSRepExportPolyDataProperties::NumberOfTypes);
+    spokeTypeArray->SetValue(vtkSRepExportPolyDataProperties::UpBoundaryPointType, 0);
+    spokeTypeArray->SetValue(vtkSRepExportPolyDataProperties::UpSkeletalPointType, 0);
+    spokeTypeArray->SetValue(vtkSRepExportPolyDataProperties::DownBoundaryPointType, 4);
+    spokeTypeArray->SetValue(vtkSRepExportPolyDataProperties::DownSkeletalPointType, 4);
+    spokeTypeArray->SetValue(vtkSRepExportPolyDataProperties::CrestBoundaryPointType, 2);
+    spokeTypeArray->SetValue(vtkSRepExportPolyDataProperties::CrestSkeletalPointType, 2);
+    spokeTypeArray->SetValue(vtkSRepExportPolyDataProperties::UpSpokeLineType, 0);
+    spokeTypeArray->SetValue(vtkSRepExportPolyDataProperties::DownSpokeLineType, 4);
+    spokeTypeArray->SetValue(vtkSRepExportPolyDataProperties::CrestSpokeLineType, 2);
+    spokeExportProps->SetSRepDataArray(spokeTypeArray);
+
+    auto sheetExportProps = vtkSmartPointer<vtkSRepExportPolyDataProperties>::New();
+    sheetExportProps->SetIncludeUpSpokes(false);
+    sheetExportProps->SetIncludeDownSpokes(false);
+    sheetExportProps->SetIncludeCrestSpokes(false);
+    sheetExportProps->SetIncludeSpine(false);
+    sheetExportProps->SetPointTypeArrayName("cellType");
+    sheetExportProps->SetLineTypeArrayName("cellType");
+    vtkNew<vtkIntArray> typeArray;
+    typeArray->SetNumberOfTuples(vtkSRepExportPolyDataProperties::NumberOfTypes);
+    typeArray->SetValue(vtkSRepExportPolyDataProperties::UpSkeletalPointType, 1);
+    typeArray->SetValue(vtkSRepExportPolyDataProperties::DownSkeletalPointType, 1);
+    typeArray->SetValue(vtkSRepExportPolyDataProperties::CrestSkeletalPointType, 3);
+    typeArray->SetValue(vtkSRepExportPolyDataProperties::CrestCurveLineType, 3);
+    typeArray->SetValue(vtkSRepExportPolyDataProperties::SkeletalSheetLineType, 1);
+    sheetExportProps->SetSRepDataArray(typeArray);
+
+    // making two different polydatas with overlapping points of different colors
+    auto logic = vtkSmartPointer<vtkSlicerSRepLogic>::New();
+    vtkNew<vtkAppendPolyData> append;
+    append->AddInputData(logic->SmartExportSRepToPolyData(*srepNode->GetSRep(), *spokeExportProps));
+    append->AddInputData(logic->SmartExportSRepToPolyData(*srepNode->GetSRep(), *sheetExportProps));
+    append->Update();
+    m_PolyData = append->GetOutput();
+    
+    m_PolyData->GetPointData()->SetActiveScalars("cellType");
+    int numAttributes = m_PolyData->GetPointData()->GetNumberOfArrays();
+    for (int j = 0; j < numAttributes; j++)
+    {
+        int dim = m_PolyData->GetPointData()->GetArray(j)->GetNumberOfComponents();
+        const char * AttributeName = m_PolyData->GetPointData()->GetArrayName(j);
+
+        if (dim == 1)
+        {
+            std::string AttributeString = AttributeName;
+            m_AttributeList.push_back(AttributeString);
+        }
+    }
+    std::sort(m_AttributeList.begin(),m_AttributeList.end());
+}

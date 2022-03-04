@@ -360,7 +360,7 @@ void ShapePopulationQT::openFiles()
 
 void ShapePopulationQT::openSRepFiles()
 {
-    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open Files"),m_lastDirectory,"S-Rep Files (*.xml)");
+    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open Files"),m_lastDirectory,"S-Rep Files (*.srep.json *.xml)");
     if(stringList.isEmpty())
     {
         return ;
@@ -1658,7 +1658,7 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
                 fileList.append(QFileInfo(filePath));
                 load = true;
             }
-            else if(filePath.endsWith(".xml") && QFileInfo(filePath).exists())
+            else if((filePath.endsWith(".xml") || filePath.endsWith(".srep.json")) && QFileInfo(filePath).exists())
             {
                 fileList.append(QFileInfo(filePath));
                 load = true;

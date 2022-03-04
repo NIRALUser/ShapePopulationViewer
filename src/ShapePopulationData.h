@@ -51,6 +51,8 @@ class ShapePopulationData
     std::string m_FileName;
     std::string m_FileDir;
     std::vector<std::string> m_AttributeList;
+private:
+    void ReadSRep(const std::string& a_filePath);
 };
 
 
