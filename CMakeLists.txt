@@ -6,8 +6,6 @@ message(STATUS "${_msg}")
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   if("${ShapePopulationViewer_VTK_VERSION_MAJOR}" STREQUAL "8" OR DEFINED Qt5_DIR OR DEFINED Slicer_DIR)
     set(CMAKE_CXX_STANDARD 11)
-  else()
-    set(CMAKE_CXX_STANDARD 98)
   endif()
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -68,33 +66,17 @@ endif()
 
 #-----------------------------------------------------------------------------
 # Qt
-#
-# If building as a Slicer extension, use Slicer's Qt Version
-# If QT_QMAKE_EXECUTABLE is defined, default to Qt4
-# If Qt5_DIR is defined, default to Qt5
-# Otherwise, default to Qt4
 #-----------------------------------------------------------------------------
 
-set(_qt_version "4")
-
-if (${LOCAL_PROJECT_NAME}_BUILD_SLICER_EXTENSION)
-  if (Slicer_REQUIRED_QT_VERSION VERSION_GREATER "4.9")
-    set(_qt_version "5")
-  endif()
-elseif(DEFINED QT_QMAKE_EXECUTABLE)
-  set(_qt_version "4")
-elseif(DEFINED Qt5_DIR)
-  set(_qt_version "5")
-endif()
-
+set(_qt_version "5")
 set(ShapePopulationViewer_QT_VERSION ${_qt_version} CACHE STRING "Version of Qt to use")
-set_property(CACHE ShapePopulationViewer_QT_VERSION PROPERTY STRINGS 4 5)
+set_property(CACHE ShapePopulationViewer_QT_VERSION PROPERTY STRINGS 5)
 
 # Select VTK major version based on Qt version
-if(ShapePopulationViewer_QT_VERSION STREQUAL "4")
-  set(ShapePopulationViewer_VTK_VERSION_MAJOR "7")
-else()
+if(ShapePopulationViewer_QT_VERSION STREQUAL "5")
   set(ShapePopulationViewer_VTK_VERSION_MAJOR "8")
+else()
+  message(FATAL_ERROR "error: Unsupported ShapePopulationViewer_QT_VERSION: ${ShapePopulationViewer_QT_VERSION}")
 endif()
 
 #-----------------------------------------------------------------------------

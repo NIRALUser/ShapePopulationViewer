@@ -33,14 +33,7 @@ if((NOT DEFINED VTK_DIR OR NOT DEFINED VTK_SOURCE_DIR) AND NOT ${SUPERBUILD_TOPL
     -DVTK_USE_QVTK_QTOPENGL:BOOL=ON
     -DModule_vtkTestingRendering:BOOL=ON
     )
-  if(ShapePopulationViewer_QT_VERSION VERSION_LESS "5")
-    set(ShapePopulationViewer_VTK_RENDERING_BACKEND "OpenGL")
-    list(APPEND EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS
-      -DVTK_QT_VERSION:STRING=4
-      -DVTK_USE_QT:BOOL=ON
-      -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-      )
-  else()
+  if(ShapePopulationViewer_QT_VERSION VERSION_EQUAL "5")
     set(ShapePopulationViewer_VTK_RENDERING_BACKEND "OpenGL2")
     list(APPEND EXTERNAL_PROJECT_OPTIONAL_CMAKE_CACHE_ARGS
       -DVTK_QT_VERSION:STRING=5
@@ -78,10 +71,8 @@ if((NOT DEFINED VTK_DIR OR NOT DEFINED VTK_SOURCE_DIR) AND NOT ${SUPERBUILD_TOPL
     )
 
 set(_git_tag)
-if("${ShapePopulationViewer_VTK_VERSION_MAJOR}" STREQUAL "7")
-  set(_git_tag "43f6ee36f6e28c8347768bd97df4d767da6b4ce7")
-elseif("${ShapePopulationViewer_VTK_VERSION_MAJOR}" STREQUAL "8")
-  set(_git_tag "75414fe171e5ae2ed6e4df608deb1d578d9ec7c3")
+if("${ShapePopulationViewer_VTK_VERSION_MAJOR}" STREQUAL "8")
+  set(_git_tag "9f91f8a3fd332e6cb1ac080db727f194d177ddc4") # slicer-v8.2.0-2018-10-02-74d9488523
 else()
   message(FATAL_ERROR "error: Unsupported ShapePopulationViewer_VTK_VERSION_MAJOR: ${ShapePopulationViewer_VTK_VERSION_MAJOR}")
 endif()
