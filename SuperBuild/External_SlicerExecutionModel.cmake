@@ -26,7 +26,7 @@ if(NOT DEFINED SlicerExecutionModel_DIR AND NOT ${SUPERBUILD_TOPLEVEL_PROJECT}_U
 
   ExternalProject_SetIfNotDefined(
     ${SUPERBUILD_TOPLEVEL_PROJECT}_${proj}_GIT_TAG
-    "0dee798848bacf26d6d4c0fc5f5397d72c1a202b"
+    "f19d6e88a94ba8f31ddafcff4adf185fe90d7e72"
     QUIET
     )
 
