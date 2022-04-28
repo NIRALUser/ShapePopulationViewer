@@ -196,7 +196,6 @@ vtkRenderWindow* ShapePopulationBase::CreateNewWindow(ShapePopulationData* a_mes
     //renderer->SetUseDepthPeeling(true);/*test opacity*/
 
     //WINDOW
-#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
     vtkSmartPointer<vtkRenderWindow> renderWindow;
     if (!testing)
       {
@@ -206,10 +205,6 @@ vtkRenderWindow* ShapePopulationBase::CreateNewWindow(ShapePopulationData* a_mes
       {
       renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
       }
-#else
-    (void)testing;
-    vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-#endif
     renderWindow->AddRenderer(renderer);
     //renderWindow->SetAlphaBitPlanes(true);/*test opacity*/
     //renderWindow->SetMultiSamples(0);/*test opacity*/

@@ -114,11 +114,7 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
 
     /// VISUALIZATION
     vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
-#ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLWIDGET
     vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-#else
-    vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-#endif
 
     renderWindow->AddRenderer(renderer);
 
