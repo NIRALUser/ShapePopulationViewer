@@ -1,7 +1,7 @@
 
 # Add external data from midas
 list(APPEND ExternalData_URL_TEMPLATES
-"http://slicer.kitware.com/midas3/api/rest?method=midas.bitstream.download&checksum=%(hash)"
+"https://github.com/Slicer/SlicerTestingData/releases/download/%(algo)/%(hash)"
 )
 
 # Set the data
