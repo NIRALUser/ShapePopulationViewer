@@ -72,7 +72,7 @@ if((NOT DEFINED VTK_DIR OR NOT DEFINED VTK_SOURCE_DIR) AND NOT ${SUPERBUILD_TOPL
 
 set(_git_tag)
 if("${ShapePopulationViewer_VTK_VERSION_MAJOR}" STREQUAL "8")
-  set(_git_tag "75414fe171e5ae2ed6e4df608deb1d578d9ec7c3")
+  set(_git_tag "9f91f8a3fd332e6cb1ac080db727f194d177ddc4") # slicer-v8.2.0-2018-10-02-74d9488523
 else()
   message(FATAL_ERROR "error: Unsupported ShapePopulationViewer_VTK_VERSION_MAJOR: ${ShapePopulationViewer_VTK_VERSION_MAJOR}")
 endif()
