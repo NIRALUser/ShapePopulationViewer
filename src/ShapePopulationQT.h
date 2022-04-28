@@ -18,11 +18,7 @@ class vtkMRMLModelNode;
 
 // QT
 #include <QWidget>
-# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
 #  include <QVTKOpenGLNativeWidget.h>
-# else
-#  include <QVTKOpenGLWidget.h>
-# endif
 class QActionGroup;
 #include <QFileDialog>              //Open directory/files
 #include <QFileInfo>                //Use Files
@@ -71,11 +67,7 @@ protected:
     QString m_colormapDirectory;
     QString m_exportDirectory;
     QString m_pathSphere;
-# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
     typedef QVTKOpenGLNativeWidget VTKWidgetType;
-# else
-    typedef QVTKOpenGLWidget VTKWidgetType;
-# endif
     std::vector<VTKWidgetType *> m_widgetList;
     cameraDialogQT * m_cameraDialog;
     backgroundDialogQT * m_backgroundDialog;

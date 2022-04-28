@@ -4,11 +4,7 @@
 #include "ShapePopulationMainWindowQT.h"
 #include "ShapePopulationViewerCLP.h"
 
-# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
 #  include <QVTKOpenGLNativeWidget.h>
-# else
-#  include <QVTKOpenGLWidget.h>
-# endif
 
 #include <iostream>
 #include <stdio.h>
@@ -56,11 +52,7 @@ int main( int argc, char** argv )
     PARSE_ARGS;
 
     // Set default surface format.
-# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
     QSurfaceFormat format = QVTKOpenGLNativeWidget::defaultFormat();
-# else
-    QSurfaceFormat format = QVTKOpenGLWidget::defaultFormat();
-# endif
     QSurfaceFormat::setDefaultFormat(format);
 
     // QT SOFTWARE

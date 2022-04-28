@@ -23,11 +23,7 @@
 #include <vtkTextProperty.h>
 #include <vtkTextActor.h>
 #include <iostream>
-# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
 #  include <QVTKOpenGLNativeWidget.h>
-# else
-#  include <QVTKOpenGLWidget.h>
-# endif
 #include <QColorDialog>
 #include <QFrame>
 
@@ -47,11 +43,7 @@ public:
 protected:
     std::vector< vtkSmartPointer<vtkActor> > m_arrowActors;
     std::vector< vtkSmartPointer<vtkTextActor> > m_labelActors;
-# ifdef ShapePopulationViewer_VTK_USE_QVTKOPENGLNATIVEWIDGET
     typedef QVTKOpenGLNativeWidget VTKWidgetType;
-# else
-    typedef QVTKOpenGLWidget VTKWidgetType;
-# endif
     VTKWidgetType * widget;
     bool m_sameColor;
     bool m_complementaryColor;
