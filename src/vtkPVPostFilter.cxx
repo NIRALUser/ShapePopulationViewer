@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtksys/SystemTools.hxx>
 //#include <vtkstd/string>
 #include <assert.h>
+#include <cmath>
 #include <sstream>
 
 namespace
