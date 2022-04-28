@@ -131,7 +131,11 @@ void customizeColorMapByDirectionDialogQT::AxisColor()
 
     widget = new VTKWidgetType(ui->widget_AxisColor);
     widget->resize(500,350);
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+    widget->setRenderWindow(renderWindow);
+#else
     widget->SetRenderWindow(renderWindow);
+#endif
     widget->setDisabled(true);
 
     widget->show();
@@ -163,7 +167,11 @@ void customizeColorMapByDirectionDialogQT::on_radioButton_sameColor_toggled(bool
             m_labelActors[l]->GetTextProperty()->SetColor( axisColor );
         }
     }
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+    widget->renderWindow()->Render();
+#else
     widget->GetRenderWindow()->Render();
+#endif
 
     emit sig_sameColor_valueChanged(checked);
 
@@ -211,7 +219,11 @@ void customizeColorMapByDirectionDialogQT::on_radioButton_complementaryColor_tog
             m_labelActors[l]->GetTextProperty()->SetColor( axisColor );
         }
     }
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+    widget->renderWindow()->Render();
+#else
     widget->GetRenderWindow()->Render();
+#endif
 
     emit sig_complementaryColor_valueChanged(checked);
 
@@ -272,7 +284,11 @@ void customizeColorMapByDirectionDialogQT::on_pushButton_pick_plusXAxis_clicked(
         m_labelActors[2]->GetTextProperty()->SetColor( plusXcolor );
         m_labelActors[5]->GetTextProperty()->SetColor( minusXcolor );
 
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+        widget->renderWindow()->Render();
+#else
         widget->GetRenderWindow()->Render();
+#endif
 
         emit sig_plusXAxis_valueChanged(color);
     }
@@ -333,7 +349,11 @@ void customizeColorMapByDirectionDialogQT::on_pushButton_pick_plusYAxis_clicked(
         m_labelActors[4]->GetTextProperty()->SetColor( plusXcolor );
         m_labelActors[1]->GetTextProperty()->SetColor( minusXcolor );
 
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+        widget->renderWindow()->Render();
+#else
         widget->GetRenderWindow()->Render();
+#endif
 
         emit sig_plusYAxis_valueChanged(color);
     }
@@ -394,7 +414,11 @@ void customizeColorMapByDirectionDialogQT::on_pushButton_pick_plusZAxis_clicked(
         m_labelActors[0]->GetTextProperty()->SetColor( plusXcolor );
         m_labelActors[3]->GetTextProperty()->SetColor( minusXcolor );
 
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+        widget->renderWindow()->Render();
+#else
         widget->GetRenderWindow()->Render();
+#endif
 
         emit sig_plusZAxis_valueChanged(color);
     }
@@ -437,7 +461,11 @@ void customizeColorMapByDirectionDialogQT::on_pushButton_default_clicked()
     emit sig_plusYAxis_valueChanged(m_axisColor[4]);
     emit sig_plusZAxis_valueChanged(m_axisColor[0]);
 
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+    widget->renderWindow()->Render();
+#else
     widget->GetRenderWindow()->Render();
+#endif
 }
 
 void customizeColorMapByDirectionDialogQT::updateAxisColor_value(axisColorStruct* axisColor, bool dialogOpen)
@@ -522,7 +550,11 @@ void customizeColorMapByDirectionDialogQT::updateAxisColor_value(axisColorStruct
         if(axisColor->sameColor != m_sameColor) ui->radioButton_sameColor->click();
         if(axisColor->complementaryColor != m_complementaryColor) ui->radioButton_complementaryColor->click();
 
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+        widget->renderWindow()->Render();
+#else
         widget->GetRenderWindow()->Render();
+#endif
     }
 
 }
@@ -537,8 +569,13 @@ void customizeColorMapByDirectionDialogQT::updateBackgroundColor_valueChanged(do
 
     if(dialogOpen)
     {
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+        widget->renderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(m_backgroundColor);
+        widget->renderWindow()->Render();
+#else
         widget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->SetBackground(m_backgroundColor);
         widget->GetRenderWindow()->Render();
+#endif
     }
 
 }

@@ -999,12 +999,18 @@ void ShapePopulationQT::CreateWidgets(const QList<vtkRenderWindow*>& renderWindo
         /* QT WIDGET */
         VTKWidgetType *meshWidget = new VTKWidgetType(this->scrollAreaWidgetContents);
         m_widgetList.push_back(meshWidget);
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+        meshWidget->setRenderWindow(renderWindow);
+        vtkRenderWindowInteractor* interactor = meshWidget->interactor();
+#else
         meshWidget->SetRenderWindow(renderWindow);
-        meshWidget->GetInteractor()->AddObserver(vtkCommand::LeftButtonPressEvent, this, &ShapePopulationQT::ClickEvent);
-        meshWidget->GetInteractor()->AddObserver(vtkCommand::KeyPressEvent, this, &ShapePopulationBase::KeyPressEventVTK);
-        meshWidget->GetInteractor()->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::CameraChangedEventVTK);
-        meshWidget->GetInteractor()->AddObserver(vtkCommand::StartInteractionEvent, this, &ShapePopulationBase::StartEventVTK);
-        meshWidget->GetInteractor()->AddObserver(vtkCommand::EndInteractionEvent, this, &ShapePopulationBase::EndEventVTK);
+        vtkRenderWindowInteractor* interactor = meshWidget->GetInteractor();
+#endif
+        interactor->AddObserver(vtkCommand::LeftButtonPressEvent, this, &ShapePopulationQT::ClickEvent);
+        interactor->AddObserver(vtkCommand::KeyPressEvent, this, &ShapePopulationBase::KeyPressEventVTK);
+        interactor->AddObserver(vtkCommand::ModifiedEvent, this, &ShapePopulationBase::CameraChangedEventVTK);
+        interactor->AddObserver(vtkCommand::StartInteractionEvent, this, &ShapePopulationBase::StartEventVTK);
+        interactor->AddObserver(vtkCommand::EndInteractionEvent, this, &ShapePopulationBase::EndEventVTK);
     }
 
     /* WINDOWS */
@@ -1014,7 +1020,11 @@ void ShapePopulationQT::CreateWidgets(const QList<vtkRenderWindow*>& renderWindo
     }
     for (unsigned int i = 0; i < m_widgetList.size(); i++)
     {
+#if VTK_MAJOR_VERSION >= 9 || (VTK_MAJOR_VERSION >= 8 && VTK_MINOR_VERSION >= 90)
+        m_windowsList.push_back(m_widgetList.at(i)->renderWindow());
+#else
         m_windowsList.push_back(m_widgetList.at(i)->GetRenderWindow());
+#endif
     }
     RealTimeRenderSynchro(radioButton_SYNC_realtime->isChecked());              //Start with a realtime synchro
 
