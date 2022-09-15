@@ -478,10 +478,10 @@ void ShapePopulationBase::computeCommonAttributes()
     m_commonAttributes.clear();
     for (unsigned int i = 0; i < m_meshList.size(); i++)
     {
-        int numScalars = m_meshList.at(i)->GetAttributeList().size();
+        size_t numScalars = m_meshList.at(i)->GetAttributeList().size();
         if(i==0)
         {
-            for (int j = 0; j < numScalars; j++)
+            for (size_t j = 0; j < numScalars; j++)
             {
                 std::string scalarName = m_meshList.at(i)->GetAttributeList().at(j);
                 m_commonAttributes.push_back(scalarName);
@@ -490,7 +490,7 @@ void ShapePopulationBase::computeCommonAttributes()
         else
         {
             std::vector<std::string> Attributes2;
-            for (int j = 0; j < numScalars; j++)
+            for (size_t j = 0; j < numScalars; j++)
             {
                 std::string scalarName = m_meshList.at(i)->GetAttributeList().at(j);
                 Attributes2.push_back(scalarName);
@@ -1439,20 +1439,20 @@ void ShapePopulationBase::deleteSphereWidget(int index)
     if(index < static_cast<int>(m_widgetSphere.size()))
     {
         if (m_createSphere[index])
-    {
-        if (m_widgetSphere[index].GetPointer())
         {
-            m_widgetSphere[index]->SetEnabled( 0 );
-        }
-        m_widgetSphere[index] = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+            if (m_widgetSphere[index].GetPointer())
+            {
+                m_widgetSphere[index]->SetEnabled( 0 );
+            }
+            m_widgetSphere[index] = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
 
-        if (m_widgetAxisByDirection[index].GetPointer())
-        {
-            m_widgetAxisByDirection[index]->SetEnabled( 0 );
+            if (m_widgetAxisByDirection[index].GetPointer())
+            {
+                m_widgetAxisByDirection[index]->SetEnabled( 0 );
+            }
+            m_widgetAxisByDirection[index] = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
         }
-        m_widgetAxisByDirection[index] = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
-    }
-    m_createSphere[index] = false;
+        m_createSphere[index] = false;
     }
 }
 
