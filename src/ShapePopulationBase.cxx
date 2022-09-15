@@ -1436,7 +1436,9 @@ void ShapePopulationBase::creationSphereWidget(int index)
 
 void ShapePopulationBase::deleteSphereWidget(int index)
 {
-    if(m_createSphere[index] && index < static_cast<int>(m_widgetSphere.size()))
+    if(index < static_cast<int>(m_widgetSphere.size()))
+    {
+        if (m_createSphere[index])
     {
         if (m_widgetSphere[index].GetPointer())
         {
@@ -1451,6 +1453,7 @@ void ShapePopulationBase::deleteSphereWidget(int index)
         m_widgetAxisByDirection[index] = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
     }
     m_createSphere[index] = false;
+    }
 }
 
 
