@@ -55,7 +55,7 @@
      <property name="text">
       <string>Import</string>
      </property>
-     <layout class="QHBoxLayout" name="ImportLayout">
+     <layout class="QVBoxLayout" name="ImportLayout">
      </layout>
     </widget>
    </item>
