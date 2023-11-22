@@ -202,6 +202,17 @@ void ShapePopulationData::ReadSRep(vtkPolyData* upPD, vtkPolyData* downPD, vtkPo
 
 void ShapePopulationData::ReadFiducial(const std::string& a_filePath)
 {
+    size_t found = a_filePath.find_last_of("/\\");
+    if (found != std::string::npos)
+    {
+      m_FileDir = a_filePath.substr(0,found);
+      m_FileName = a_filePath.substr(found+1);
+    }
+    else
+    {
+      m_FileName = a_filePath;
+    }
+  
     // Read file and record fiducial positions
     QFile inputFile(a_filePath.c_str());
     if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text))
