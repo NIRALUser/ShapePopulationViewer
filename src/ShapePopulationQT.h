@@ -9,6 +9,7 @@
 #include "cameraDialogQT.h"
 #include "backgroundDialogQT.h"
 #include "CSVloaderQT.h"
+#include "timeSeriesLoaderQT.h"
 #include "customizeColorMapByDirectionDialogQT.h"
 #include <iostream>
 #include <vtkInteractorStyleTrackballCamera.h>
@@ -51,6 +52,7 @@ public:
     void loadModel(vtkMRMLModelNode* modelNode);
     void loadModel(vtkPolyData* polyData, const QString& modelName);
     void loadCSVFileCLP(QFileInfo file);
+    void loadTimeSeriesCLP(QFileInfo file);
     void loadVTKDirCLP(QDir vtkDir);
     void loadColorMapCLP(std::string a_filePath);
     void loadCameraCLP(std::string a_filePath);
@@ -74,6 +76,7 @@ protected:
     cameraDialogQT * m_cameraDialog;
     backgroundDialogQT * m_backgroundDialog;
     CSVloaderQT * m_CSVloaderDialog;
+    timeSeriesLoaderQT * m_timeSeriesLoaderDialog;
     customizeColorMapByDirectionDialogQT* m_customizeColorMapByDirectionDialog;
 
     void CreateWidgets(const QFileInfoList& files);
@@ -114,7 +117,9 @@ protected:
     void openSRepFiles();
     void openFiducialFiles();
     void loadCSV();
+    void loadTimeSeries();
     void slot_itemsSelected(QFileInfoList fileList);
+    void slot_timeSeriesSelected(QFileInfoList fileList);
     void deleteAll();
     void deleteSelection();
 

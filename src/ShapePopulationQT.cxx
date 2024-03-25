@@ -23,6 +23,7 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
     m_cameraDialog = new cameraDialogQT(this);
     m_backgroundDialog = new backgroundDialogQT(this);
     m_CSVloaderDialog = new CSVloaderQT(this);
+    m_timeSeriesLoaderDialog = new timeSeriesLoaderQT(this);
     m_customizeColorMapByDirectionDialog = new customizeColorMapByDirectionDialogQT(this);
     m_exportActions = new QActionGroup(this);
     m_exportActions->setExclusive(false);
@@ -87,7 +88,9 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
     connect(actionOpen_SRep_Files,SIGNAL(triggered()),this,SLOT(openSRepFiles()));
     connect(actionOpen_Fiducial_Files,SIGNAL(triggered()),this,SLOT(openFiducialFiles()));
     connect(actionLoad_CSV,SIGNAL(triggered()),this,SLOT(loadCSV()));
+    connect(actionLoad_Time_Series,SIGNAL(triggered()),this,SLOT(loadTimeSeries()));
     connect(m_CSVloaderDialog,SIGNAL(sig_itemsSelected(QFileInfoList)),this,SLOT(slot_itemsSelected(QFileInfoList)));
+    connect(m_timeSeriesLoaderDialog,SIGNAL(sig_timeSeriesSelected(QFileInfoList)),this,SLOT(slot_timeSeriesSelected(QFileInfoList)));
     connect(actionDelete,SIGNAL(triggered()),this,SLOT(deleteSelection()));
     connect(actionDelete_All,SIGNAL(triggered()),this,SLOT(deleteAll()));
     connect(actionCameraConfig,SIGNAL(triggered()),this,SLOT(showCameraConfigWindow()));
@@ -168,6 +171,7 @@ ShapePopulationQT::~ShapePopulationQT()
     delete m_cameraDialog;
     delete m_backgroundDialog;
     delete m_CSVloaderDialog;
+    delete m_timeSeriesLoaderDialog;
     delete m_customizeColorMapByDirectionDialog;
 }
 
@@ -291,6 +295,20 @@ void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
 
     //Display in CSVloaderQT
     m_CSVloaderDialog->displayTable(table,file.absoluteDir());
+}
+
+void ShapePopulationQT::loadTimeSeriesCLP(QFileInfo file)
+{
+    //Read .CSV with VTK
+    vtkSmartPointer<vtkDelimitedTextReader> CSVreader = vtkSmartPointer<vtkDelimitedTextReader>::New();
+    CSVreader->SetFieldDelimiterCharacters(",");
+    CSVreader->SetFileName(file.absoluteFilePath().toStdString().c_str());
+    CSVreader->SetHaveHeaders(true);
+    CSVreader->Update();
+    vtkTable* table = CSVreader->GetOutput();
+
+    //Display in CSVloaderQT
+    m_timeSeriesLoaderDialog->displayTable(table,file.absoluteDir());
 }
 
 void ShapePopulationQT::loadVTKDirCLP(QDir vtkDir)
@@ -441,8 +459,35 @@ void ShapePopulationQT::loadCSV()
 
 }
 
+void ShapePopulationQT::loadTimeSeries()
+{
+    // get directory
+    QString filename = QFileDialog::getOpenFileName(this,tr("Open .csv file"),m_lastDirectory,"CSV file (*.csv)");
+    if(filename.isEmpty() || !QFileInfo(filename).exists()) return;
+
+    //MAJ lastDirectory
+    QFileInfo file(filename);
+    m_lastDirectory= file.path();
+
+    //Read .CSV with VTK
+    vtkSmartPointer<vtkDelimitedTextReader> CSVreader = vtkSmartPointer<vtkDelimitedTextReader>::New();
+    CSVreader->SetFieldDelimiterCharacters(",");
+    CSVreader->SetFileName(filename.toStdString().c_str());
+    CSVreader->SetHaveHeaders(true);
+    CSVreader->Update();
+    vtkTable* table = CSVreader->GetOutput();
+
+    //Display in timeSeriesLoaderQT
+    m_timeSeriesLoaderDialog->displayTable(table,file.absoluteDir());
+}
 
 void ShapePopulationQT::slot_itemsSelected(QFileInfoList fileList)
+{
+    // Display widgets
+    if(!fileList.isEmpty()) this->CreateWidgets(fileList);
+}
+
+void ShapePopulationQT::slot_timeSeriesSelected(QFileInfoList fileList)
 {
     // Display widgets
     if(!fileList.isEmpty()) this->CreateWidgets(fileList);

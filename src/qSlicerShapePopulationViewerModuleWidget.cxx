@@ -180,6 +180,7 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
     d->toolButton_Open_Directory->setDefaultAction(d->ShapePopulationWidget->actionOpen_Directory);
     d->toolButton_Open_VTK_Files->setDefaultAction(d->ShapePopulationWidget->actionOpen_VTK_Files);
     d->toolButton_Load_CSV->setDefaultAction(d->ShapePopulationWidget->actionLoad_CSV);
+    d->toolButton_Load_Time_Series->setDefaultAction(d->ShapePopulationWidget->actionLoad_Time_Series);
     d->toolButton_Open_SRep_Files->setDefaultAction(d->ShapePopulationWidget->actionOpen_SRep_Files);
     d->toolButton_Open_Fiducial_Files->setDefaultAction(d->ShapePopulationWidget->actionOpen_Fiducial_Files);
 

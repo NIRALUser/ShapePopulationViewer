@@ -21,6 +21,7 @@ set(CXX_FILES
   backgroundDialogQT.cxx
   cameraDialogQT.cxx
   CSVloaderQT.cxx
+  timeSeriesLoaderQT.cxx
   customizeColorMapByDirectionDialogQT.cxx
   gradientArrow.cxx
   gradientWidgetQT.cxx
@@ -38,6 +39,7 @@ set(UI_FILES
   backgroundDialogQT.ui
   cameraDialogQT.ui
   CSVloaderQT.ui
+  timeSeriesLoaderQT.ui
   customizeColorMapByDirectionDialogQT.ui
   ShapePopulationMainWindowQT.ui
   ShapePopulationQT.ui
@@ -47,6 +49,7 @@ set(QT_WRAP
   backgroundDialogQT.h
   cameraDialogQT.h
   CSVloaderQT.h
+  timeSeriesLoaderQT.h
   customizeColorMapByDirectionDialogQT.h
   gradientWidgetQT.h
   ShapePopulationGradientWidgetQT.h

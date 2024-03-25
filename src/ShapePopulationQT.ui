@@ -1656,6 +1656,11 @@ p, li { white-space: pre-wrap; }
     <string>Load CSV Files</string>
    </property>
   </action>
+  <action name="actionLoad_Time_Series">
+   <property name="text">
+    <string>Load Time Series</string>
+   </property>
+  </action>
   <action name="actionOpen_SRep_Files">
    <property name="text">
     <string>Open S-Rep Files</string>
