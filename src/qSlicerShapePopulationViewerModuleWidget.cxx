@@ -172,33 +172,16 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
     layoutNode->AddLayoutDescription(
                 vtkMRMLLayoutNode::SlicerLayoutUserView, shapePopulationViewerLayout);
 
-    // Delete Selection
-    {
-        QToolButton* button = new QToolButton();
-        button->setDefaultAction(d->ShapePopulationWidget->actionDelete);
-        d->ModuleWidgetLayout->insertWidget(1, button);
-    }
-
-    // Delete All
-    {
-        QToolButton* button = new QToolButton();
-        button->setDefaultAction(d->ShapePopulationWidget->actionDelete_All);
-        d->ModuleWidgetLayout->insertWidget(2, button);
-    }
+    // Delete Selection & All
+    d->toolButton_Delete_Selection->setDefaultAction(d->ShapePopulationWidget->actionDelete);
+    d->toolButton_Delete_All->setDefaultAction(d->ShapePopulationWidget->actionDelete_All);
 
     // Import
-    foreach(QAction* action, QList<QAction*>()
-            << d->ShapePopulationWidget->actionOpen_Directory
-            << d->ShapePopulationWidget->actionOpen_VTK_Files
-            << d->ShapePopulationWidget->actionLoad_CSV
-            << d->ShapePopulationWidget->actionOpen_SRep_Files
-            << d->ShapePopulationWidget->actionOpen_Fiducial_Files
-    )
-    {
-        QToolButton* button = new QToolButton();
-        button->setDefaultAction(action);
-        d->ImportLayout->addWidget(button);
-    }
+    d->toolButton_Open_Directory->setDefaultAction(d->ShapePopulationWidget->actionOpen_Directory);
+    d->toolButton_Open_VTK_Files->setDefaultAction(d->ShapePopulationWidget->actionOpen_VTK_Files);
+    d->toolButton_Load_CSV->setDefaultAction(d->ShapePopulationWidget->actionLoad_CSV);
+    d->toolButton_Open_SRep_Files->setDefaultAction(d->ShapePopulationWidget->actionOpen_SRep_Files);
+    d->toolButton_Open_Fiducial_Files->setDefaultAction(d->ShapePopulationWidget->actionOpen_Fiducial_Files);
 
     // Export
 #ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
