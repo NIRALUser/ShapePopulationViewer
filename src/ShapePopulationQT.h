@@ -73,6 +73,7 @@ protected:
     QString m_pathSphere;
     typedef QVTKOpenGLNativeWidget VTKWidgetType;
     std::vector<VTKWidgetType *> m_widgetList;
+    QList<QFileInfoList> m_timeSeries;
     cameraDialogQT * m_cameraDialog;
     backgroundDialogQT * m_backgroundDialog;
     CSVloaderQT * m_CSVloaderDialog;
@@ -120,7 +121,7 @@ protected:
     void loadTimeSeries();
     void slot_itemsSelected(QFileInfoList fileList);
     void slot_timeSeriesSelected(QList<QFileInfoList> fileList);
-    void slot_timeIndicesChanged(int index);
+    void slot_timeIndicesChanged(double index);
     void deleteAll();
     void deleteSelection();
 
@@ -239,6 +240,7 @@ signals:
     void sig_axisColor_value(axisColorStruct* axisColor, bool dialogOpen);
     void sig_backgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen);
     void sig_resetColor();
+    void sig_loadTimeSeries(bool slider_enabled);
 
 private:
     QActionGroup* m_exportActions;

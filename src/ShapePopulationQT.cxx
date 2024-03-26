@@ -20,6 +20,7 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
     m_lastDirectory = "";
     m_colormapDirectory = "";
     m_exportDirectory = "";
+    m_timeSeries.clear();
     m_cameraDialog = new cameraDialogQT(this);
     m_backgroundDialog = new backgroundDialogQT(this);
     m_CSVloaderDialog = new CSVloaderQT(this);
@@ -492,20 +493,20 @@ void ShapePopulationQT::slot_timeSeriesSelected(QList<QFileInfoList> timeSeries)
     // Display widgets
     if(!timeSeries.isEmpty())
     {
-        // todo: store new time series and reset time step.
+        // todo: check time series length (and reset time step).
+        m_timeSeries.append(timeSeries);
+
         QFileInfoList fileList0;
         for (auto fileList : timeSeries) fileList0.append(fileList.at(0));
         this->CreateWidgets(fileList0);
+        emit sig_loadTimeSeries(true);
     }
 }
 
-void ShapePopulationQT::slot_timeIndicesChanged(int index)
+void ShapePopulationQT::slot_timeIndicesChanged(double index)
 {
     // Update widgets
-    // this->m_timeSeriesLoaderDialog->m_tableView // filelist
-    // m_meshList;
-    initializationAllWidgets();
-    computeCommonAttributes();
+    qInfo("%d", (int)index);
 }
 
 void ShapePopulationQT::deleteAll()
@@ -540,6 +541,7 @@ void ShapePopulationQT::deleteAll()
     m_selectedIndex.clear();
     m_windowsList.clear();
     m_widgetList.clear();
+    m_timeSeries.clear();
     m_numberOfMeshes = 0;
 
     axisColorStruct * axisColor = new axisColorStruct;
@@ -557,12 +559,14 @@ void ShapePopulationQT::deleteAll()
 
     if(m_customizeColorMapByDirectionDialog->isVisible()) m_customizeColorMapByDirectionDialog->hide();
     emit sig_axisColor_value(axisColor, false);
+    emit sig_loadTimeSeries(false);
     m_axisColor.clear();
 }
 
 
 void ShapePopulationQT::deleteSelection()
 {
+    //todo: delete selected time series from m_timeSeries.clear();
     if(m_selectedIndex.size() == 0) return;
 
     this->scrollArea->setVisible(false);

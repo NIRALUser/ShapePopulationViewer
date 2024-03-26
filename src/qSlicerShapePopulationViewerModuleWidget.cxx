@@ -203,6 +203,7 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
     bool exportVisible = false;
 #endif
     d->ExportCTKCollapsibleButton->setVisible(exportVisible);
+    d->SliderWidget_Load_Time_Series->setEnabled(false);
 
     // Settings
     foreach(QAction* action, QList<QAction*>()
@@ -217,6 +218,8 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
     }
 
     connect(d->ModelLoadPushButton, SIGNAL(clicked()), this, SLOT(loadSelectedModel()));
+    connect(d->SliderWidget_Load_Time_Series, SIGNAL(valueChanged(double)), d->ShapePopulationWidget, SLOT(slot_timeIndicesChanged(double)));
+    connect(d->ShapePopulationWidget, SIGNAL(sig_loadTimeSeries(bool)), d->SliderWidget_Load_Time_Series, SLOT(setEnabled(bool)));
 }
 
 //-----------------------------------------------------------------------------
