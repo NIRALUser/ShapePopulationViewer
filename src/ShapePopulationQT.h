@@ -119,7 +119,8 @@ protected:
     void loadCSV();
     void loadTimeSeries();
     void slot_itemsSelected(QFileInfoList fileList);
-    void slot_timeSeriesSelected(QFileInfoList fileList);
+    void slot_timeSeriesSelected(QList<QFileInfoList> fileList);
+    void slot_timeIndicesChanged(int index);
     void deleteAll();
     void deleteSelection();
 

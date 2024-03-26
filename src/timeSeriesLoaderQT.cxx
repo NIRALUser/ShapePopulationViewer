@@ -22,9 +22,9 @@ void timeSeriesLoaderQT::displayTable(vtkSmartPointer<vtkTable> table, QDir dire
     m_directory = directory;
 
     //Translate to QT
-    vtkSmartPointer<vtkQtTableView> tableView = vtkSmartPointer<vtkQtTableView>::New();
+    vtkNew<vtkQtTableView> tableView;
     tableView->AddRepresentationFromInput(m_table);
-    tableView->SetSelectionBehavior(0);                 //to select single items
+    tableView->SetSelectionBehavior(1);                 //to select rows
     tableView->SetSortingEnabled(false);                //to select vertical headers therefore columns
     //tableView->SetSplitMultiComponentColumns(true);   //to tell Bowser to let princess Peach go
     tableView->Update();
@@ -38,43 +38,50 @@ void timeSeriesLoaderQT::displayTable(vtkSmartPointer<vtkTable> table, QDir dire
 void timeSeriesLoaderQT::on_buttonBox_accepted()
 {
     //Get rows and columns
-    vtkSmartPointer<vtkIdTypeArray> items = vtkSmartPointer<vtkIdTypeArray>::New();
-    m_tableView->GetSelectedItems(items);
+    vtkNew<vtkIdTypeArray> rows;
+    m_tableView->GetSelectedItems(rows);
+    auto columns = m_table->GetNumberOfColumns();
 
-    //Get selected Items
-    QFileInfoList fileList;
-    for(int i = 0 ; i < items->GetNumberOfTuples(); i++)
+    //Get selected rows
+    QList<QFileInfoList> timeSeries;
+    for(int i = 0 ; i < rows->GetNumberOfTuples(); i++)
     {
-        double* cell = items->GetTuple(i);
-        vtkVariant test = m_table->GetValue(cell[0],cell[1]);
-        QString relativePath = test.ToString().c_str();
-        fileList.append(QFileInfo(m_directory,relativePath));
+        auto row = rows->GetTuple1(i);
+        QFileInfoList fileList;
+        for(int j = 0; j < columns; j++)
+        {
+            vtkVariant test = m_table->GetValue(row,j);
+            QString relativePath = test.ToString().c_str();
+            fileList.append(QFileInfo(m_directory,relativePath));
+        }
+        timeSeries.append(fileList);
     }
 
     // Control the files format
-    for (int i = 0; i < fileList.size(); i++)
+    for (int i = 0; i < timeSeries.size(); i++)
     {
-        QString QFilePath = fileList[i].absoluteFilePath();
-        if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp") && !QFilePath.endsWith(".xml"))
+        for (int j = 0; j < timeSeries.at(i).size(); j++)
         {
-            fileList.removeAt(i);
-            i--;
-            std::ostringstream strs;
-            strs << QFilePath.toStdString() << std::endl
-                 << "This is not a vtk/vtp/xml file."<< std::endl;
-            QMessageBox::critical(this,"Wrong file format",QString(strs.str().c_str()), QMessageBox::Ok);
-        }
-        else if(!fileList[i].exists())
-        {
-            fileList.removeAt(i);
-            i--;
-            std::ostringstream strs;
-            strs << QFilePath.toStdString() << std::endl
-                 << "This file does not exist."<< std::endl;
-            QMessageBox::critical(this,"File not found",QString(strs.str().c_str()), QMessageBox::Ok);
+            QString QFilePath = timeSeries[i][j].absoluteFilePath();
+            if (!QFilePath.endsWith(".vtk") && !QFilePath.endsWith(".vtp") && !QFilePath.endsWith(".xml") && !QFilePath.endsWith(".srep.json"))
+            {
+                timeSeries[i].removeAt(j);
+                j--;
+                std::ostringstream strs;
+                strs << QFilePath.toStdString() << std::endl
+                     << "This is not a vtk/vtp/xml/srep.json file."<< std::endl;
+                QMessageBox::critical(this,"Wrong file format",QString(strs.str().c_str()), QMessageBox::Ok);
+            }
+            else if(!timeSeries[i][j].exists())
+            {
+                timeSeries[i].removeAt(j);
+                j--;
+                std::ostringstream strs;
+                strs << QFilePath.toStdString() << std::endl
+                     << "This file does not exist."<< std::endl;
+                QMessageBox::critical(this,"File not found",QString(strs.str().c_str()), QMessageBox::Ok);
+            }
         }
     }
-
-    emit sig_timeSeriesSelected(fileList);
-
+    emit sig_timeSeriesSelected(timeSeries);
 }

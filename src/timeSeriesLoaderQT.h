@@ -30,7 +30,7 @@ private slots:
     void on_buttonBox_accepted();
 
 signals:
-    void sig_timeSeriesSelected(QFileInfoList fileList);
+    void sig_timeSeriesSelected(QList<QFileInfoList> timeSeries);
 
 private:
     vtkSmartPointer<vtkQtTableView> m_tableView;
