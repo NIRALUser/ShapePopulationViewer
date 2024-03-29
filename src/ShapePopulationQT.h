@@ -73,6 +73,7 @@ protected:
     QString m_pathSphere;
     typedef QVTKOpenGLNativeWidget VTKWidgetType;
     std::vector<VTKWidgetType *> m_widgetList;
+    // todo: store m_timeSeries as shapePopulationData for faster visualization.
     QList<QFileInfoList> m_timeSeries;
     cameraDialogQT * m_cameraDialog;
     backgroundDialogQT * m_backgroundDialog;

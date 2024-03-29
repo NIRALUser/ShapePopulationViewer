@@ -134,6 +134,7 @@ void ShapePopulationData::ReadMesh(vtkPolyData* polyData, const std::string& a_f
     //Update the class members
     m_PolyData = normalGenerator->GetOutput();
 
+    m_AttributeList.clear();
     int numAttributes = m_PolyData->GetPointData()->GetNumberOfArrays();
     for (int j = 0; j < numAttributes; j++)
     {

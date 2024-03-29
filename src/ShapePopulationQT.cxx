@@ -493,9 +493,22 @@ void ShapePopulationQT::slot_timeSeriesSelected(QList<QFileInfoList> timeSeries)
     // Display widgets
     if(!timeSeries.isEmpty())
     {
-        // todo: check time series length (and reset time step).
-        m_timeSeries.append(timeSeries);
-
+        if(!m_timeSeries.isEmpty())
+        {
+            for(auto timeSerie : timeSeries)
+            {
+                if (m_timeSeries.at(0).size() != timeSerie.size())
+                {
+                    QMessageBox::critical(this,"Length of time series does not match.", timeSerie.at(0).absoluteFilePath(), QMessageBox::Ok);
+                    return;
+                }
+            }
+            // todo: sync ctksliderwidget from module
+            slot_timeIndicesChanged(0.0);
+        }
+        // todo: check size of each individual time series
+        for(auto timeSerie : timeSeries)
+            m_timeSeries.append(timeSerie);
         QFileInfoList fileList0;
         for (auto fileList : timeSeries) fileList0.append(fileList.at(0));
         this->CreateWidgets(fileList0);
@@ -506,7 +519,16 @@ void ShapePopulationQT::slot_timeSeriesSelected(QList<QFileInfoList> timeSeries)
 void ShapePopulationQT::slot_timeIndicesChanged(double index)
 {
     // Update widgets
-    qInfo("%d", (int)index);
+    auto index_i = (int) index;
+    if (index_i >= 0 && index_i < (int) m_timeSeries[0].size())
+    {
+        for (unsigned int i = 0; i < m_numberOfMeshes; i++)
+        {
+            m_meshList[i]->ReadMesh(m_timeSeries[i][index_i].absoluteFilePath().toStdString());
+        }
+    }
+    //todo: more complete update to the rendering windows.
+    this->UpdateWindows();
 }
 
 void ShapePopulationQT::deleteAll()
@@ -566,7 +588,7 @@ void ShapePopulationQT::deleteAll()
 
 void ShapePopulationQT::deleteSelection()
 {
-    //todo: delete selected time series from m_timeSeries.clear();
+    //todo: delete selected time series from m_timeSeries
     if(m_selectedIndex.size() == 0) return;
 
     this->scrollArea->setVisible(false);
@@ -585,6 +607,7 @@ void ShapePopulationQT::deleteSelection()
             {
                 delete m_meshList.at(j);
                 m_meshList.erase(m_meshList.begin()+j);
+                m_timeSeries.erase(m_timeSeries.begin()+j);
                 m_glyphList.erase(m_glyphList.begin()+j);
 
                 m_selectedIndex.erase(m_selectedIndex.begin()+i);           // CAREFUL : erase i value not j value, different vector here
