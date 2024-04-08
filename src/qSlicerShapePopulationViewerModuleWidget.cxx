@@ -336,5 +336,6 @@ void qSlicerShapePopulationViewerModuleWidget::onLoadTimeSeries(bool slider_enab
     Q_D(qSlicerShapePopulationViewerModuleWidget);
     d->SliderWidget_Load_Time_Series->setMinimum(0.0);
     d->SliderWidget_Load_Time_Series->setMaximum((double)total_time_step - 1.0);
+    d->SliderWidget_Load_Time_Series->setValue(0.0);
     d->SliderWidget_Load_Time_Series->setEnabled(slider_enabled);
 }

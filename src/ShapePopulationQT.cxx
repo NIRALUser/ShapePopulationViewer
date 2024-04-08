@@ -503,12 +503,18 @@ void ShapePopulationQT::slot_timeSeriesSelected(QList<QFileInfoList> timeSeries)
                     return;
                 }
             }
-            // todo: sync ctksliderwidget from module
-            slot_timeIndicesChanged(0.0);
         }
-        // todo: check size of each individual time series
+
         for(auto timeSerie : timeSeries)
+        {
             m_timeSeries.append(timeSerie);
+            if (m_timeSeries.at(0).size() != timeSerie.size())
+            {
+                QMessageBox::critical(this,"Length of time series does not match.", timeSerie.at(0).absoluteFilePath(), QMessageBox::Ok);
+                return;
+            }
+        }
+
         QFileInfoList fileList0;
         for (auto fileList : timeSeries) fileList0.append(fileList.at(0));
         this->CreateWidgets(fileList0);
