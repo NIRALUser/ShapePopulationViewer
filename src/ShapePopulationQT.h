@@ -241,7 +241,7 @@ signals:
     void sig_axisColor_value(axisColorStruct* axisColor, bool dialogOpen);
     void sig_backgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen);
     void sig_resetColor();
-    void sig_loadTimeSeries(bool slider_enabled);
+    void sig_loadTimeSeries(bool slider_enabled, unsigned int total_time_step);
 
 private:
     QActionGroup* m_exportActions;

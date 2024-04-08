@@ -219,7 +219,7 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
 
     connect(d->ModelLoadPushButton, SIGNAL(clicked()), this, SLOT(loadSelectedModel()));
     connect(d->SliderWidget_Load_Time_Series, SIGNAL(valueChanged(double)), d->ShapePopulationWidget, SLOT(slot_timeIndicesChanged(double)));
-    connect(d->ShapePopulationWidget, SIGNAL(sig_loadTimeSeries(bool)), d->SliderWidget_Load_Time_Series, SLOT(setEnabled(bool)));
+    connect(d->ShapePopulationWidget, SIGNAL(sig_loadTimeSeries(bool, unsigned int)), this, SLOT(onLoadTimeSeries(bool, unsigned int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -329,4 +329,12 @@ void qSlicerShapePopulationViewerModuleWidget::onMRMLNodeModified(vtkObject *cal
     }
     this->loadModel(modelNode);
     qvtkDisconnect(modelNode, vtkCommand::ModifiedEvent, this, SLOT(onMRMLNodeModified(vtkObject*)));
+}
+
+void qSlicerShapePopulationViewerModuleWidget::onLoadTimeSeries(bool slider_enabled, unsigned int total_time_step)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->SliderWidget_Load_Time_Series->setMinimum(0.0);
+    d->SliderWidget_Load_Time_Series->setMaximum((double)total_time_step - 1.0);
+    d->SliderWidget_Load_Time_Series->setEnabled(slider_enabled);
 }

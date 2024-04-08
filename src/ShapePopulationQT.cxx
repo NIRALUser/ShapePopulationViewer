@@ -512,7 +512,7 @@ void ShapePopulationQT::slot_timeSeriesSelected(QList<QFileInfoList> timeSeries)
         QFileInfoList fileList0;
         for (auto fileList : timeSeries) fileList0.append(fileList.at(0));
         this->CreateWidgets(fileList0);
-        emit sig_loadTimeSeries(true);
+        emit sig_loadTimeSeries(true, m_timeSeries.at(0).size());
     }
 }
 
@@ -581,7 +581,7 @@ void ShapePopulationQT::deleteAll()
 
     if(m_customizeColorMapByDirectionDialog->isVisible()) m_customizeColorMapByDirectionDialog->hide();
     emit sig_axisColor_value(axisColor, false);
-    emit sig_loadTimeSeries(false);
+    emit sig_loadTimeSeries(false, 0);
     m_axisColor.clear();
 }
 
