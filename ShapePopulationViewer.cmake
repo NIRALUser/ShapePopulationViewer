@@ -8,7 +8,7 @@ if( ShapePopulationViewer_BUILD_SLICER_EXTENSION )
   set(EXTENSION_CONTRIBUTORS "Alexis Girault (NIRAL, UNC), Francois Budin (NIRAL, UNC), Laura Pascal (DCBIA-OrthoLab, UofM)")
   set(EXTENSION_DESCRIPTION "Visualize and interact with multiple surfaces at the same time to easily compare them")
   set(EXTENSION_ICONURL "https://www.nitrc.org/project/screenshot.php?group_id=759&screenshot_id=704")
-  set(EXTENSION_SCREENSHOTURLS "http://wiki.na-mic.org/Wiki/images/8/81/Screenshot1.png http://wiki.na-mic.org/Wiki/images/1/13/SPVscreenshot2.png")
+  set(EXTENSION_SCREENSHOTURLS "https://www.na-mic.org/w/img_auth.php/8/81/Screenshot1.png https://www.na-mic.org/w/img_auth.php/1/13/SPVscreenshot2.png")
   set(EXTENSION_DEPENDS "NA") # Specified as a space separated list or 'NA' if any
   set(EXTENSION_BUILD_SUBDIRECTORY .)
 endif()
