@@ -263,7 +263,7 @@ void ShapePopulationBase::UpdateWindows()
     for (i = 0; i < m_meshList.size(); i++)
     {
         //MAPPER
-        vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        vtkNew<vtkPolyDataMapper> mapper;
         mapper->SetInputData(m_meshList[i]->GetPolyData());
 
         //ACTOR
@@ -272,7 +272,7 @@ void ShapePopulationBase::UpdateWindows()
 
         /* VECTORS */
         //Arrow
-        vtkSmartPointer<vtkArrowSource> arrow = vtkSmartPointer<vtkArrowSource>::New();
+        vtkNew<vtkArrowSource> arrow;
         m_glyphList[i]->SetSourceConnection(arrow->GetOutputPort());
         m_glyphList[i]->SetInputData(m_meshList[i]->GetPolyData());
         m_glyphList[i]->ScalingOn();
@@ -284,9 +284,9 @@ void ShapePopulationBase::UpdateWindows()
         m_glyphList[i]->Update();
 
         //Mapper & Actor
-        vtkSmartPointer<vtkPolyDataMapper> glyphMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        vtkNew<vtkPolyDataMapper> glyphMapper;
         glyphMapper->SetInputData(m_glyphList[i]->GetOutput());
-        vtkSmartPointer<vtkActor> glyphActor = vtkSmartPointer<vtkActor>::New();
+        vtkNew<vtkActor> glyphActor;
         glyphActor->SetMapper(glyphMapper);
 
         /* END VECTORS */
@@ -315,7 +315,7 @@ void ShapePopulationBase::UpdateWindows()
         renderer->AddViewProp(fileName);
 
         //ANNOTATIONS (attribute name)
-        vtkSmartPointer<vtkCornerAnnotation> attributeName = vtkSmartPointer<vtkCornerAnnotation>::New();
+        vtkNew<vtkCornerAnnotation> attributeName;
         attributeName->SetLinearFontScaleFactor(2);
         attributeName->SetNonlinearFontScaleFactor(1);
         attributeName->SetMaximumFontSize(15);
@@ -324,13 +324,13 @@ void ShapePopulationBase::UpdateWindows()
         renderer->AddViewProp(attributeName);
 
         // SCALAR BAR
-        vtkSmartPointer<vtkScalarBarActor> scalarBar = vtkSmartPointer<vtkScalarBarActor>::New();
+        vtkNew<vtkScalarBarActor> scalarBar;
         scalarBar->SetLookupTable(mapper->GetLookupTable());
     //    scalarBar->SetTitle("Title");
         scalarBar->SetNumberOfLabels(5);
         scalarBar->SetMaximumWidthInPixels(60);
 
-        vtkSmartPointer<vtkTextProperty> LabelProperty = vtkSmartPointer<vtkTextProperty>::New();
+        vtkNew<vtkTextProperty> LabelProperty;
         LabelProperty->SetFontSize(12);
         LabelProperty->SetColor(m_labelColor);
 

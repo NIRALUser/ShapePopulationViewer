@@ -533,8 +533,19 @@ void ShapePopulationQT::slot_timeIndicesChanged(double index)
             m_meshList[i]->ReadMesh(m_timeSeries[i][index_i].absoluteFilePath().toStdString());
         }
     }
-    //todo: more complete update to the rendering windows.
     this->UpdateWindows();
+
+    /* ATTRIBUTES & COLORBARS */
+    ShapePopulationBase::SelectAll();
+    int ind = comboBox_VISU_attribute->currentIndex();
+    m_updateOnAttributeChanged = true;
+    comboBox_VISU_attribute->setCurrentIndex(ind);
+    emit comboBox_VISU_attribute->currentIndexChanged(ind);
+    
+    /* VECTORS UPDATE */
+    this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
+    this->setVectorScale((double)this->spinbox_vectorScale->value()/100.0);
+    this->setVectorDensity(this->spinbox_arrowDens->value());
 }
 
 void ShapePopulationQT::deleteAll()
@@ -594,7 +605,6 @@ void ShapePopulationQT::deleteAll()
 
 void ShapePopulationQT::deleteSelection()
 {
-    //todo: delete selected time series from m_timeSeries
     if(m_selectedIndex.size() == 0) return;
 
     this->scrollArea->setVisible(false);
