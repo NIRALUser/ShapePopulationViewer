@@ -518,6 +518,8 @@ void ShapePopulationQT::slot_timeSeriesSelected(QList<QFileInfoList> timeSeries)
         QFileInfoList fileList0;
         for (auto fileList : timeSeries) fileList0.append(fileList.at(0));
         this->CreateWidgets(fileList0);
+        comboBox_alignment->setCurrentIndex(1);
+        on_comboBox_alignment_currentIndexChanged();
         emit sig_loadTimeSeries(true, m_timeSeries.at(0).size());
     }
 }
@@ -534,6 +536,8 @@ void ShapePopulationQT::slot_timeIndicesChanged(double index)
         }
     }
     this->UpdateWindows();
+    comboBox_alignment->setCurrentIndex(1);
+    on_comboBox_alignment_currentIndexChanged();
 
     /* ATTRIBUTES & COLORBARS */
     ShapePopulationBase::SelectAll();
