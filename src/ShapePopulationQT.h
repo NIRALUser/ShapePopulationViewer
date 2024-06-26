@@ -122,7 +122,7 @@ protected:
     void loadTimeSeries();
     void slot_itemsSelected(QFileInfoList fileList);
     void slot_timeSeriesSelected(QList<QFileInfoList> fileList);
-    void slot_timeIndicesChanged(double index);
+    void slot_timeIndicesChanged(int index);
     void deleteAll();
     void deleteSelection();
 

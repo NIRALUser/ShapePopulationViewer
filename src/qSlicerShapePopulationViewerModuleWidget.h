@@ -66,6 +66,9 @@ protected slots:
     void onMRMLSceneNodeAddedEvent(vtkObject*,vtkObject*);
     void onMRMLNodeModified(vtkObject*);
     void onLoadTimeSeries(bool slider_enabled, unsigned int total_time_step);
+    void showFirst();
+    void showLast();
+    void showPlay();
 
 protected:
     QScopedPointer<qSlicerShapePopulationViewerModuleWidgetPrivate> d_ptr;

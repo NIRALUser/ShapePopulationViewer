@@ -524,15 +524,14 @@ void ShapePopulationQT::slot_timeSeriesSelected(QList<QFileInfoList> timeSeries)
     }
 }
 
-void ShapePopulationQT::slot_timeIndicesChanged(double index)
+void ShapePopulationQT::slot_timeIndicesChanged(int index)
 {
     // Update widgets
-    auto index_i = (int) index;
-    if (index_i >= 0 && index_i < (int) m_timeSeries[0].size())
+    if (index >= 0 && index < (int) m_timeSeries[0].size())
     {
         for (unsigned int i = 0; i < m_numberOfMeshes; i++)
         {
-            m_meshList[i]->ReadMesh(m_timeSeries[i][index_i].absoluteFilePath().toStdString());
+            m_meshList[i]->ReadMesh(m_timeSeries[i][index].absoluteFilePath().toStdString());
         }
     }
     this->UpdateWindows();
@@ -540,12 +539,12 @@ void ShapePopulationQT::slot_timeIndicesChanged(double index)
     on_comboBox_alignment_currentIndexChanged();
 
     /* ATTRIBUTES & COLORBARS */
-    ShapePopulationBase::SelectAll();
+    SelectAll();
     int ind = comboBox_VISU_attribute->currentIndex();
     m_updateOnAttributeChanged = true;
     comboBox_VISU_attribute->setCurrentIndex(ind);
     emit comboBox_VISU_attribute->currentIndexChanged(ind);
-    
+
     /* VECTORS UPDATE */
     this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
     this->setVectorScale((double)this->spinbox_vectorScale->value()/100.0);
@@ -602,7 +601,7 @@ void ShapePopulationQT::deleteAll()
 
     if(m_customizeColorMapByDirectionDialog->isVisible()) m_customizeColorMapByDirectionDialog->hide();
     emit sig_axisColor_value(axisColor, false);
-    emit sig_loadTimeSeries(false, 0);
+    emit sig_loadTimeSeries(false, 1);
     m_axisColor.clear();
 }
 

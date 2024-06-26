@@ -8,5 +8,10 @@
         <file>resources/eyeOpenDisabled.png</file>
         <file>resources/logo.png</file>
         <file>resources/sRepColorMap.spvcm</file>
+        <file>resources/pqVcrFirst.svg</file>
+        <file>resources/pqVcrBack.svg</file>
+        <file>resources/pqVcrPlay.svg</file>
+        <file>resources/pqVcrForward.svg</file>
+        <file>resources/pqVcrLast.svg</file>
     </qresource>
 </RCC>

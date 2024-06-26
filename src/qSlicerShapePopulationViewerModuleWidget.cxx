@@ -22,6 +22,7 @@
 #include <QList>
 #include <QMainWindow>
 #include <QToolButton>
+#include <QTimer>
 
 // MRML includes
 #include <vtkMRMLLayoutLogic.h>
@@ -203,7 +204,7 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
     bool exportVisible = false;
 #endif
     d->ExportCTKCollapsibleButton->setVisible(exportVisible);
-    d->SliderWidget_Load_Time_Series->setEnabled(false);
+    d->spinBox_Time_Step->setEnabled(false);
 
     // Settings
     foreach(QAction* action, QList<QAction*>()
@@ -217,8 +218,29 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
         d->SettingsLayout->addWidget(button);
     }
 
+    // Play buttons
+    d->pushButton_First->setIcon(QIcon(QString(":/resources/pqVcrFirst.svg")));
+    d->pushButton_First->setIconSize(QSize(16, 16));
+    connect(d->pushButton_First, SIGNAL(clicked()), this, SLOT(showFirst()));
+
+    d->pushButton_Back->setIcon(QIcon(QString(":/resources/pqVcrBack.svg")));
+    d->pushButton_Back->setIconSize(QSize(16, 16));
+    connect(d->pushButton_Back, SIGNAL(clicked()), d->spinBox_Time_Step, SLOT(stepDown()));
+
+    d->pushButton_Play->setIcon(QIcon(QString(":/resources/pqVcrPlay.svg")));
+    d->pushButton_Play->setIconSize(QSize(16, 16));
+    connect(d->pushButton_Play, SIGNAL(clicked()), this, SLOT(showPlay()));
+
+    d->pushButton_Forward->setIcon(QIcon(QString(":/resources/pqVcrForward.svg")));
+    d->pushButton_Forward->setIconSize(QSize(16, 16));
+    connect(d->pushButton_Forward, SIGNAL(clicked()), d->spinBox_Time_Step, SLOT(stepUp()));
+
+    d->pushButton_Last->setIcon(QIcon(QString(":/resources/pqVcrLast.svg")));
+    d->pushButton_Last->setIconSize(QSize(16, 16));
+    connect(d->pushButton_Last, SIGNAL(clicked()), this, SLOT(showLast()));
+
     connect(d->ModelLoadPushButton, SIGNAL(clicked()), this, SLOT(loadSelectedModel()));
-    connect(d->SliderWidget_Load_Time_Series, SIGNAL(valueChanged(double)), d->ShapePopulationWidget, SLOT(slot_timeIndicesChanged(double)));
+    connect(d->spinBox_Time_Step, SIGNAL(valueChanged(int)), d->ShapePopulationWidget, SLOT(slot_timeIndicesChanged(int)));
     connect(d->ShapePopulationWidget, SIGNAL(sig_loadTimeSeries(bool, unsigned int)), this, SLOT(onLoadTimeSeries(bool, unsigned int)));
 }
 
@@ -331,11 +353,34 @@ void qSlicerShapePopulationViewerModuleWidget::onMRMLNodeModified(vtkObject *cal
     qvtkDisconnect(modelNode, vtkCommand::ModifiedEvent, this, SLOT(onMRMLNodeModified(vtkObject*)));
 }
 
-void qSlicerShapePopulationViewerModuleWidget::onLoadTimeSeries(bool slider_enabled, unsigned int total_time_step)
+void qSlicerShapePopulationViewerModuleWidget::onLoadTimeSeries(bool spin_box_enabled, unsigned int total_time_step)
 {
     Q_D(qSlicerShapePopulationViewerModuleWidget);
-    d->SliderWidget_Load_Time_Series->setMinimum(0.0);
-    d->SliderWidget_Load_Time_Series->setMaximum((double)total_time_step - 1.0);
-    d->SliderWidget_Load_Time_Series->setValue(0.0);
-    d->SliderWidget_Load_Time_Series->setEnabled(slider_enabled);
+    d->spinBox_Time_Step->setMinimum(0);
+    d->spinBox_Time_Step->setMaximum(total_time_step - 1);
+    d->spinBox_Time_Step->setValue(0);
+    d->spinBox_Time_Step->setEnabled(spin_box_enabled);
+}
+
+void qSlicerShapePopulationViewerModuleWidget::showFirst()
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->spinBox_Time_Step->setValue(d->spinBox_Time_Step->minimum());
+}
+
+void qSlicerShapePopulationViewerModuleWidget::showLast()
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->spinBox_Time_Step->setValue(d->spinBox_Time_Step->maximum());
+}
+
+void qSlicerShapePopulationViewerModuleWidget::showPlay()
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    if(d->spinBox_Time_Step->value() != d->spinBox_Time_Step->maximum())
+    {
+        d->spinBox_Time_Step->stepUp();
+        // todo: avoid recursion and magic number for timer interval
+        QTimer::singleShot(200, this, SLOT(showPlay()));
+    }
 }
