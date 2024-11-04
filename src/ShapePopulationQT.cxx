@@ -549,6 +549,8 @@ void ShapePopulationQT::slot_timeIndicesChanged(int index)
     this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
     this->setVectorScale((double)this->spinbox_vectorScale->value()/100.0);
     this->setVectorDensity(this->spinbox_arrowDens->value());
+
+    pushButton_VIEW_reset->click();
 }
 
 void ShapePopulationQT::deleteAll()
