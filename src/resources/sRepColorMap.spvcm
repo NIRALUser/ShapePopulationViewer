@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SPVColorMap description="ShapePopulationViewer Color Map configuration" version="1.0">
+    <colormap name="222" points="5">
+        <colorpoint index="0">
+            <position>0</position>
+            <R>1</R>
+            <G>0</G>
+            <B>1</B>
+        </colorpoint>
+        <colorpoint index="1">
+            <position>0.25</position>
+            <R>0</R>
+            <G>0.666667</G>
+            <B>0</B>
+        </colorpoint>
+        <colorpoint index="2">
+            <position>0.5</position>
+            <R>1</R>
+            <G>1</G>
+            <B>0</B>
+        </colorpoint>
+        <colorpoint index="3">
+            <position>0.75</position>
+            <R>1</R>
+            <G>1</G>
+            <B>0</B>
+        </colorpoint>
+        <colorpoint index="4">
+            <position>1</position>
+            <R>0.333333</R>
+            <G>1</G>
+            <B>1</B>
+        </colorpoint>
+    </colormap>
+</SPVColorMap>

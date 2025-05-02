@@ -20,9 +20,11 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
     m_lastDirectory = "";
     m_colormapDirectory = "";
     m_exportDirectory = "";
+    m_timeSeries.clear();
     m_cameraDialog = new cameraDialogQT(this);
     m_backgroundDialog = new backgroundDialogQT(this);
     m_CSVloaderDialog = new CSVloaderQT(this);
+    m_timeSeriesLoaderDialog = new timeSeriesLoaderQT(this);
     m_customizeColorMapByDirectionDialog = new customizeColorMapByDirectionDialogQT(this);
     m_exportActions = new QActionGroup(this);
     m_exportActions->setExclusive(false);
@@ -84,8 +86,12 @@ ShapePopulationQT::ShapePopulationQT(QWidget* parent) : QWidget(parent)
     //Menu signals
     connect(actionOpen_Directory,SIGNAL(triggered()),this,SLOT(openDirectory()));
     connect(actionOpen_VTK_Files,SIGNAL(triggered()),this,SLOT(openFiles()));
+    connect(actionOpen_SRep_Files,SIGNAL(triggered()),this,SLOT(openSRepFiles()));
+    connect(actionOpen_Fiducial_Files,SIGNAL(triggered()),this,SLOT(openFiducialFiles()));
     connect(actionLoad_CSV,SIGNAL(triggered()),this,SLOT(loadCSV()));
+    connect(actionLoad_Time_Series,SIGNAL(triggered()),this,SLOT(loadTimeSeries()));
     connect(m_CSVloaderDialog,SIGNAL(sig_itemsSelected(QFileInfoList)),this,SLOT(slot_itemsSelected(QFileInfoList)));
+    connect(m_timeSeriesLoaderDialog,SIGNAL(sig_timeSeriesSelected(QList<QFileInfoList>)),this,SLOT(slot_timeSeriesSelected(QList<QFileInfoList>)));
     connect(actionDelete,SIGNAL(triggered()),this,SLOT(deleteSelection()));
     connect(actionDelete_All,SIGNAL(triggered()),this,SLOT(deleteAll()));
     connect(actionCameraConfig,SIGNAL(triggered()),this,SLOT(showCameraConfigWindow()));
@@ -166,6 +172,7 @@ ShapePopulationQT::~ShapePopulationQT()
     delete m_cameraDialog;
     delete m_backgroundDialog;
     delete m_CSVloaderDialog;
+    delete m_timeSeriesLoaderDialog;
     delete m_customizeColorMapByDirectionDialog;
 }
 
@@ -199,6 +206,24 @@ void ShapePopulationQT::on_pushButton_displayTools_clicked()
 
 void ShapePopulationQT::loadVTKFilesCLP(QFileInfoList a_fileList)
 {
+    this->CreateWidgets(a_fileList);
+}
+
+void ShapePopulationQT::loadSRepFilesCLP(QFileInfoList a_fileList)
+{
+    this->CreateWidgets(a_fileList);
+
+    //Load color map for S-Reps
+    QString filename = ":/resources/sRepColorMap.spvcm";
+    QFileInfo file(filename);
+    m_colormapDirectory= file.path();
+    gradientWidget_VISU->loadColorPointList(filename, &m_usedColorBar->colorPointList);
+    this->updateColorbar_QT();
+}
+
+void ShapePopulationQT::loadFiducialFilesCLP(QFileInfoList a_fileList)
+{
+
     this->CreateWidgets(a_fileList);
 }
 
@@ -273,6 +298,20 @@ void ShapePopulationQT::loadCSVFileCLP(QFileInfo file)
     m_CSVloaderDialog->displayTable(table,file.absoluteDir());
 }
 
+void ShapePopulationQT::loadTimeSeriesCLP(QFileInfo file)
+{
+    //Read .CSV with VTK
+    vtkSmartPointer<vtkDelimitedTextReader> CSVreader = vtkSmartPointer<vtkDelimitedTextReader>::New();
+    CSVreader->SetFieldDelimiterCharacters(",");
+    CSVreader->SetFileName(file.absoluteFilePath().toStdString().c_str());
+    CSVreader->SetHaveHeaders(true);
+    CSVreader->Update();
+    vtkTable* table = CSVreader->GetOutput();
+
+    //Display in CSVloaderQT
+    m_timeSeriesLoaderDialog->displayTable(table,file.absoluteDir());
+}
+
 void ShapePopulationQT::loadVTKDirCLP(QDir vtkDir)
 {
     //Add to fileList
@@ -345,6 +384,58 @@ void ShapePopulationQT::openFiles()
     this->CreateWidgets(fileInfos);
 }
 
+void ShapePopulationQT::openSRepFiles()
+{
+    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open Files"),m_lastDirectory,"S-Rep Files (*.srep.json *.xml)");
+    if(stringList.isEmpty())
+    {
+        return ;
+    }
+
+    m_lastDirectory=QFileInfo(stringList.at(0)).path();
+
+    //Add to fileList
+    QFileInfoList fileInfos;
+
+    //Control the files format
+    foreach(const QString& filePath, stringList)
+    {
+        fileInfos.append(QFileInfo(filePath));
+    }
+
+    //Display widgets
+    this->CreateWidgets(fileInfos);
+
+    //Load color map for S-Reps
+    QString filename = ":/resources/sRepColorMap.spvcm";
+    QFileInfo file(filename);
+    m_colormapDirectory= file.path();
+    gradientWidget_VISU->loadColorPointList(filename, &m_usedColorBar->colorPointList);
+    this->updateColorbar_QT();
+}
+
+void ShapePopulationQT::openFiducialFiles()
+{
+    QStringList stringList = QFileDialog::getOpenFileNames(this,tr("Open Files"),m_lastDirectory,"Fiducial Files (*.fcsv)");
+    if(stringList.isEmpty())
+    {
+      return ;
+    }
+
+    m_lastDirectory=QFileInfo(stringList.at(0)).path();
+
+    //Add to fileList
+    QFileInfoList fileInfos;
+
+    //Control the files format
+    foreach(const QString& filePath, stringList)
+    {
+      fileInfos.append(QFileInfo(filePath));
+    }
+
+    //Display widgets
+    this->CreateWidgets(fileInfos);
+}
 
 void ShapePopulationQT::loadCSV()
 {
@@ -369,11 +460,97 @@ void ShapePopulationQT::loadCSV()
 
 }
 
+void ShapePopulationQT::loadTimeSeries()
+{
+    // get directory
+    QString filename = QFileDialog::getOpenFileName(this,tr("Open .csv file"),m_lastDirectory,"CSV file (*.csv)");
+    if(filename.isEmpty() || !QFileInfo(filename).exists()) return;
+
+    //MAJ lastDirectory
+    QFileInfo file(filename);
+    m_lastDirectory= file.path();
+
+    //Read .CSV with VTK
+    vtkSmartPointer<vtkDelimitedTextReader> CSVreader = vtkSmartPointer<vtkDelimitedTextReader>::New();
+    CSVreader->SetFieldDelimiterCharacters(",");
+    CSVreader->SetFileName(filename.toStdString().c_str());
+    CSVreader->SetHaveHeaders(true);
+    CSVreader->Update();
+    vtkTable* table = CSVreader->GetOutput();
+
+    //Display in timeSeriesLoaderQT
+    m_timeSeriesLoaderDialog->displayTable(table,file.absoluteDir());
+}
 
 void ShapePopulationQT::slot_itemsSelected(QFileInfoList fileList)
 {
     // Display widgets
     if(!fileList.isEmpty()) this->CreateWidgets(fileList);
+}
+
+void ShapePopulationQT::slot_timeSeriesSelected(QList<QFileInfoList> timeSeries)
+{
+    // Display widgets
+    if(!timeSeries.isEmpty())
+    {
+        if(!m_timeSeries.isEmpty())
+        {
+            for(auto timeSerie : timeSeries)
+            {
+                if (m_timeSeries.at(0).size() != timeSerie.size())
+                {
+                    QMessageBox::critical(this,"Length of time series does not match.", timeSerie.at(0).absoluteFilePath(), QMessageBox::Ok);
+                    return;
+                }
+            }
+        }
+
+        for(auto timeSerie : timeSeries)
+        {
+            m_timeSeries.append(timeSerie);
+            if (m_timeSeries.at(0).size() != timeSerie.size())
+            {
+                QMessageBox::critical(this,"Length of time series does not match.", timeSerie.at(0).absoluteFilePath(), QMessageBox::Ok);
+                return;
+            }
+        }
+
+        QFileInfoList fileList0;
+        for (auto fileList : timeSeries) fileList0.append(fileList.at(0));
+        this->CreateWidgets(fileList0);
+        comboBox_alignment->setCurrentIndex(1);
+        on_comboBox_alignment_currentIndexChanged();
+        emit sig_loadTimeSeries(true, m_timeSeries.at(0).size());
+    }
+}
+
+void ShapePopulationQT::slot_timeIndicesChanged(int index)
+{
+    // Update widgets
+    if (index >= 0 && index < (int) m_timeSeries[0].size())
+    {
+        for (unsigned int i = 0; i < m_numberOfMeshes; i++)
+        {
+            m_meshList[i]->ReadMesh(m_timeSeries[i][index].absoluteFilePath().toStdString());
+        }
+    }
+    this->UpdateWindows();
+    comboBox_alignment->setCurrentIndex(1);
+    on_comboBox_alignment_currentIndexChanged();
+
+    /* ATTRIBUTES & COLORBARS */
+    SelectAll();
+    int ind = comboBox_VISU_attribute->currentIndex();
+    m_updateOnAttributeChanged = true;
+    comboBox_VISU_attribute->setCurrentIndex(ind);
+    emit comboBox_VISU_attribute->currentIndexChanged(ind);
+
+    /* VECTORS UPDATE */
+    this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
+    this->setVectorScale((double)this->spinbox_vectorScale->value()/100.0);
+    this->setVectorDensity(this->spinbox_arrowDens->value());
+
+    pushButton_VIEW_reset->click();
 }
 
 void ShapePopulationQT::deleteAll()
@@ -396,9 +573,11 @@ void ShapePopulationQT::deleteAll()
     m_optionsActions->setDisabled(true);
 
     //Initialize Menu actions
-    actionOpen_Directory->setText("Open Directory");
-    actionOpen_VTK_Files->setText("Open VTK Files");
-    actionLoad_CSV->setText("Load CSV File");
+//    actionOpen_Directory->setText("Open Directory");
+//    actionOpen_VTK_Files->setText("Open VTK Files");
+//    actionOpen_SRep_Files->setText("Open SRep Files");
+//    actionOpen_Fiducial_Files->setText("Open Fiducial Files");
+//    actionLoad_CSV->setText("Load CSV File");
 
     //Empty the meshes FileInfo List
     m_meshList.clear();
@@ -406,6 +585,7 @@ void ShapePopulationQT::deleteAll()
     m_selectedIndex.clear();
     m_windowsList.clear();
     m_widgetList.clear();
+    m_timeSeries.clear();
     m_numberOfMeshes = 0;
 
     axisColorStruct * axisColor = new axisColorStruct;
@@ -423,6 +603,7 @@ void ShapePopulationQT::deleteAll()
 
     if(m_customizeColorMapByDirectionDialog->isVisible()) m_customizeColorMapByDirectionDialog->hide();
     emit sig_axisColor_value(axisColor, false);
+    emit sig_loadTimeSeries(false, 1);
     m_axisColor.clear();
 }
 
@@ -431,189 +612,188 @@ void ShapePopulationQT::deleteSelection()
 {
     if(m_selectedIndex.size() == 0) return;
 
-        this->scrollArea->setVisible(false);
+    this->scrollArea->setVisible(false);
 
-        // Deleting the selection, the widget, and the data
-        QGridLayout *Qlayout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
+    // Deleting the selection, the widget, and the data
+    QGridLayout *Qlayout = (QGridLayout *)this->scrollAreaWidgetContents->layout();
 
-        // delete markers widgets
-        deleteAllWidgets();
+    // delete markers widgets
+    deleteAllWidgets();
 
-
-
-        for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
+    for (unsigned int i = 0; i < m_selectedIndex.size(); i++)
+    {
+        for(unsigned int j = 0; j < m_widgetList.size(); j++)
         {
-            for(unsigned int j = 0; j < m_widgetList.size(); j++)
+            if( j == m_selectedIndex[i])
             {
-                if( j == m_selectedIndex[i])
+                delete m_meshList.at(j);
+                m_meshList.erase(m_meshList.begin()+j);
+                m_timeSeries.erase(m_timeSeries.begin()+j);
+                m_glyphList.erase(m_glyphList.begin()+j);
+
+                m_selectedIndex.erase(m_selectedIndex.begin()+i);           // CAREFUL : erase i value not j value, different vector here
+                for(unsigned int k = 0; k < m_selectedIndex.size() ; k++)
                 {
-                    delete m_meshList.at(j);
-                    m_meshList.erase(m_meshList.begin()+j);
-                    m_glyphList.erase(m_glyphList.begin()+j);
-
-                    m_selectedIndex.erase(m_selectedIndex.begin()+i);           // CAREFUL : erase i value not j value, different vector here
-                    for(unsigned int k = 0; k < m_selectedIndex.size() ; k++)
-                    {
-                        if (m_selectedIndex[k] > j)  m_selectedIndex[k]-- ;     // and then decrement the upper indeces
-                    }
-
-                    m_windowsList.erase(m_windowsList.begin()+j);
-
-                    Qlayout->removeWidget(m_widgetList.at(j));
-                    delete m_widgetList.at(j);
-                    m_widgetList.erase(m_widgetList.begin()+j);
-
-                    //
-                    m_displayColorMapByMagnitude.erase(m_displayColorMapByMagnitude.begin()+j);
-                    m_displayColorMapByDirection.erase(m_displayColorMapByDirection.begin()+j);
-                    m_displayVectors.erase(m_displayVectors.begin()+j);
-                    m_displayVectorsByMagnitude.erase(m_displayVectorsByMagnitude.begin()+j);
-                    m_displayVectorsByDirection.erase(m_displayVectorsByDirection.begin()+j);
-
-                    m_meshOpacity.erase(m_meshOpacity.begin()+j);
-                    m_vectorDensity.erase(m_vectorDensity.begin()+j);
-                    m_vectorScale.erase(m_vectorScale.begin()+j);
-
-                    i--;
-                    break;
+                    if (m_selectedIndex[k] > j)  m_selectedIndex[k]-- ;     // and then decrement the upper indeces
                 }
+
+                m_windowsList.erase(m_windowsList.begin()+j);
+
+                Qlayout->removeWidget(m_widgetList.at(j));
+                delete m_widgetList.at(j);
+                m_widgetList.erase(m_widgetList.begin()+j);
+
+                //
+                m_displayColorMapByMagnitude.erase(m_displayColorMapByMagnitude.begin()+j);
+                m_displayColorMapByDirection.erase(m_displayColorMapByDirection.begin()+j);
+                m_displayVectors.erase(m_displayVectors.begin()+j);
+                m_displayVectorsByMagnitude.erase(m_displayVectorsByMagnitude.begin()+j);
+                m_displayVectorsByDirection.erase(m_displayVectorsByDirection.begin()+j);
+
+                m_meshOpacity.erase(m_meshOpacity.begin()+j);
+                m_vectorDensity.erase(m_vectorDensity.begin()+j);
+                m_vectorScale.erase(m_vectorScale.begin()+j);
+
+                i--;
+                break;
             }
         }
+    }
 
-        m_numberOfMeshes = m_widgetList.size();
-        spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
+    m_numberOfMeshes = m_widgetList.size();
+    spinBox_DISPLAY_columns->setMaximum(m_numberOfMeshes);
 
-        m_noUpdateVectorsByDirection = true;
+    m_noUpdateVectorsByDirection = true;
 
-        // initialization of all axis, sphere, and titles widgets
-        initializationAllWidgets();
+    // initialization of all axis, sphere, and titles widgets
+    initializationAllWidgets();
 
-        computeCommonAttributes();                                                  // get the common attributes in m_commonAttributes
+    computeCommonAttributes();                                                  // get the common attributes in m_commonAttributes
 
-        // If no more widgets, do as deleteAll
-        if(m_numberOfMeshes == 0)
+    // If no more widgets, do as deleteAll
+    if(m_numberOfMeshes == 0)
+    {
+        deleteAll();
+    }
+    else
+    {
+        //Selected of all the meshes
+        for(unsigned int i = 0; i < m_windowsList.size(); i++)
         {
-            deleteAll();
+            m_windowsList[i]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(m_headcam); //connect to headcam for synchro
+            m_windowsList[i]->Render();
         }
-        else
+
+
+        for (unsigned int j = 0; j < m_widgetList.size(); j++)
         {
-            //Selected of all the meshes
-            for(unsigned int i = 0; i < m_windowsList.size(); i++)
-            {
-                m_windowsList[i]->GetRenderers()->GetFirstRenderer()->SetActiveCamera(m_headcam); //connect to headcam for synchro
-                m_windowsList[i]->Render();
-            }
-
-
-            for (unsigned int j = 0; j < m_widgetList.size(); j++)
-            {
-                m_selectedIndex.clear();
-                m_selectedIndex.push_back(j);
-
-                const char * a_cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
-                std::string cmap = std::string(a_cmap);
-                size_t found1 = cmap.rfind("_mag");
-                cmap = cmap.substr(0,found1);
-                found1 = cmap.rfind("_ColorByDirection");
-                cmap = cmap.substr(0,found1);
-
-                comboBox_VISU_attribute->clear();                                           // clear the Attributes in the comboBox
-                m_colorBarList.clear();                                                     // clear the existing colorbars
-                int index = 0;
-                m_magnitude.clear();
-                m_updateOnAttributeChanged = false;
-                for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
-                {
-                    if(cmap == m_commonAttributes[i].c_str()) index = i;
-                    colorBarStruct * colorBar = new colorBarStruct;                         //new colorbar for this attribute
-                    gradientWidget_VISU->reset();                                           //create points
-                    gradientWidget_VISU->getAllColors(&colorBar->colorPointList);           //get the points into the colorbar
-                    this->UpdateAttribute(m_commonAttributes[i].c_str(), m_selectedIndex);  //create the range
-                    colorBar->range[0] = m_commonRange[0];                                  //get the range into the colorbar
-                    colorBar->range[1] = m_commonRange[1];
-                    m_colorBarList.push_back(colorBar);                                     //add the colorbar to the list
-
-                    comboBox_VISU_attribute->addItem(QString(m_commonAttributes[i].c_str()));   // Then add the attribute to the comboBox
-
-                    // color map by direction
-                    int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[i].c_str())->GetNumberOfComponents();
-                    magnitudStruct * magnitude = new magnitudStruct;
-                    if (dimension == 3 )
-                    {
-                        magnitude->max = m_commonRange[1];
-                        magnitude->min = m_commonRange[0];
-                    }
-                    else if (dimension == 1 )
-                    {
-                        magnitude->min = 0.0;
-                        magnitude->max = 0.0;
-                    }
-                    m_magnitude.push_back(magnitude);
-
-                    if(dimension == 3 )
-                    {
-                        this->UpdateColorMapByDirection(m_commonAttributes[i].c_str(),i);
-                    }
-                }
-                m_updateOnAttributeChanged = true;
-
-                // attribute previous selected
-                comboBox_VISU_attribute->setCurrentIndex(index);
-                this->UpdateAttribute(m_commonAttributes[index].c_str(), m_selectedIndex);
-                m_usedColorBar = m_colorBarList[index];
-                this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
-                m_noChange = true;
-                spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
-                spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
-                m_noChange = false;
-
-                m_noUpdateVectorsByDirection = false;
-
-                this->updateColorbar_QT();
-                this->updateArrowPosition();
-
-
-                // COLOR MAP previous selected
-                if(m_displayColorMapByMagnitude[j])
-                {
-                    this->displayColorMapByMagnitude(true);
-                }
-                else if(m_displayColorMapByDirection[j])
-                {
-                    this->displayColorMapByDirection(true);
-                }
-                // VECTORS previous selected
-                if(m_displayVectors[j])
-                {
-                    if(m_displayVectorsByMagnitude[j])
-                    {
-                        this->displayVectorsByMagnitude(true);
-                    }
-                    else if(m_displayVectorsByDirection[j])
-                    {
-                        this->displayVectorsByDirection(true);
-                    }
-                    this->spinbox_meshOpacity->setValue(m_meshOpacity[j]);
-                    this->spinbox_arrowDens->setValue(m_vectorDensity[j]);
-                    this->spinbox_vectorScale->setValue(m_vectorScale[j]);
-                    this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
-                    this->setVectorDensity(this->spinbox_arrowDens->value());
-                    this->setVectorScale((double)this->spinbox_vectorScale->value()/100);
-
-                }
-                pushButton_VIEW_reset->click();
-            }
             m_selectedIndex.clear();
+            m_selectedIndex.push_back(j);
 
-            for (unsigned int j = 0; j < m_widgetList.size(); j++)
+            const char * a_cmap = m_meshList[m_selectedIndex[0]]->GetPolyData()->GetPointData()->GetScalars()->GetName();
+            std::string cmap = std::string(a_cmap);
+            size_t found1 = cmap.rfind("_mag");
+            cmap = cmap.substr(0,found1);
+            found1 = cmap.rfind("_ColorByDirection");
+            cmap = cmap.substr(0,found1);
+
+            comboBox_VISU_attribute->clear();                                           // clear the Attributes in the comboBox
+            m_colorBarList.clear();                                                     // clear the existing colorbars
+            int index = 0;
+            m_magnitude.clear();
+            m_updateOnAttributeChanged = false;
+            for(unsigned int i = 0 ; i < m_commonAttributes.size() ; i++)
             {
-                m_selectedIndex.push_back(j);
-            }
+                if(cmap == m_commonAttributes[i].c_str()) index = i;
+                colorBarStruct * colorBar = new colorBarStruct;                         //new colorbar for this attribute
+                gradientWidget_VISU->reset();                                           //create points
+                gradientWidget_VISU->getAllColors(&colorBar->colorPointList);           //get the points into the colorbar
+                this->UpdateAttribute(m_commonAttributes[i].c_str(), m_selectedIndex);  //create the range
+                colorBar->range[0] = m_commonRange[0];                                  //get the range into the colorbar
+                colorBar->range[1] = m_commonRange[1];
+                m_colorBarList.push_back(colorBar);                                     //add the colorbar to the list
 
-            this->UnselectAll();
-//            this->updateInfo_QT();
-            on_spinBox_DISPLAY_columns_valueChanged();
+                comboBox_VISU_attribute->addItem(QString(m_commonAttributes[i].c_str()));   // Then add the attribute to the comboBox
+
+                // color map by direction
+                int dimension = m_meshList[0]->GetPolyData()->GetPointData()->GetScalars(m_commonAttributes[i].c_str())->GetNumberOfComponents();
+                magnitudStruct * magnitude = new magnitudStruct;
+                if (dimension == 3 )
+                {
+                    magnitude->max = m_commonRange[1];
+                    magnitude->min = m_commonRange[0];
+                }
+                else if (dimension == 1 )
+                {
+                    magnitude->min = 0.0;
+                    magnitude->max = 0.0;
+                }
+                m_magnitude.push_back(magnitude);
+
+                if(dimension == 3 )
+                {
+                    this->UpdateColorMapByDirection(m_commonAttributes[i].c_str(),i);
+                }
+            }
+            m_updateOnAttributeChanged = true;
+
+            // attribute previous selected
+            comboBox_VISU_attribute->setCurrentIndex(index);
+            this->UpdateAttribute(m_commonAttributes[index].c_str(), m_selectedIndex);
+            m_usedColorBar = m_colorBarList[index];
+            this->gradientWidget_VISU->setAllColors(&m_usedColorBar->colorPointList);
+            m_noChange = true;
+            spinBox_VISU_min->setValue(m_usedColorBar->range[0]);
+            spinBox_VISU_max->setValue(m_usedColorBar->range[1]);
+            m_noChange = false;
+
+            m_noUpdateVectorsByDirection = false;
+
+            this->updateColorbar_QT();
+            this->updateArrowPosition();
+
+
+            // COLOR MAP previous selected
+            if(m_displayColorMapByMagnitude[j])
+            {
+                this->displayColorMapByMagnitude(true);
+            }
+            else if(m_displayColorMapByDirection[j])
+            {
+                this->displayColorMapByDirection(true);
+            }
+            // VECTORS previous selected
+            if(m_displayVectors[j])
+            {
+                if(m_displayVectorsByMagnitude[j])
+                {
+                    this->displayVectorsByMagnitude(true);
+                }
+                else if(m_displayVectorsByDirection[j])
+                {
+                    this->displayVectorsByDirection(true);
+                }
+                this->spinbox_meshOpacity->setValue(m_meshOpacity[j]);
+                this->spinbox_arrowDens->setValue(m_vectorDensity[j]);
+                this->spinbox_vectorScale->setValue(m_vectorScale[j]);
+                this->setMeshOpacity((double)this->spinbox_meshOpacity->value()/100.0);
+                this->setVectorDensity(this->spinbox_arrowDens->value());
+                this->setVectorScale((double)this->spinbox_vectorScale->value()/100);
+
+            }
+            pushButton_VIEW_reset->click();
         }
+        m_selectedIndex.clear();
+
+        for (unsigned int j = 0; j < m_widgetList.size(); j++)
+        {
+            m_selectedIndex.push_back(j);
+        }
+
+        this->UnselectAll();
+//      this->updateInfo_QT();
+        on_spinBox_DISPLAY_columns_valueChanged();
+    }
 }
 
 
@@ -1195,9 +1375,11 @@ void ShapePopulationQT::CreateWidgets(const QList<vtkRenderWindow*>& renderWindo
     this->actionDelete->setEnabled(true);
     this->actionDelete_All->setEnabled(true);
     this->m_exportActions->setEnabled(true);
-    this->actionOpen_Directory->setText("Add Directory");
-    this->actionOpen_VTK_Files->setText("Add VTK/VTP files");
-    this->actionLoad_CSV->setText("Add CSV file");
+//    this->actionOpen_Directory->setText("Add Directory");
+//    this->actionOpen_VTK_Files->setText("Add VTK/VTP files");
+//    this->actionLoad_CSV->setText("Add CSV file");
+//    this->actionOpen_SRep_Files->setText("Add S-Rep files");
+//    this->actionOpen_Fiducial_Files->setText("Add Fiducial files");
 
     /* DISPLAY INFOS */
     this->updateInfo_QT();
@@ -1614,6 +1796,11 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
                 fileList.append(QFileInfo(filePath));
                 load = true;
             }
+            else if((filePath.endsWith(".xml") || filePath.endsWith(".srep.json")) && QFileInfo(filePath).exists())
+            {
+                fileList.append(QFileInfo(filePath));
+                load = true;
+            }
             else if(filePath.endsWith(".csv") && QFileInfo(filePath).exists())
             {
                 this->loadCSVFileCLP(QFileInfo(filePath));
@@ -1633,7 +1820,7 @@ void ShapePopulationQT::dropEvent(QDropEvent* Qevent)
         }
         if(load == true)
         {
-            this->loadVTKFilesCLP(fileList);
+            this->CreateWidgets(fileList);
         }
     }
 }

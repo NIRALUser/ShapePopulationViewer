@@ -9,6 +9,7 @@
 #include "cameraDialogQT.h"
 #include "backgroundDialogQT.h"
 #include "CSVloaderQT.h"
+#include "timeSeriesLoaderQT.h"
 #include "customizeColorMapByDirectionDialogQT.h"
 #include <iostream>
 #include <vtkInteractorStyleTrackballCamera.h>
@@ -46,9 +47,12 @@ public:
     ~ShapePopulationQT();
 
     void loadVTKFilesCLP(QFileInfoList a_fileList);
+    void loadSRepFilesCLP(QFileInfoList a_fileList);
+    void loadFiducialFilesCLP(QFileInfoList a_fileList);
     void loadModel(vtkMRMLModelNode* modelNode);
     void loadModel(vtkPolyData* polyData, const QString& modelName);
     void loadCSVFileCLP(QFileInfo file);
+    void loadTimeSeriesCLP(QFileInfo file);
     void loadVTKDirCLP(QDir vtkDir);
     void loadColorMapCLP(std::string a_filePath);
     void loadCameraCLP(std::string a_filePath);
@@ -69,9 +73,12 @@ protected:
     QString m_pathSphere;
     typedef QVTKOpenGLNativeWidget VTKWidgetType;
     std::vector<VTKWidgetType *> m_widgetList;
+    // todo: store m_timeSeries as shapePopulationData for faster visualization.
+    QList<QFileInfoList> m_timeSeries;
     cameraDialogQT * m_cameraDialog;
     backgroundDialogQT * m_backgroundDialog;
     CSVloaderQT * m_CSVloaderDialog;
+    timeSeriesLoaderQT * m_timeSeriesLoaderDialog;
     customizeColorMapByDirectionDialogQT* m_customizeColorMapByDirectionDialog;
 
     void CreateWidgets(const QFileInfoList& files);
@@ -109,8 +116,13 @@ protected:
     //FILE
     void openDirectory();
     void openFiles();
+    void openSRepFiles();
+    void openFiducialFiles();
     void loadCSV();
+    void loadTimeSeries();
     void slot_itemsSelected(QFileInfoList fileList);
+    void slot_timeSeriesSelected(QList<QFileInfoList> fileList);
+    void slot_timeIndicesChanged(int index);
     void deleteAll();
     void deleteSelection();
 
@@ -229,6 +241,7 @@ signals:
     void sig_axisColor_value(axisColorStruct* axisColor, bool dialogOpen);
     void sig_backgroundColor_valueChanged(double backgroundColor_red, double backgroundColor_green, double backgroundColor_blue, bool dialogOpen);
     void sig_resetColor();
+    void sig_loadTimeSeries(bool slider_enabled, unsigned int total_time_step);
 
 private:
     QActionGroup* m_exportActions;

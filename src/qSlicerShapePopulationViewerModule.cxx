@@ -93,7 +93,7 @@ QStringList qSlicerShapePopulationViewerModule::categories() const
 //-----------------------------------------------------------------------------
 QStringList qSlicerShapePopulationViewerModule::dependencies() const
 {
-    return QStringList();
+    return QStringList() << "SRep";
 }
 
 //-----------------------------------------------------------------------------

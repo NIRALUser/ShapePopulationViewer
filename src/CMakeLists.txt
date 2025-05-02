@@ -21,6 +21,7 @@ set(CXX_FILES
   backgroundDialogQT.cxx
   cameraDialogQT.cxx
   CSVloaderQT.cxx
+  timeSeriesLoaderQT.cxx
   customizeColorMapByDirectionDialogQT.cxx
   gradientArrow.cxx
   gradientWidgetQT.cxx
@@ -38,6 +39,7 @@ set(UI_FILES
   backgroundDialogQT.ui
   cameraDialogQT.ui
   CSVloaderQT.ui
+  timeSeriesLoaderQT.ui
   customizeColorMapByDirectionDialogQT.ui
   ShapePopulationMainWindowQT.ui
   ShapePopulationQT.ui
@@ -47,6 +49,7 @@ set(QT_WRAP
   backgroundDialogQT.h
   cameraDialogQT.h
   CSVloaderQT.h
+  timeSeriesLoaderQT.h
   customizeColorMapByDirectionDialogQT.h
   gradientWidgetQT.h
   ShapePopulationGradientWidgetQT.h
@@ -90,6 +93,8 @@ if(ShapePopulationViewer_BUILD_SLICER_EXTENSION)
 
   # Current_{source,binary} and Slicer_{Libs,Base} already included
   set(MODULE_INCLUDE_DIRECTORIES
+    ${vtkSlicerSRepModuleMRML_INCLUDE_DIRS}
+    ${vtkSlicerSRepModuleLogic_INCLUDE_DIRS}
     )
   set(MODULE_SRCS
     qSlicer${MODULE_NAME}LayoutViewFactory.cxx
@@ -109,6 +114,8 @@ if(ShapePopulationViewer_BUILD_SLICER_EXTENSION)
     )
   set(MODULE_TARGET_LIBRARIES
     ${LOCAL_PROJECT_NAME}Widget
+    vtkSlicerSRepModuleMRML
+    vtkSlicerSRepModuleLogic
     )
   set(MODULE_RESOURCES
     )

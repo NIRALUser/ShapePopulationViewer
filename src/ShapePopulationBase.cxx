@@ -257,6 +257,95 @@ vtkRenderWindow* ShapePopulationBase::CreateNewWindow(ShapePopulationData* a_mes
     return renderWindow;
 }
 
+void ShapePopulationBase::UpdateWindows()
+{
+    unsigned int i;
+    for (i = 0; i < m_meshList.size(); i++)
+    {
+        //MAPPER
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputData(m_meshList[i]->GetPolyData());
+
+        //ACTOR
+        vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+
+        /* VECTORS */
+        //Arrow
+        vtkNew<vtkArrowSource> arrow;
+        m_glyphList[i]->SetSourceConnection(arrow->GetOutputPort());
+        m_glyphList[i]->SetInputData(m_meshList[i]->GetPolyData());
+        m_glyphList[i]->ScalingOn();
+        m_glyphList[i]->OrientOn();
+        m_glyphList[i]->ClampingOff();
+        m_glyphList[i]->SetColorModeToColorByVector();
+        m_glyphList[i]->SetScaleModeToScaleByVector();
+        m_glyphList[i]->SetVectorModeToUseVector();
+        m_glyphList[i]->Update();
+
+        //Mapper & Actor
+        vtkNew<vtkPolyDataMapper> glyphMapper;
+        glyphMapper->SetInputData(m_glyphList[i]->GetOutput());
+        vtkNew<vtkActor> glyphActor;
+        glyphActor->SetMapper(glyphMapper);
+
+        /* END VECTORS */
+
+        //RENDERER
+        auto renderer = m_windowsList[i]->GetRenderers()->GetFirstRenderer();
+        renderer->RemoveAllViewProps();
+
+        renderer->AddActor(actor);
+        renderer->AddActor(glyphActor);
+        renderer->SetActiveCamera(m_headcam); //set the active camera for this renderer to main camera
+        renderer->ResetCamera();
+        //renderer->SetUseDepthPeeling(true);/*test opacity*/
+
+//        //INTERACTOR
+//        vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//        renderWindow->SetInteractor(interactor);
+
+        //ANNOTATIONS (file name)
+        vtkSmartPointer<vtkCornerAnnotation> fileName = vtkSmartPointer<vtkCornerAnnotation>::New();
+        fileName->SetLinearFontScaleFactor( 2 );
+        fileName->SetNonlinearFontScaleFactor( 1 );
+        fileName->SetMaximumFontSize( 15 );
+        fileName->SetText(2,m_meshList[i]->GetFileName().c_str());
+        fileName->GetTextProperty()->SetColor(m_labelColor);
+        renderer->AddViewProp(fileName);
+
+        //ANNOTATIONS (attribute name)
+        vtkNew<vtkCornerAnnotation> attributeName;
+        attributeName->SetLinearFontScaleFactor(2);
+        attributeName->SetNonlinearFontScaleFactor(1);
+        attributeName->SetMaximumFontSize(15);
+        attributeName->SetText(0," ");
+        attributeName->GetTextProperty()->SetColor(m_labelColor);
+        renderer->AddViewProp(attributeName);
+
+        // SCALAR BAR
+        vtkNew<vtkScalarBarActor> scalarBar;
+        scalarBar->SetLookupTable(mapper->GetLookupTable());
+    //    scalarBar->SetTitle("Title");
+        scalarBar->SetNumberOfLabels(5);
+        scalarBar->SetMaximumWidthInPixels(60);
+
+        vtkNew<vtkTextProperty> LabelProperty;
+        LabelProperty->SetFontSize(12);
+        LabelProperty->SetColor(m_labelColor);
+
+        scalarBar->SetLabelTextProperty(LabelProperty);
+        scalarBar->SetTitleTextProperty(LabelProperty);
+        renderer->AddActor2D(scalarBar);
+
+        //DISPLAY
+        if (m_displayMeshName == false) fileName->SetVisibility(0);
+        if (m_displayAttribute == false) attributeName->SetVisibility(0);
+        if (m_displayColorbar == false) scalarBar->SetVisibility(0);
+    }
+    RenderAll();
+}
+
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
 // *                                          SELECTION                                            * //
 // * ///////////////////////////////////////////////////////////////////////////////////////////// * //
