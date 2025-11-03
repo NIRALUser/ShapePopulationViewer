@@ -89,6 +89,7 @@ class ShapePopulationBase
     vtkRenderWindow* CreateNewWindow(std::string a_filePath, bool testing = false);
     vtkRenderWindow* CreateNewWindow(vtkPolyData* a_popyData, std::string a_filePath, bool testing = false);
     vtkRenderWindow* CreateNewWindow(ShapePopulationData* a_mesh, bool testing = false);
+    void UpdateWindows();
 
     //SELECTION
     unsigned int getSelectedIndex(vtkSmartPointer<vtkRenderWindow> a_selectedWindow);

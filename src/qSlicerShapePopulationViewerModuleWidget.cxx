@@ -22,6 +22,7 @@
 #include <QList>
 #include <QMainWindow>
 #include <QToolButton>
+#include <QTimer>
 
 // MRML includes
 #include <vtkMRMLLayoutLogic.h>
@@ -172,31 +173,17 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
     layoutNode->AddLayoutDescription(
                 vtkMRMLLayoutNode::SlicerLayoutUserView, shapePopulationViewerLayout);
 
-    // Delete Selection
-    {
-        QToolButton* button = new QToolButton();
-        button->setDefaultAction(d->ShapePopulationWidget->actionDelete);
-        d->ModuleWidgetLayout->insertWidget(1, button);
-    }
-
-    // Delete All
-    {
-        QToolButton* button = new QToolButton();
-        button->setDefaultAction(d->ShapePopulationWidget->actionDelete_All);
-        d->ModuleWidgetLayout->insertWidget(2, button);
-    }
+    // Delete Selection & All
+    d->toolButton_Delete_Selection->setDefaultAction(d->ShapePopulationWidget->actionDelete);
+    d->toolButton_Delete_All->setDefaultAction(d->ShapePopulationWidget->actionDelete_All);
 
     // Import
-    foreach(QAction* action, QList<QAction*>()
-            << d->ShapePopulationWidget->actionOpen_Directory
-            << d->ShapePopulationWidget->actionOpen_VTK_Files
-            << d->ShapePopulationWidget->actionLoad_CSV
-            )
-    {
-        QToolButton* button = new QToolButton();
-        button->setDefaultAction(action);
-        d->ImportLayout->addWidget(button);
-    }
+    d->toolButton_Open_Directory->setDefaultAction(d->ShapePopulationWidget->actionOpen_Directory);
+    d->toolButton_Open_VTK_Files->setDefaultAction(d->ShapePopulationWidget->actionOpen_VTK_Files);
+    d->toolButton_Load_CSV->setDefaultAction(d->ShapePopulationWidget->actionLoad_CSV);
+    d->toolButton_Load_Time_Series->setDefaultAction(d->ShapePopulationWidget->actionLoad_Time_Series);
+    d->toolButton_Open_SRep_Files->setDefaultAction(d->ShapePopulationWidget->actionOpen_SRep_Files);
+    d->toolButton_Open_Fiducial_Files->setDefaultAction(d->ShapePopulationWidget->actionOpen_Fiducial_Files);
 
     // Export
 #ifdef ShapePopulationViewer_HAS_EXPORT_SUPPORT
@@ -217,6 +204,7 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
     bool exportVisible = false;
 #endif
     d->ExportCTKCollapsibleButton->setVisible(exportVisible);
+    d->spinBox_Time_Step->setEnabled(false);
 
     // Settings
     foreach(QAction* action, QList<QAction*>()
@@ -230,7 +218,30 @@ void qSlicerShapePopulationViewerModuleWidget::setup()
         d->SettingsLayout->addWidget(button);
     }
 
+    // Play buttons
+    d->pushButton_First->setIcon(QIcon(QString(":/resources/pqVcrFirst.svg")));
+    d->pushButton_First->setIconSize(QSize(16, 16));
+    connect(d->pushButton_First, SIGNAL(clicked()), this, SLOT(showFirst()));
+
+    d->pushButton_Back->setIcon(QIcon(QString(":/resources/pqVcrBack.svg")));
+    d->pushButton_Back->setIconSize(QSize(16, 16));
+    connect(d->pushButton_Back, SIGNAL(clicked()), d->spinBox_Time_Step, SLOT(stepDown()));
+
+    d->pushButton_Play->setIcon(QIcon(QString(":/resources/pqVcrPlay.svg")));
+    d->pushButton_Play->setIconSize(QSize(16, 16));
+    connect(d->pushButton_Play, SIGNAL(clicked()), this, SLOT(showPlay()));
+
+    d->pushButton_Forward->setIcon(QIcon(QString(":/resources/pqVcrForward.svg")));
+    d->pushButton_Forward->setIconSize(QSize(16, 16));
+    connect(d->pushButton_Forward, SIGNAL(clicked()), d->spinBox_Time_Step, SLOT(stepUp()));
+
+    d->pushButton_Last->setIcon(QIcon(QString(":/resources/pqVcrLast.svg")));
+    d->pushButton_Last->setIconSize(QSize(16, 16));
+    connect(d->pushButton_Last, SIGNAL(clicked()), this, SLOT(showLast()));
+
     connect(d->ModelLoadPushButton, SIGNAL(clicked()), this, SLOT(loadSelectedModel()));
+    connect(d->spinBox_Time_Step, SIGNAL(valueChanged(int)), d->ShapePopulationWidget, SLOT(slot_timeIndicesChanged(int)));
+    connect(d->ShapePopulationWidget, SIGNAL(sig_loadTimeSeries(bool, unsigned int)), this, SLOT(onLoadTimeSeries(bool, unsigned int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -271,6 +282,20 @@ void qSlicerShapePopulationViewerModuleWidget::loadCSVFile(const QString& filePa
         modelFileInfoList << QFileInfo(modelFilePath);
     }
     d->ShapePopulationWidget->loadVTKFilesCLP(modelFileInfoList);
+}
+
+//-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::loadSRep(const QString &filePath)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->loadSRepFilesCLP(QFileInfoList() << QFileInfo(filePath));
+}
+
+//-----------------------------------------------------------------------------
+void qSlicerShapePopulationViewerModuleWidget::loadFiducial(const QString &filePath)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->ShapePopulationWidget->loadFiducialFilesCLP(QFileInfoList() << QFileInfo(filePath));
 }
 
 //-----------------------------------------------------------------------------
@@ -326,4 +351,36 @@ void qSlicerShapePopulationViewerModuleWidget::onMRMLNodeModified(vtkObject *cal
     }
     this->loadModel(modelNode);
     qvtkDisconnect(modelNode, vtkCommand::ModifiedEvent, this, SLOT(onMRMLNodeModified(vtkObject*)));
+}
+
+void qSlicerShapePopulationViewerModuleWidget::onLoadTimeSeries(bool spin_box_enabled, unsigned int total_time_step)
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->spinBox_Time_Step->setMinimum(0);
+    d->spinBox_Time_Step->setMaximum(total_time_step - 1);
+    d->spinBox_Time_Step->setValue(0);
+    d->spinBox_Time_Step->setEnabled(spin_box_enabled);
+}
+
+void qSlicerShapePopulationViewerModuleWidget::showFirst()
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->spinBox_Time_Step->setValue(d->spinBox_Time_Step->minimum());
+}
+
+void qSlicerShapePopulationViewerModuleWidget::showLast()
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    d->spinBox_Time_Step->setValue(d->spinBox_Time_Step->maximum());
+}
+
+void qSlicerShapePopulationViewerModuleWidget::showPlay()
+{
+    Q_D(qSlicerShapePopulationViewerModuleWidget);
+    if(d->spinBox_Time_Step->value() != d->spinBox_Time_Step->maximum())
+    {
+        d->spinBox_Time_Step->stepUp();
+        // todo: avoid recursion and magic number for timer interval
+        QTimer::singleShot(200, this, SLOT(showPlay()));
+    }
 }

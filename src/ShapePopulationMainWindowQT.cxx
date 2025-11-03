@@ -9,6 +9,7 @@ ShapePopulationMainWindowQT::ShapePopulationMainWindowQT()
     this->menuFile->addAction(this->shapePopulation()->actionOpen_Directory);
     this->menuFile->addAction(this->shapePopulation()->actionOpen_VTK_Files);
     this->menuFile->addAction(this->shapePopulation()->actionLoad_CSV);
+    this->menuFile->addAction(this->shapePopulation()->actionOpen_SRep_Files);
     this->menuFile->addSeparator();
     this->menuFile->addMenu(this->menuExport);
     this->menuFile->addSeparator();

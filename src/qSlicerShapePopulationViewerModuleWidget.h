@@ -53,6 +53,8 @@ public slots:
     void loadModel(const QString& filePath);
     void loadModel(vtkPolyData* polydata, const QString& modelName);
     void loadCSVFile(const QString& filePath);
+    void loadSRep(const QString& filePath);
+    void loadFiducial(const QString& filePath);
 
     void deleteModels();
 
@@ -63,6 +65,10 @@ public slots:
 protected slots:
     void onMRMLSceneNodeAddedEvent(vtkObject*,vtkObject*);
     void onMRMLNodeModified(vtkObject*);
+    void onLoadTimeSeries(bool slider_enabled, unsigned int total_time_step);
+    void showFirst();
+    void showLast();
+    void showPlay();
 
 protected:
     QScopedPointer<qSlicerShapePopulationViewerModuleWidgetPrivate> d_ptr;
